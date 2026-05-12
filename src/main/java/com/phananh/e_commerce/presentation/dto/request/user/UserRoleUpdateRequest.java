@@ -1,0 +1,27 @@
+package com.phananh.e_commerce.presentation.dto.request.user;
+
+import com.phananh.e_commerce.domain.model.enums.RoleName;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Set;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserRoleUpdateRequest {
+
+    @NotNull(message = "User id is required")
+    private Long userId;
+
+    @NotEmpty(message = "Roles must not be empty")
+    private Set<RoleName> roles;
+}
+
+
+

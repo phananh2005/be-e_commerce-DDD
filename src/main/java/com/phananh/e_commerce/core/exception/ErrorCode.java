@@ -33,6 +33,7 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(409, "User already exists", HttpStatus.CONFLICT),
     USERNAME_ALREADY_EXISTS(409, "Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS(409, "Email already exists", HttpStatus.CONFLICT),
+    OLD_PASSWORD_INCORRECT(400, "Old password is incorrect", HttpStatus.BAD_REQUEST),
     INVALID_QUANTITY(400, "Invalid quantity", HttpStatus.BAD_REQUEST),
     INSUFFICIENT_STOCK(400, "Insufficient stock", HttpStatus.BAD_REQUEST),
 

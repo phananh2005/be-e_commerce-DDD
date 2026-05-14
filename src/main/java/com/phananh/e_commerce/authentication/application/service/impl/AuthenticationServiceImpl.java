@@ -8,11 +8,11 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.auth.Refre
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.RegisterRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.LogoutResponse;
-import com.phananh.e_commerce.usermanagement.domain.model.entity.Role;
-import com.phananh.e_commerce.usermanagement.domain.model.entity.User;
+import com.phananh.e_commerce.usermanagement.domain.model.Role;
+import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
-import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.RoleRepository;
-import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.UserRepository;
+import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
+import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -41,8 +41,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private static final String ACCESS_TYPE = "access";
 	private static final String REFRESH_TYPE = "refresh";
 
-	private final UserRepository userRepository;
-	private final RoleRepository roleRepository;
+	private final SpringDataUserRepository springDataUserRepository;
+	private final SpringDataRoleRepository springDataRoleRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final byte[] jwtSecret;
@@ -52,15 +52,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
 	public AuthenticationServiceImpl(
-			UserRepository userRepository,
-			RoleRepository roleRepository,
+			SpringDataUserRepository springDataUserRepository,
+			SpringDataRoleRepository springDataRoleRepository,
 			PasswordEncoder passwordEncoder,
 			@Value("${application.security.jwt.secret-key}") String jwtSecret,
 			@Value("${application.security.jwt.expiration}") long accessTokenExpirationSeconds,
 			@Value("${application.security.jwt.refresh-expiration}") long refreshTokenExpirationSeconds
 	) {
-		this.userRepository = userRepository;
-		this.roleRepository = roleRepository;
+		this.springDataUserRepository = springDataUserRepository;
+		this.springDataRoleRepository = springDataRoleRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtSecret = jwtSecret.getBytes(StandardCharsets.UTF_8);
 		this.accessTokenExpirationSeconds = accessTokenExpirationSeconds;
@@ -69,7 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public AuthTokenResponse login(AuthenticationRequest request) {
-		User user = userRepository.findByUsername(request.getUsername())
+		User user = springDataUserRepository.findByUserName(request.getUsername())
 				.orElseThrow(() -> unauthorized("Invalid username or password"));
 
 		if (!Boolean.TRUE.equals(user.getEnabled())) {
@@ -85,16 +85,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public AuthTokenResponse register(RegisterRequest request) {
-		if (userRepository.existsByUsername(request.getUsername())) {
+		if (springDataUserRepository.existsByUsername(request.getUsername())) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 		}
 
-		if (request.getEmail() != null && !request.getEmail().isBlank() && userRepository.existsByEmail(request.getEmail())) {
+		if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByEmail(request.getEmail())) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
 		}
 
-	Role customerRole = roleRepository.findByName(RoleName.USER)
-			.orElseGet(() -> roleRepository.save(Role.builder().name(RoleName.USER).build()));
+	Role customerRole = springDataRoleRepository.findByName(RoleName.USER)
+			.orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.USER).build()));
 
 		User user = User.builder()
 				.username(request.getUsername())
@@ -105,7 +105,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				.roles(new HashSet<>(Set.of(customerRole)))
 				.build();
 
-		User savedUser = userRepository.save(user);
+		User savedUser = springDataUserRepository.save(user);
 		return issueTokenPair(savedUser);
 	}
 
@@ -114,7 +114,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		TokenClaims claims = parseAndValidateToken(request.getRefreshToken(), REFRESH_TYPE);
 		invalidatedTokens.add(request.getRefreshToken());
 
-		User user = userRepository.findByUsername(claims.username())
+		User user = springDataUserRepository.findByUserName(claims.username())
 				.orElseThrow(() -> unauthorized("User not found"));
 
 		if (!Boolean.TRUE.equals(user.getEnabled())) {

@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.usermanagement.domain.model.entity;
+package com.phananh.e_commerce.usermanagement.domain.model;
 
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.persistence.*;
@@ -9,8 +9,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-@Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

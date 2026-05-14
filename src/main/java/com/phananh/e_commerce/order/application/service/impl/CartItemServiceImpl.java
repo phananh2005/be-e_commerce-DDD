@@ -8,7 +8,7 @@ import com.phananh.e_commerce.order.presentation.dto.request.cart.CartUpdateItem
 import com.phananh.e_commerce.order.presentation.dto.response.cart.CartItemResponse;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
-import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.UserRepository;
+import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.ProductVariantRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     CartItemRepository cartItemRepository;
     ProductVariantRepository productVariantRepository;
-    UserRepository userRepository;
+    SpringDataUserRepository springDataUserRepository;
 
     @Override
     @Transactional
@@ -35,7 +35,7 @@ public class CartItemServiceImpl implements CartItemService {
             throw new AppException(ErrorCode.INVALID_QUANTITY);
         }
 
-        var user = userRepository.findById(userId)
+        var user = springDataUserRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         var variant = productVariantRepository.findById(variantId)

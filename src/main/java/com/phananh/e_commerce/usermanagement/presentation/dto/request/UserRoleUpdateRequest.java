@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.usermanagement.presentation.dto.request.user;
+package com.phananh.e_commerce.usermanagement.presentation.dto.request;
 
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.validation.constraints.NotEmpty;
@@ -20,7 +20,7 @@ public class UserRoleUpdateRequest {
     private Long userId;
 
     @NotEmpty(message = "Roles must not be empty")
-    private Set<RoleName> roles;
+    private Set<RoleName> roleNames;
 }
 
 

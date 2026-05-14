@@ -3,7 +3,7 @@ package com.phananh.e_commerce.order.domain.model.entity;
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
 import com.phananh.e_commerce.order.domain.model.enums.PaymentMethod;
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
-import com.phananh.e_commerce.usermanagement.domain.model.entity.User;
+import com.phananh.e_commerce.usermanagement.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 

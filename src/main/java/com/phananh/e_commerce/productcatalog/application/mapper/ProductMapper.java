@@ -2,7 +2,6 @@ package com.phananh.e_commerce.productcatalog.application.mapper;
 
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductDetailResponse;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductSummaryResponse;
-import com.phananh.e_commerce.productcatalog.domain.model.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

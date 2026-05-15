@@ -4,13 +4,14 @@ import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.Bran
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandUpdateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface BrandService {
-    List<BrandResponse> getBrandsBySearch(BrandSearchRequest request);
+    Page<BrandResponse> getBrandsBySearch(BrandSearchRequest request);
 
-    BrandResponse createBrand(BrandCreateRequest request);
+    void createBrand(BrandCreateRequest request);
 
     BrandResponse updateBrand(BrandUpdateRequest request);
 }

@@ -6,10 +6,8 @@ import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.P
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.productcatalog.application.mapper.ProductMapper;
-import com.phananh.e_commerce.productcatalog.domain.model.entity.Product;
-import com.phananh.e_commerce.productcatalog.domain.model.entity.ProductVariant;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.ProductRepository;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.ProductVariantRepository;
+import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.ProductRepository;
+import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.ProductVariantRepository;
 import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.specification.ProductSearchSpecification;
 import com.phananh.e_commerce.productcatalog.application.service.ProductService;
 import com.phananh.e_commerce.modules.productcatalog.presentation.dto.request.product.*;

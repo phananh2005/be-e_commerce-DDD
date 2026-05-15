@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class BrandResponse {
     private Long brandId;
     private String brandName;
+    private String brandDescription;
     private String brandImage;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

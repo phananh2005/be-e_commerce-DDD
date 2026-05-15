@@ -35,7 +35,6 @@ public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
     UserMapper userMapper;
-    PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -72,8 +71,7 @@ public class UserServiceImpl implements UserService {
 
         user.changePassword(
                 userChangePasswordRequest.getOldPassword(),
-                userChangePasswordRequest.getNewPassword(),
-                passwordEncoder
+                userChangePasswordRequest.getNewPassword()
         );
 
         userRepository.save(user);
@@ -87,16 +85,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponse> getAllUsers(AdminUserQueryRequest adminUserQueryRequest) {
-        adminUserQueryRequest.setSortBy(adminUserQueryRequest.getSortBy() != null ? adminUserQueryRequest.getSortBy() : "id");
-        adminUserQueryRequest.setSortType(adminUserQueryRequest.getSortType() != null ? adminUserQueryRequest.getSortType() : "asc");
+    public Page<UserResponse> getAllUsers(AdminUserQueryRequest request) {
+        request.setSortBy(request.getSortBy() != null ? request.getSortBy() : "id");
+        request.setSortType(request.getSortType() != null ? request.getSortType() : "asc");
 
-        Pageable pageable = PageRequest.of(adminUserQueryRequest.getPage() - 1, adminUserQueryRequest.getSize(),
-                Sort.by(Sort.Direction.fromString(adminUserQueryRequest.getSortType()), adminUserQueryRequest.getSortBy()));
+        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
+                Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
 
         return userRepository.getListUsers(
-                adminUserQueryRequest.getKeyword(),
-                adminUserQueryRequest.getRoleNames(),
+                request.getKeyword(),
+                request.getRoleNames(),
                 pageable
         ).map(userMapper::toResponse);
     }

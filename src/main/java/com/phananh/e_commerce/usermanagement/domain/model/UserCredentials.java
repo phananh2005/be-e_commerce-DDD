@@ -2,6 +2,8 @@ package com.phananh.e_commerce.usermanagement.domain.model;
 
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.core.util.PasswordUtils;
+import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Builder;
@@ -20,24 +22,27 @@ public record UserCredentials(
 
     @Builder
     public UserCredentials(String username, String password, Boolean enabled) {
-        if (username == null || username.isBlank()) {
+        if (!StringUtils.isNotBlank(username)) {
             throw new IllegalArgumentException("Username cannot be null or blank");
         }
-        if (password == null || password.isBlank()) {
+        if (!StringUtils.isNotBlank(password)) {
             throw new IllegalArgumentException("Password cannot be null or blank");
         }
         if (enabled == null) {
             throw new IllegalArgumentException("Enabled cannot be null");
         }
+        this.username = username.trim();
+        this.password = PasswordUtils.encode(password.trim());
+        this.enabled = enabled;
     }
 
-    public UserCredentials changePassword(String oldPassword, String newPassword, PasswordEncoder passwordEncoder) {
-        boolean verifyPassword = passwordEncoder.matches(oldPassword, this.password);
+    public UserCredentials changePassword(String oldPassword, String newPassword) {
+        boolean verifyPassword = PasswordUtils.matches(oldPassword, this.password);
         if (!verifyPassword) {
             throw new AppException(ErrorCode.OLD_PASSWORD_INCORRECT);
         }
 
-        String newPasswordEncoded = passwordEncoder.encode(newPassword);
+        String newPasswordEncoded = PasswordUtils.encode(newPassword);
 
         return new UserCredentials(this.username, newPasswordEncoded, this.enabled);
     }

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +29,9 @@ public class BrandController {
     BrandService brandService;
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<BrandResponse>>> getBrandsBySearch(@Valid @ModelAttribute BrandSearchRequest request) {
-        List<BrandResponse> brands = brandService.getBrandsBySearch(request);
-        ApiResponse<List<BrandResponse>> response = ApiResponse.<List<BrandResponse>>builder()
+    public ResponseEntity<ApiResponse<Page<BrandResponse>>> getBrandsBySearch(@Valid @ModelAttribute BrandSearchRequest request) {
+        Page<BrandResponse> brands = brandService.getBrandsBySearch(request);
+        ApiResponse<Page<BrandResponse>> response = ApiResponse.<Page<BrandResponse>>builder()
                 .message("Get brands successfully")
                 .result(brands)
                 .build();
@@ -38,13 +39,9 @@ public class BrandController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<BrandResponse>> createBrand(@Valid @ModelAttribute BrandCreateRequest request) {
-        BrandResponse brand = brandService.createBrand(request);
-        ApiResponse<BrandResponse> response = ApiResponse.<BrandResponse>builder()
-                .message("Create brand successfully")
-                .result(brand)
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> createBrand(@Valid @ModelAttribute BrandCreateRequest request) {
+        brandService.createBrand(request);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

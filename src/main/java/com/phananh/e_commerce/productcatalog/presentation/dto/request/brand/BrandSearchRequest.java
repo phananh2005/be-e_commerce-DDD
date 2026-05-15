@@ -7,20 +7,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class BrandSearchRequest {
 
     private String keyword;
 
-    @Builder.Default
     @Min(value = 0, message = "Page must be >= 0")
     private Integer page = 0;
 
-    @Builder.Default
     @Min(value = 1, message = "Size must be >= 1")
-    private Integer size = 20;
+    private Integer size = 50;
+
+    private String sortBy;
+    private String sortType;
 }
 
 

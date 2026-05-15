@@ -7,8 +7,8 @@ import com.phananh.e_commerce.productcatalog.presentation.dto.response.category.
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.productcatalog.application.mapper.CategoryMapper;
-import com.phananh.e_commerce.productcatalog.domain.model.entity.Category;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.CategoryRepository;
+import com.phananh.e_commerce.productcatalog.domain.model.Category;
+import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.SpringDataCategoryRepository;
 import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
 import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
 import lombok.AccessLevel;
@@ -29,14 +29,14 @@ import java.util.List;
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
-    CategoryRepository categoryRepository;
+    SpringDataCategoryRepository springDataCategoryRepository;
     CloudinaryService cloudinaryService;
     CategoryMapper categoryMapper;
 
     @Override
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories(CategorySearchRequest categorySearchRequest) {
-        List<Category> categories = categoryRepository
+        List<Category> categories = springDataCategoryRepository
                 .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(categorySearchRequest.getKeyword(),
                         categorySearchRequest.getKeyword(),
                         PageRequest.of(categorySearchRequest.getPage(), categorySearchRequest.getSize(), Sort.by(Sort.Direction.ASC, "name")))
@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         String normalizedName = normalizeName(request.getCategoryName());
-        if (categoryRepository.existsByNameIgnoreCase(normalizedName)) {
+        if (springDataCategoryRepository.existsByNameIgnoreCase(normalizedName)) {
             throw new AppException(ErrorCode.CONFLICT);
         }
 
@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .name(request.getCategoryName())
                 .description(request.getCategoryDescription())
                 .build();
-        category = categoryRepository.saveAndFlush(category);
+        category = springDataCategoryRepository.saveAndFlush(category);
         if(request.getImage() != null && !request.getImage().isEmpty()){
             try {
                 String publicId = buildCategoryAvatarPublicId(category.getId());
@@ -74,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryResponse updateCategory(CategoryUpdateRequest request) {
-        Category category = categoryRepository.findById(request.getCategoryId())
+        Category category = springDataCategoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         String normalizedName = normalizeName(request.getCategoryName());
@@ -92,7 +92,7 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
 
-        category = categoryRepository.save(category);
+        category = springDataCategoryRepository.save(category);
         return categoryMapper.toResponse(category);
     }
 

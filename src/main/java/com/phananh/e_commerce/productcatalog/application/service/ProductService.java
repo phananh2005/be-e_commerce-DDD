@@ -7,7 +7,6 @@ import com.phananh.e_commerce.productcatalog.presentation.dto.request.product.Va
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.product.VariantImageUpdateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductDetailResponse;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductSummaryResponse;
-import com.phananh.e_commerce.productcatalog.domain.model.entity.ProductVariant;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

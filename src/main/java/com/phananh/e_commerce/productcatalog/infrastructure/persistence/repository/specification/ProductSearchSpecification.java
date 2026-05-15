@@ -1,7 +1,5 @@
 package com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.specification;
 
-import com.phananh.e_commerce.productcatalog.domain.model.entity.Product;
-import com.phananh.e_commerce.productcatalog.domain.model.entity.ProductVariant;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProductSearchSpecification {

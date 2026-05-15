@@ -1,0 +1,38 @@
+package com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.impl;
+
+import com.phananh.e_commerce.productcatalog.domain.model.Brand;
+import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
+import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.SpringDataBrandRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+public class BrandRepositoryImpl implements BrandRepository {
+
+    SpringDataBrandRepository springDataBrandRepository;
+
+    @Override
+    public Page<Brand> getListBrand(String keyword, Pageable pageable) {
+        return springDataBrandRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword,pageable);
+    }
+
+    @Override
+    public Brand saveAndFlush(Brand brand) {
+        return springDataBrandRepository.saveAndFlush(brand);
+    }
+
+    @Override
+    public void save(Brand brand) {
+        springDataBrandRepository.save(brand);
+    }
+
+    @Override
+    public boolean existsByNameIgnoreCase(String normalizedName) {
+        return springDataBrandRepository.existsByNameIgnoreCase(normalizedName);
+    }
+}

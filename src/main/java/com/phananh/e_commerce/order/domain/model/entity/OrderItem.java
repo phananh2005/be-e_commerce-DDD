@@ -1,6 +1,5 @@
 package com.phananh.e_commerce.order.domain.model.entity;
 
-import com.phananh.e_commerce.productcatalog.domain.model.entity.ProductVariant;
 import jakarta.persistence.*;
 import lombok.*;
 

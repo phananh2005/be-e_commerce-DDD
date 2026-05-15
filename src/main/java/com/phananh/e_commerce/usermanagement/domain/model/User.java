@@ -38,9 +38,8 @@ public class User extends BaseEntity{
         this.info = userInfo;
     }
 
-    public void changePassword (String oldPassword, String newPassword, PasswordEncoder passwordEncoder){
-        if(passwordEncoder == null) throw new IllegalArgumentException("PasswordEncoder is required");
-        this.credentials = this.credentials.changePassword(oldPassword, newPassword, passwordEncoder);
+    public void changePassword (String oldPassword, String newPassword){
+        this.credentials = this.credentials.changePassword(oldPassword, newPassword);
     }
 
     public void updateRoles(Set<Role> roles){

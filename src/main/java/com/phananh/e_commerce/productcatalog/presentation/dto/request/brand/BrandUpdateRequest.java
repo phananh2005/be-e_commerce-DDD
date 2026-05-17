@@ -20,6 +20,8 @@ public class BrandUpdateRequest {
     @NotBlank(message = "Brand name is required")
     private String name;
 
+    private String description;
+
     private MultipartFile image;
 }
 

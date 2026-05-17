@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.impl;
 
+import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
@@ -41,10 +42,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Page<User> getListUsers(String keyword, Set<RoleName> roleName, Pageable pageable) {
-        Specification<User> specification = Specification.where(UserSearchSpecification.hasKeyword(keyword))
-                .and(UserSearchSpecification.hasRoleName(roleName));
-        return springDataUserRepository.findAll(specification, pageable);
+    public Page<User> getListUsers(UserSearchQuery userSearchQuery) {
+        Specification<User> specification = Specification
+                .where(UserSearchSpecification.hasKeyword(userSearchQuery.getKeyword()))
+                .and(UserSearchSpecification.hasRoleName(userSearchQuery.getRoleNames()))
+                .and(UserSearchSpecification.isEnabled(userSearchQuery.getEnabled()));
+        return springDataUserRepository.findAll(specification, userSearchQuery.getPageable());
     }
 
     @Override

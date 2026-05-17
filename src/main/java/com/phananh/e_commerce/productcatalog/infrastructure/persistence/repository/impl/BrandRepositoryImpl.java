@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
@@ -17,8 +19,13 @@ public class BrandRepositoryImpl implements BrandRepository {
     SpringDataBrandRepository springDataBrandRepository;
 
     @Override
-    public Page<Brand> getListBrand(String keyword, Pageable pageable) {
+    public Page<Brand> getListBrandByKeyword(String keyword, Pageable pageable) {
         return springDataBrandRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword,pageable);
+    }
+
+    @Override
+    public Page<Brand> getListBrand(Pageable pageable) {
+        return springDataBrandRepository.findAll(pageable);
     }
 
     @Override
@@ -34,5 +41,10 @@ public class BrandRepositoryImpl implements BrandRepository {
     @Override
     public boolean existsByNameIgnoreCase(String normalizedName) {
         return springDataBrandRepository.existsByNameIgnoreCase(normalizedName);
+    }
+
+    @Override
+    public Optional<Brand> getById(Long brandId) {
+        return springDataBrandRepository.findById(brandId);
     }
 }

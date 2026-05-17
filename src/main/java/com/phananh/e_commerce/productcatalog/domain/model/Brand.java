@@ -27,9 +27,9 @@ public class Brand extends BaseEntity{
     private String imageUrl;
 
     public static Brand create(String name, String description) {
-        if(StringUtils.isNotBlank(name)) throw new IllegalArgumentException("Brand name cannot be null or blank");
+        if(StringUtils.isBlank(name)) throw new IllegalArgumentException("Brand name cannot be null or blank");
         if(description != null){
-            if(description.isBlank()) throw new IllegalArgumentException("Brand description cannot be null or blank");
+            if(description.isBlank()) throw new IllegalArgumentException("Brand description cannot be blank");
             description = description.trim();
         }
         return Brand.builder()
@@ -42,10 +42,18 @@ public class Brand extends BaseEntity{
         return "brand-" + id + "-avatar";
     }
 
-    public Brand updateImage(String imageUrl){
-        if(!StringUtils.isNotBlank(imageUrl)) throw new IllegalArgumentException("Image url cannot be null or blank");
-        this.imageUrl = imageUrl;
-        return this;
+    public void updateImage(String imageUrl){
+        if(StringUtils.isBlank(imageUrl)) throw new IllegalArgumentException("Image url cannot be null or blank");
+        this.imageUrl = imageUrl.trim();
+    }
+
+    public void updateName(String name){
+        if(StringUtils.isBlank(name)) throw new IllegalArgumentException("Brand name cannot be null or blank");
+        this.name = name.trim();
+    }
+
+    public void updateDescription(String description){
+        this.description = description.trim();
     }
 }
 

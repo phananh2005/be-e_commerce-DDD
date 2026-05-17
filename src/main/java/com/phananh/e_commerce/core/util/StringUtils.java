@@ -1,19 +1,37 @@
 package com.phananh.e_commerce.core.util;
 
-import com.phananh.e_commerce.core.exception.AppException;
-import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 
-public class StringUtils {
+import java.io.IOException;
 
-    public static String normalizeName(String name) {
-        String normalizedName = name == null ? "" : name.trim();
-        if (normalizedName.isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_REQUEST);
-        }
-        return normalizedName;
+public class StringUtils extends JsonDeserializer<String> {
+
+//    public static String normalizeName(String name) throws IOException {
+//        String normalizedName = name == null ? "" : name.trim();
+//        if (normalizedName.isEmpty()) {
+//            throw new IllegalArgumentException;
+//        }
+//        return normalizedName;
+//    }
+
+    public static boolean isBlank(String str) {
+        return str == null || str.isBlank();
     }
 
-    public static boolean isNotBlank(String str) {
-        return str != null && !str.isBlank();
+    @Override
+    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+        String value = p.getValueAsString();
+        if (value == null) {
+            return null;
+        }
+
+        if (value.isBlank()) {
+            return null;
+        }
+
+        return value;
     }
 }

@@ -18,10 +18,10 @@ public record UserInfo(
 
     @Builder
     public UserInfo(String fullName, String email, String address, String phoneNumber) {
-        if (!StringUtils.isNotBlank(fullName)) {
+        if (StringUtils.isBlank(fullName)) {
             throw new IllegalArgumentException("Full name cannot be null or blank");
         }
-        if (!StringUtils.isNotBlank(phoneNumber)) {
+        if (StringUtils.isBlank(phoneNumber)) {
             throw new IllegalArgumentException("Phone number cannot be null or blank");
         }
 

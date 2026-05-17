@@ -32,4 +32,11 @@ public class UserSearchSpecification {
             return root.join("roles").get("name").in(roleNames);
         };
     }
+
+    public static Specification<User> isEnabled(Boolean enabled) {
+        return (root, query, criteriaBuilder) -> {
+            if (enabled == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.equal(root.get("credentials").get("enabled"), enabled);
+        };
+    }
 }

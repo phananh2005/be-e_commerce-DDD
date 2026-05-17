@@ -3,6 +3,7 @@ package com.phananh.e_commerce.usermanagement.application.service.impl;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.SecurityUtils;
+import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserResponse;
 import com.phananh.e_commerce.usermanagement.application.mapper.UserMapper;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,17 +86,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> getAllUsers(AdminUserQueryRequest request) {
-        request.setSortBy(request.getSortBy() != null ? request.getSortBy() : "id");
-        request.setSortType(request.getSortType() != null ? request.getSortType() : "asc");
 
         Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
                 Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
 
-        return userRepository.getListUsers(
-                request.getKeyword(),
-                request.getRoleNames(),
-                pageable
-        ).map(userMapper::toResponse);
+        UserSearchQuery userSearchQuery = UserSearchQuery.builder()
+                .keyword(request.getKeyword())
+                .roleNames(request.getRoleNames())
+                .enabled(request.getEnabled())
+                .pageable(pageable)
+                .build();
+
+        return userRepository.getListUsers(userSearchQuery)
+                .map(userMapper::toResponse);
     }
 
     @Override

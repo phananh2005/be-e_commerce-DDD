@@ -37,7 +37,7 @@ public class BrandServiceImpl implements BrandService {
     BrandMapper brandMapper;
     CloudinaryService cloudinaryService;
 
-    private Pageable getPageable(BrandSearchRequest request){
+    private Pageable getPageable(BrandSearchRequest request) {
         request.setSortBy(request.getSortBy() != null ? request.getSortBy() : "id");
         request.setSortType(request.getSortType() != null ? request.getSortType() : "asc");
 
@@ -49,16 +49,19 @@ public class BrandServiceImpl implements BrandService {
     @Transactional(readOnly = true)
     public Page<BrandResponse> getBrandsBySearch(BrandSearchRequest request) {
         Pageable pageable = getPageable(request);
-        String keyword = StringUtils.normalizeName(request.getKeyword());
+        if (StringUtils.isBlank(request.getKeyword()))
+            return brandRepository.getListBrand(pageable)
+                    .map(brandMapper::toResponse);
 
-        return brandRepository.getListBrand(keyword, pageable)
+        else return brandRepository.getListBrandByKeyword(request.getKeyword().trim(), pageable)
                 .map(brandMapper::toResponse);
     }
 
     @Override
     @Transactional
     public void createBrand(BrandCreateRequest request) {
-        String normalizedName = StringUtils.normalizeName(request.getName());
+
+        if(!StringUtils.isBlank(request.getName()))
         if (brandRepository.existsByNameIgnoreCase(normalizedName)) {
             throw new AppException(ErrorCode.CONFLICT);
         }
@@ -84,11 +87,11 @@ public class BrandServiceImpl implements BrandService {
     @Override
     @Transactional
     public BrandResponse updateBrand(BrandUpdateRequest request) {
-        String normalizedName = normalizeName(request.getName());
-        Brand brand = springDataBrandRepository.findById(request.getBrandId())
+        Brand brand = brandRepository.getById(request.getBrandId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
-        brand.setName(normalizedName);
+        brand.updateName(request.getName());
+        brand.updateDescription(request.getDescription());
 
         // Handle image upload
         if (request.getImage() != null && !request.getImage().isEmpty()) {
@@ -102,7 +105,7 @@ public class BrandServiceImpl implements BrandService {
             }
         }
 
-        springDataBrandRepository.save(brand);
+        brandRepository.save(brand);
         return brandMapper.toResponse(brand);
     }
 

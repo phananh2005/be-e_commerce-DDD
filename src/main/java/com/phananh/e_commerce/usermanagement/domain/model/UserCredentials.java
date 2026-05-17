@@ -22,10 +22,10 @@ public record UserCredentials(
 
     @Builder
     public UserCredentials(String username, String password, Boolean enabled) {
-        if (!StringUtils.isNotBlank(username)) {
+        if (StringUtils.isBlank(username)) {
             throw new IllegalArgumentException("Username cannot be null or blank");
         }
-        if (!StringUtils.isNotBlank(password)) {
+        if (StringUtils.isBlank(password)) {
             throw new IllegalArgumentException("Password cannot be null or blank");
         }
         if (enabled == null) {

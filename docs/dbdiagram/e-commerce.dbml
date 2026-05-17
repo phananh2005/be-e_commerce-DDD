@@ -40,7 +40,7 @@ Table users {
   full_name varchar
   address text
   phone_number varchar [unique]
-  enabled boolean [not null, default: true]
+  isEnabled boolean [not null, default: true]
 }
 
 Table roles {

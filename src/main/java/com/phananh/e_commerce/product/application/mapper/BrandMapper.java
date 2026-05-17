@@ -1,7 +1,7 @@
 package com.phananh.e_commerce.product.application.mapper;
 
 import com.phananh.e_commerce.productcatalog.domain.model.Brand;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
+import com.phananh.e_commerce.productcatalog.application.dto.response.BrandResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

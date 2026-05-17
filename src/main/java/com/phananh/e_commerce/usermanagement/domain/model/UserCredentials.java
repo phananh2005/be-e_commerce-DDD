@@ -6,8 +6,6 @@ import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Builder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Embeddable
 public record UserCredentials(
@@ -18,22 +16,21 @@ public record UserCredentials(
         String password,
 
         @Column(nullable = false)
-        Boolean enabled) {
+        Boolean isEnabled) {
 
-    @Builder
-    public UserCredentials(String username, String password, Boolean enabled) {
+    public UserCredentials(String username, String password, Boolean isEnabled) {
         if (StringUtils.isBlank(username)) {
             throw new IllegalArgumentException("Username cannot be null or blank");
         }
         if (StringUtils.isBlank(password)) {
             throw new IllegalArgumentException("Password cannot be null or blank");
         }
-        if (enabled == null) {
+        if (isEnabled == null) {
             throw new IllegalArgumentException("Enabled cannot be null");
         }
         this.username = username.trim();
         this.password = PasswordUtils.encode(password.trim());
-        this.enabled = enabled;
+        this.isEnabled = isEnabled;
     }
 
     public UserCredentials changePassword(String oldPassword, String newPassword) {
@@ -42,8 +39,16 @@ public record UserCredentials(
             throw new AppException(ErrorCode.OLD_PASSWORD_INCORRECT);
         }
 
-        String newPasswordEncoded = PasswordUtils.encode(newPassword);
+        String encodedNewPassword = PasswordUtils.encode(newPassword);
 
-        return new UserCredentials(this.username, newPasswordEncoded, this.enabled);
+        return new UserCredentials(this.username, encodedNewPassword, this.isEnabled);
+    }
+
+    public UserCredentials activeUser(){
+        return new UserCredentials(this.username, this.password, true);
+    }
+
+    public UserCredentials inactiveUser(){
+        return new UserCredentials(this.username, this.password, false);
     }
 }

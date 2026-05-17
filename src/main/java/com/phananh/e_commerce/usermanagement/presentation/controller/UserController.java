@@ -78,4 +78,10 @@ public class UserController {
         userService.updateUserRole(userRoleUpdateRequest);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/update-status")
+    public ResponseEntity<?> updateUserStatus(@RequestBody @Valid UserRoleUpdateRequest userRoleUpdateRequest) {
+        userService.updateUserRole(userRoleUpdateRequest);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -10,7 +10,7 @@ import com.phananh.e_commerce.productcatalog.infrastructure.persistence.reposito
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandInfoUpdateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
+import com.phananh.e_commerce.productcatalog.application.dto.response.BrandResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

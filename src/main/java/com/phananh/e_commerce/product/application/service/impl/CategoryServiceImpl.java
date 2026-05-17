@@ -10,7 +10,7 @@ import com.phananh.e_commerce.productcatalog.infrastructure.persistence.reposito
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.category.CategoryResponse;
+import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

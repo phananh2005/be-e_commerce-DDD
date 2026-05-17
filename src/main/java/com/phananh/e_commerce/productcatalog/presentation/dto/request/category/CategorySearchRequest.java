@@ -1,22 +1,32 @@
 package com.phananh.e_commerce.productcatalog.presentation.dto.request.category;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 import lombok.Data;
 
-@Builder
 @Data
 public class CategorySearchRequest {
 
     private String keyword;
 
-    @Builder.Default
-    @Min(value = 0, message = "Page must be >= 0")
-    private Integer page = 0;
+    @Min(value = 1, message = "Page must be >= 0")
+    @JsonSetter(nulls = Nulls.SKIP)
+    private Integer page = 1;
 
-    @Builder.Default
     @Min(value = 1, message = "Size must be >= 1")
-    private Integer size = 20;
+    @JsonSetter(nulls = Nulls.SKIP)
+    private Integer size = 50;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @JsonDeserialize(using = StringUtils.class)
+    private String sortBy = "id";
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @JsonDeserialize(using = StringUtils.class)
+    private String sortType = "acs";
 }
 
 

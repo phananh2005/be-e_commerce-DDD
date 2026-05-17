@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -13,5 +14,9 @@ public class UserSearchQuery {
     private String keyword;
     private Set<RoleName> roleNames;
     private Boolean enabled;
+    private LocalDateTime createdDateFrom;
+    private LocalDateTime createdDateTo;
+    private LocalDateTime modifiedDateFrom;
+    private LocalDateTime modifiedDateTo;
     private Pageable pageable;
 }

@@ -12,10 +12,7 @@ import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.repository.UserRepository;
-import com.phananh.e_commerce.usermanagement.presentation.dto.request.AdminUserQueryRequest;
-import com.phananh.e_commerce.usermanagement.presentation.dto.request.UserChangePasswordRequest;
-import com.phananh.e_commerce.usermanagement.presentation.dto.request.UserInfoUpdateRequest;
-import com.phananh.e_commerce.usermanagement.presentation.dto.request.UserRoleUpdateRequest;
+import com.phananh.e_commerce.usermanagement.presentation.dto.request.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -64,6 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void changePassword(UserChangePasswordRequest userChangePasswordRequest) {
         String userName = SecurityUtils.getCurrentUserName();
         User user = userRepository.getByUserName(userName)
@@ -78,6 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long id) {
         User user = userRepository.getById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -85,6 +84,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(AdminUserQueryRequest request) {
 
         Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
@@ -94,14 +94,19 @@ public class UserServiceImpl implements UserService {
                 .keyword(request.getKeyword())
                 .roleNames(request.getRoleNames())
                 .enabled(request.getEnabled())
+                .createdDateFrom(request.getCreatedDateFrom())
+                .createdDateTo(request.getCreatedDateTo())
+                .modifiedDateFrom(request.getModifiedDateFrom())
+                .modifiedDateTo(request.getModifiedDateTo())
                 .pageable(pageable)
                 .build();
 
-        return userRepository.getListUsers(userSearchQuery)
+        return userRepository.getListUsersBySearch(userSearchQuery)
                 .map(userMapper::toResponse);
     }
 
     @Override
+    @Transactional
     public void updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest) {
         User user = userRepository.getById(userRoleUpdateRequest.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -109,6 +114,18 @@ public class UserServiceImpl implements UserService {
         Set<Role> roles = userRepository.getRolesByRoleNames(userRoleUpdateRequest.getRoleNames());
 
         user.updateRoles(roles);
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest) {
+        User user = userRepository.getById(userStatusUpdateRequest.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (userStatusUpdateRequest.getStatus()) user.activate();
+        else user.inactive();
+
         userRepository.save(user);
     }
 

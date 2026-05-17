@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.productcatalog.presentation.dto.response.brand;
+package com.phananh.e_commerce.productcatalog.application.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

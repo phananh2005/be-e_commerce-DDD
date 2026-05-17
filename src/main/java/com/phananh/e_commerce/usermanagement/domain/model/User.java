@@ -45,6 +45,10 @@ public class User extends BaseEntity{
         this.roles.clear();
         this.roles = roles;
     }
+
+    public void activate(){this.credentials = this.credentials.activeUser();}
+
+    public void inactive(){this.credentials = this.credentials.inactiveUser();}
 }
 
 

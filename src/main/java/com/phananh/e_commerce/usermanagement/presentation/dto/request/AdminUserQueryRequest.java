@@ -8,6 +8,7 @@ import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -15,6 +16,10 @@ public class AdminUserQueryRequest {
     private String keyword;
     private Set<RoleName> roleNames;
     private Boolean enabled;
+    private LocalDateTime createdDateFrom;
+    private LocalDateTime createdDateTo;
+    private LocalDateTime modifiedDateFrom;
+    private LocalDateTime modifiedDateTo;
 
     @Min(value = 1, message = "Page must be >= 0")
     @JsonSetter(nulls = Nulls.SKIP)

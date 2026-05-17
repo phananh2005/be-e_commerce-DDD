@@ -1,6 +1,5 @@
 package com.phananh.e_commerce.core.exception;
 
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

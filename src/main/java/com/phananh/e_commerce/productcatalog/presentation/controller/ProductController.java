@@ -1,7 +1,6 @@
 package com.phananh.e_commerce.productcatalog.presentation.controller;
 
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.product.*;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductDetailResponse;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductSummaryResponse;
 import com.phananh.e_commerce.modules.productcatalog.presentation.dto.request.product.*;

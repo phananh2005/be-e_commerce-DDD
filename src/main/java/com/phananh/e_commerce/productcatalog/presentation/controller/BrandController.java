@@ -1,11 +1,8 @@
 package com.phananh.e_commerce.productcatalog.presentation.controller;
 
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandImageUpdateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandInfoUpdateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
+import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.*;
+import com.phananh.e_commerce.productcatalog.application.dto.response.BrandResponse;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -37,20 +34,26 @@ public class BrandController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createBrand(@Valid @ModelAttribute BrandCreateRequest request) {
+    public ResponseEntity<?> createBrand(@Valid @RequestBody BrandCreateRequest request) {
         brandService.createBrand(request);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateBrand(@Valid @ModelAttribute BrandInfoUpdateRequest request) {
+    public ResponseEntity<?> updateBrand(@Valid @RequestBody BrandInfoUpdateRequest request) {
         brandService.updateBrandInfo(request);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateBrandImage(@Valid @ModelAttribute BrandImageUpdateRequest request) {
+    public ResponseEntity<?> updateBrandImage(@Valid @RequestBody BrandImageUpdateRequest request) {
         brandService.updateBrandImage(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/update-status")
+    public ResponseEntity<?> updateBrandStatus(@RequestBody @Valid BrandStatusUpdateRequest request) {
+        brandService.updateBrandStatus(request);
         return ResponseEntity.noContent().build();
     }
 }

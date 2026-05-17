@@ -3,7 +3,7 @@ package com.phananh.e_commerce.product.application.service;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.category.CategoryResponse;
+import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 
 import java.util.List;
 

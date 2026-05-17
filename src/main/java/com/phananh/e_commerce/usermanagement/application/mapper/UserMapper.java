@@ -17,7 +17,7 @@ public interface UserMapper {
     @Mapping(target = "phoneNumber", source = "info.phoneNumber")
     @Mapping(target = "address", source = "info.address")
     @Mapping(target = "roles", source = "roles.name")
-    @Mapping(target = "enabled", source = "credentials.enabled")
+    @Mapping(target = "enabled", source = "credentials.isEnabled")
     UserInfoResponse toUserInfoResponse(User user);
 
     @Mapping(target = "id", source = "id")
@@ -27,7 +27,7 @@ public interface UserMapper {
     @Mapping(target = "phoneNumber", source = "info.phoneNumber")
     @Mapping(target = "address", source = "info.address")
     @Mapping(target = "roles", source = "roles.name")
-    @Mapping(target = "enabled", source = "credentials.enabled")
+    @Mapping(target = "enabled", source = "credentials.isEnabled")
     @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "createdBy", source = "createdBy")
     @Mapping(target = "modifiedAt", source = "modifiedAt")

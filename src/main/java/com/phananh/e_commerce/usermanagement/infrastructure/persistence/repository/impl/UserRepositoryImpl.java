@@ -11,7 +11,6 @@ import com.phananh.e_commerce.usermanagement.infrastructure.persistence.specific
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
@@ -42,11 +41,15 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Page<User> getListUsers(UserSearchQuery userSearchQuery) {
+    public Page<User> getListUsersBySearch(UserSearchQuery userSearchQuery) {
         Specification<User> specification = Specification
                 .where(UserSearchSpecification.hasKeyword(userSearchQuery.getKeyword()))
                 .and(UserSearchSpecification.hasRoleName(userSearchQuery.getRoleNames()))
-                .and(UserSearchSpecification.isEnabled(userSearchQuery.getEnabled()));
+                .and(UserSearchSpecification.isEnabled(userSearchQuery.getEnabled()))
+                .and(UserSearchSpecification.createdAtFrom(userSearchQuery.getCreatedDateFrom()))
+                .and(UserSearchSpecification.createdAtTo(userSearchQuery.getCreatedDateTo()))
+                .and(UserSearchSpecification.modifiedAtFrom(userSearchQuery.getModifiedDateFrom()))
+                .and(UserSearchSpecification.modifiedAtTo(userSearchQuery.getModifiedDateTo()));
         return springDataUserRepository.findAll(specification, userSearchQuery.getPageable());
     }
 

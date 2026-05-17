@@ -1,6 +1,6 @@
 package com.phananh.e_commerce.productcatalog.application.mapper;
 
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.category.CategoryResponse;
+import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import com.phananh.e_commerce.productcatalog.domain.model.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

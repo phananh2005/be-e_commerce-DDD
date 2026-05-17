@@ -26,6 +26,9 @@ public class Brand extends BaseEntity{
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(nullable = false)
+    private Boolean status;
+
     public static Brand create(String name, String description) {
         if(StringUtils.isBlank(name)) throw new IllegalArgumentException("Brand name cannot be null or blank");
         if(description != null){
@@ -35,6 +38,7 @@ public class Brand extends BaseEntity{
         return Brand.builder()
                 .name(name.trim())
                 .description(description)
+                .status(true)
                 .build();
     }
 
@@ -59,6 +63,10 @@ public class Brand extends BaseEntity{
     public void updateDescription(String description){
         this.description = description == null ? "" : description.trim();
     }
+
+    public void active() {this.status = true;}
+
+    public void inactive() {this.status = false;}
 }
 
 

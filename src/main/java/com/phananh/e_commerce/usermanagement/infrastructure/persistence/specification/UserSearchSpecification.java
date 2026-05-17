@@ -4,6 +4,7 @@ import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 public class UserSearchSpecification {
@@ -36,7 +37,35 @@ public class UserSearchSpecification {
     public static Specification<User> isEnabled(Boolean enabled) {
         return (root, query, criteriaBuilder) -> {
             if (enabled == null) return criteriaBuilder.conjunction();
-            return criteriaBuilder.equal(root.get("credentials").get("enabled"), enabled);
+            return criteriaBuilder.equal(root.get("credentials").get("isEnabled"), enabled);
+        };
+    }
+
+    public static Specification<User> createdAtFrom(LocalDateTime createdDateFrom) {
+        return (root, query, criteriaBuilder) -> {
+            if (createdDateFrom == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), createdDateFrom);
+        };
+    }
+
+    public static Specification<User> createdAtTo(LocalDateTime createdDateTo) {
+        return (root, query, criteriaBuilder) -> {
+            if (createdDateTo == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), createdDateTo);
+        };
+    }
+
+    public static Specification<User> modifiedAtFrom(LocalDateTime modifiedDateFrom) {
+        return (root, query, criteriaBuilder) -> {
+            if (modifiedDateFrom == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.greaterThanOrEqualTo(root.get("modifiedAt"), modifiedDateFrom);
+        };
+    }
+
+    public static Specification<User> modifiedAtTo(LocalDateTime modifiedDateTo) {
+        return (root, query, criteriaBuilder) -> {
+            if (modifiedDateTo == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.lessThanOrEqualTo(root.get("modifiedAt"), modifiedDateTo);
         };
     }
 }

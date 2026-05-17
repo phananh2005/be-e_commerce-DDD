@@ -2,11 +2,8 @@ package com.phananh.e_commerce.productcatalog.application.service.impl;
 
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandImageUpdateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandInfoUpdateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.*;
+import com.phananh.e_commerce.productcatalog.application.dto.response.BrandResponse;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.productcatalog.application.mapper.BrandMapper;
@@ -88,6 +85,7 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    @Transactional
     public void updateBrandImage(BrandImageUpdateRequest request) {
         Brand brand = brandRepository.getById(request.getBrandId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
@@ -111,6 +109,18 @@ public class BrandServiceImpl implements BrandService {
                 throw new AppException(ErrorCode.FILE_DELETE_ERROR);
             }
         }
+    }
+
+    @Override
+    @Transactional
+    public void updateBrandStatus(BrandStatusUpdateRequest request) {
+        Brand brand = brandRepository.getById(request.getBrandId())
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
+
+        if(request.getStatus()) brand.active();
+        else brand.inactive();
+
+        brandRepository.save(brand);
     }
 }
 

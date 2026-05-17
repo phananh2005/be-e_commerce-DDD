@@ -51,7 +51,7 @@
 //                        .username("admin")
 //                        .password(passwordEncoder.encode("admin"))
 //                        .fullName("ADMIN-MANAGEMENT")
-//                        .enabled(true)
+//                        .isEnabled(true)
 //                        .roles(new HashSet<>(Set.of(adminRole)))
 //                        .build());
 //                log.info("admin account created with default credentials (admin/admin), please change it!");

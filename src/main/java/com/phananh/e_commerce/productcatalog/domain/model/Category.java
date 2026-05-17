@@ -10,8 +10,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "categories")
-@Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +26,9 @@ public class Category extends BaseEntity{
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(nullable = false)
+    private Boolean enabled;
 }
 
 

@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 import java.util.Set;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserRoleUpdateRequest {
 
     @NotNull(message = "User id is required")

@@ -2,6 +2,7 @@ package com.phananh.e_commerce.core.infrastructure.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
+import com.phananh.e_commerce.core.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 throw new IllegalArgumentException("File is empty");
             }
 
-            if (publicId != null && !publicId.isBlank()) {
+            if (StringUtils.isBlank(publicId)) {
                 throw new IllegalArgumentException("publicId must not be blank");
             }
 
@@ -46,6 +47,28 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             throw e;
         }
     }
+
+    @Override
+    public void deleteFile(String publicId) throws IOException {
+        try {
+            if (StringUtils.isBlank(publicId)) {
+                throw new IllegalArgumentException("publicId must not be blank");
+            }
+
+            Map<String, Object> deleteParams = new HashMap<>();
+            deleteParams.put("invalidate", true);
+
+            Map<?, ?> deleteResult = cloudinary.uploader().destroy(publicId, deleteParams);
+            String result = (String) deleteResult.get("result");
+
+            if ("ok".equals(result)) {
+                log.info("File deleted successfully from Cloudinary: {}", publicId);
+            } else {
+                log.warn("Unexpected result when deleting file from Cloudinary: {} - Result: {}", publicId, result);
+            }
+        } catch (IOException e) {
+            log.error("Error deleting file from Cloudinary: {}", publicId, e);
+            throw e;
+        }
+    }
 }
-
-

@@ -17,9 +17,11 @@ public class AdminUserQueryRequest {
     private Boolean enabled;
 
     @Min(value = 1, message = "Page must be >= 0")
+    @JsonSetter(nulls = Nulls.SKIP)
     private Integer page = 1;
 
     @Min(value = 1, message = "Size must be >= 1")
+    @JsonSetter(nulls = Nulls.SKIP)
     private Integer size = 50;
 
     @JsonSetter(nulls = Nulls.SKIP)

@@ -43,8 +43,12 @@ public class Brand extends BaseEntity{
     }
 
     public void updateImage(String imageUrl){
-        if(StringUtils.isBlank(imageUrl)) throw new IllegalArgumentException("Image url cannot be null or blank");
-        this.imageUrl = imageUrl.trim();
+        if(StringUtils.isBlank(imageUrl)) throw new IllegalArgumentException("Brand image url cannot be null or blank");
+        else this.imageUrl = imageUrl.trim();
+    }
+
+    public void removeImage(){
+        this.imageUrl = null;
     }
 
     public void updateName(String name){
@@ -53,7 +57,7 @@ public class Brand extends BaseEntity{
     }
 
     public void updateDescription(String description){
-        this.description = description.trim();
+        this.description = description == null ? "" : description.trim();
     }
 }
 

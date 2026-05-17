@@ -15,6 +15,12 @@ public interface CloudinaryService {
      * @throws IOException if an error occurs during upload
      */
     String uploadFile(MultipartFile file, String folder, String publicId) throws IOException;
+
+    /**
+     * Delete a file from Cloudinary by public ID
+     *
+     * @param publicId the public ID of the file to delete
+     * @throws IOException if an error occurs during deletion
+     */
+    void deleteFile(String publicId) throws IOException;
 }
-
-

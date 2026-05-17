@@ -1,8 +1,9 @@
 package com.phananh.e_commerce.productcatalog.presentation.controller;
 
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandImageUpdateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandUpdateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandInfoUpdateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
@@ -12,12 +13,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
@@ -44,14 +42,16 @@ public class BrandController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<BrandResponse>> updateBrand(@Valid @ModelAttribute BrandUpdateRequest request) {
-        BrandResponse brand = brandService.updateBrand(request);
-        ApiResponse<BrandResponse> response = ApiResponse.<BrandResponse>builder()
-                .message("Update brand successfully")
-                .result(brand)
-                .build();
-        return ResponseEntity.ok(response);
+    @PatchMapping
+    public ResponseEntity<?> updateBrand(@Valid @ModelAttribute BrandInfoUpdateRequest request) {
+        brandService.updateBrandInfo(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateBrandImage(@Valid @ModelAttribute BrandImageUpdateRequest request) {
+        brandService.updateBrandImage(request);
+        return ResponseEntity.noContent().build();
     }
 }
 

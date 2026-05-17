@@ -9,7 +9,7 @@ import com.phananh.e_commerce.productcatalog.domain.model.Brand;
 import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.SpringDataBrandRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandUpdateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandInfoUpdateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +80,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     @Transactional
-    public BrandResponse updateBrand(BrandUpdateRequest request) {
+    public BrandResponse updateBrand(BrandInfoUpdateRequest request) {
         String normalizedName = normalizeName(request.getName());
         Brand brand = springDataBrandRepository.findById(request.getBrandId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));

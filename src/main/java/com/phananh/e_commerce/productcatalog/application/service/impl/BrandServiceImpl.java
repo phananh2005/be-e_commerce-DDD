@@ -3,14 +3,14 @@ package com.phananh.e_commerce.productcatalog.application.service.impl;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandImageUpdateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandUpdateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandInfoUpdateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.response.brand.BrandResponse;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.productcatalog.application.mapper.BrandMapper;
 import com.phananh.e_commerce.productcatalog.domain.model.Brand;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.SpringDataBrandRepository;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
 import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
 import lombok.AccessLevel;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,18 +36,12 @@ public class BrandServiceImpl implements BrandService {
     BrandMapper brandMapper;
     CloudinaryService cloudinaryService;
 
-    private Pageable getPageable(BrandSearchRequest request) {
-        request.setSortBy(request.getSortBy() != null ? request.getSortBy() : "id");
-        request.setSortType(request.getSortType() != null ? request.getSortType() : "asc");
-
-        return PageRequest.of(request.getPage() - 1, request.getSize(),
-                Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
-    }
-
     @Override
     @Transactional(readOnly = true)
     public Page<BrandResponse> getBrandsBySearch(BrandSearchRequest request) {
-        Pageable pageable = getPageable(request);
+        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
+                Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
+
         if (StringUtils.isBlank(request.getKeyword()))
             return brandRepository.getListBrand(pageable)
                     .map(brandMapper::toResponse);
@@ -60,13 +53,11 @@ public class BrandServiceImpl implements BrandService {
     @Override
     @Transactional
     public void createBrand(BrandCreateRequest request) {
-
-        if(!StringUtils.isBlank(request.getName()))
-        if (brandRepository.existsByNameIgnoreCase(normalizedName)) {
+        if (brandRepository.existsByNameIgnoreCase(request.getName().trim())) {
             throw new AppException(ErrorCode.CONFLICT);
         }
 
-        Brand brand = Brand.create(normalizedName, request.getDescription());
+        Brand brand = Brand.create(request.getName(), request.getDescription());
 
         brand = brandRepository.saveAndFlush(brand);
 
@@ -86,32 +77,40 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     @Transactional
-    public BrandResponse updateBrand(BrandUpdateRequest request) {
+    public void updateBrandInfo(BrandInfoUpdateRequest request) {
         Brand brand = brandRepository.getById(request.getBrandId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
         brand.updateName(request.getName());
         brand.updateDescription(request.getDescription());
 
-        // Handle image upload
+        brandRepository.save(brand);
+    }
+
+    @Override
+    public void updateBrandImage(BrandImageUpdateRequest request) {
+        Brand brand = brandRepository.getById(request.getBrandId())
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
+        String publicId = brand.buildBrandAvatarPublicId();
+
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             try {
-                String publicId = buildBrandAvatarPublicId(brand.getId());
                 String imageUrl = cloudinaryService.uploadFile(request.getImage(), "brands", publicId);
-                brand.setImageUrl(imageUrl);
+                brand.updateImage(imageUrl);
             } catch (IOException e) {
                 log.error("Error uploading brand image", e);
                 throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
             }
         }
-
-        brandRepository.save(brand);
-        return brandMapper.toResponse(brand);
-    }
-
-
-    private String buildBrandAvatarPublicId(Long brandId) {
-        return "brand-" + brandId + "-avatar";
+        else {
+            try {
+                cloudinaryService.deleteFile("brands/" + publicId);
+                brand.removeImage();
+            } catch (IOException e) {
+                log.error("Error deleting brand image", e);
+                throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+            }
+        }
     }
 }
 

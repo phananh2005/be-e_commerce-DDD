@@ -40,7 +40,8 @@ public enum ErrorCode {
     // Server errors (5xx)
     INTERNAL_SERVER_ERROR(500, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
     DATABASE_ERROR(500, "Database error", HttpStatus.INTERNAL_SERVER_ERROR),
-    FILE_UPLOAD_ERROR(500, "File upload error", HttpStatus.INTERNAL_SERVER_ERROR);
+    FILE_UPLOAD_ERROR(500, "File upload error", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_DELETE_ERROR(500, "File delete error", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;

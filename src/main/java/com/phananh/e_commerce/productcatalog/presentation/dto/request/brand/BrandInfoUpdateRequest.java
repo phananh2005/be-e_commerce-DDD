@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BrandUpdateRequest {
+public class BrandInfoUpdateRequest {
 
     @NotNull(message = "Brand id is required")
     private Long brandId;
@@ -21,8 +20,6 @@ public class BrandUpdateRequest {
     private String name;
 
     private String description;
-
-    private MultipartFile image;
 }
 
 

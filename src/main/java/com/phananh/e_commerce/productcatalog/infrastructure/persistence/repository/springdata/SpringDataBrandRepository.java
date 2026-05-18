@@ -1,16 +1,14 @@
 package com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata;
 
 import com.phananh.e_commerce.productcatalog.domain.model.Brand;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface SpringDataBrandRepository extends JpaRepository<Brand, Long> {
-    Page<Brand> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String nameKeyword, String descriptionKeyword, Pageable pageable);
+import java.util.List;
 
+public interface SpringDataBrandRepository extends JpaRepository<Brand, Long>, JpaSpecificationExecutor<Brand> {
+    List<Brand> findByIsEnabledTrue();
     boolean existsByNameIgnoreCase(String name);
-
-    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
 }
 
 

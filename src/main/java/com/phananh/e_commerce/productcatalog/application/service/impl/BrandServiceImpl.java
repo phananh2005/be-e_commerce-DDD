@@ -1,6 +1,6 @@
 package com.phananh.e_commerce.productcatalog.application.service.impl;
 
-import com.phananh.e_commerce.core.util.StringUtils;
+import com.phananh.e_commerce.productcatalog.application.dto.query.BrandSearchQuery;
 import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.*;
 import com.phananh.e_commerce.productcatalog.application.dto.response.BrandResponse;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,16 +35,22 @@ public class BrandServiceImpl implements BrandService {
     CloudinaryService cloudinaryService;
 
     @Override
+    public List<BrandResponse> getBrandActive() {
+        return brandRepository.getListBrandActive()
+                .stream().map(brandMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<BrandResponse> getBrandsBySearch(BrandSearchRequest request) {
         Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
                 Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
 
-        if (StringUtils.isBlank(request.getKeyword()))
-            return brandRepository.getListBrand(pageable)
-                    .map(brandMapper::toResponse);
+        BrandSearchQuery query = brandMapper.toSearchQuery(request);
+        query.setPageable(pageable);
 
-        else return brandRepository.getListBrandByKeyword(request.getKeyword().trim(), pageable)
+        return brandRepository.getListBrandBySearch(query)
                 .map(brandMapper::toResponse);
     }
 

@@ -17,7 +17,7 @@ public class UserResponse {
     private String phoneNumber;
     private String address;
     private Set<RoleName> roles;
-    private Boolean enabled;
+    private Boolean isEnabled;
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime modifiedAt;

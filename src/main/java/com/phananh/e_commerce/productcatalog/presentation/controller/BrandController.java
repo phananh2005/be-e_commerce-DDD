@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/brands")
 @RequiredArgsConstructor
@@ -23,6 +25,18 @@ public class BrandController {
 
     BrandService brandService;
 
+    //customer
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<BrandResponse>>> getBrandsActive() {
+        List<BrandResponse> brands = brandService.getBrandActive();
+        ApiResponse<List<BrandResponse>> response = ApiResponse.<List<BrandResponse>>builder()
+                .message("Get brands successfully")
+                .result(brands)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    //admin
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<BrandResponse>>> getBrandsBySearch(@Valid @ModelAttribute BrandSearchRequest request) {
         Page<BrandResponse> brands = brandService.getBrandsBySearch(request);
@@ -34,19 +48,19 @@ public class BrandController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createBrand(@Valid @RequestBody BrandCreateRequest request) {
+    public ResponseEntity<?> createBrand(@Valid @ModelAttribute BrandCreateRequest request) {
         brandService.createBrand(request);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping
+    @PatchMapping("/update-info")
     public ResponseEntity<?> updateBrand(@Valid @RequestBody BrandInfoUpdateRequest request) {
         brandService.updateBrandInfo(request);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateBrandImage(@Valid @RequestBody BrandImageUpdateRequest request) {
+    public ResponseEntity<?> updateBrandImage(@Valid @ModelAttribute BrandImageUpdateRequest request) {
         brandService.updateBrandImage(request);
         return ResponseEntity.noContent().build();
     }

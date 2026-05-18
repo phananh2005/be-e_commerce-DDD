@@ -12,6 +12,7 @@ public class BrandResponse {
     private String brandName;
     private String brandDescription;
     private String brandImage;
+    private Boolean isEnabled;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String createdBy;

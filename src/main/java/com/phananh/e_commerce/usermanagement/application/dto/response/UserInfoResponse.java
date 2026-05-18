@@ -16,5 +16,5 @@ public class UserInfoResponse {
     private String phoneNumber;
     private String address;
     private Set<RoleName> roles;
-    private Boolean enabled;
+    private Boolean isEnabled;
 }

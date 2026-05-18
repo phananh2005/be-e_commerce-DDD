@@ -5,15 +5,18 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 public class BrandSearchRequest {
 
     private String keyword;
+    private LocalDateTime createdDateFrom;
+    private LocalDateTime createdDateTo;
+    private LocalDateTime modifiedDateFrom;
+    private LocalDateTime modifiedDateTo;
 
     @Min(value = 1, message = "Page must be >= 0")
     @JsonSetter(nulls = Nulls.SKIP)

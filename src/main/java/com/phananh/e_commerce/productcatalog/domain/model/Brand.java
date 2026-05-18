@@ -27,7 +27,7 @@ public class Brand extends BaseEntity{
     private String imageUrl;
 
     @Column(nullable = false)
-    private Boolean status;
+    private Boolean isEnabled;
 
     public static Brand create(String name, String description) {
         if(StringUtils.isBlank(name)) throw new IllegalArgumentException("Brand name cannot be null or blank");
@@ -38,7 +38,7 @@ public class Brand extends BaseEntity{
         return Brand.builder()
                 .name(name.trim())
                 .description(description)
-                .status(true)
+                .isEnabled(true)
                 .build();
     }
 
@@ -64,9 +64,9 @@ public class Brand extends BaseEntity{
         this.description = description == null ? "" : description.trim();
     }
 
-    public void active() {this.status = true;}
+    public void active() {this.isEnabled = true;}
 
-    public void inactive() {this.status = false;}
+    public void inactive() {this.isEnabled = false;}
 }
 
 

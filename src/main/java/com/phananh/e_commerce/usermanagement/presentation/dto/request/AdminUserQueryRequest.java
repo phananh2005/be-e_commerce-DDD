@@ -7,6 +7,7 @@ import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -16,9 +17,21 @@ public class AdminUserQueryRequest {
     private String keyword;
     private Set<RoleName> roleNames;
     private Boolean enabled;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateFrom;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateTo;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime modifiedDateFrom;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime modifiedDateTo;
 
     @Min(value = 1, message = "Page must be >= 0")

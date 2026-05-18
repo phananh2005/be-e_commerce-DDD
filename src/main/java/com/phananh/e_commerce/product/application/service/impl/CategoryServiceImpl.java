@@ -9,7 +9,7 @@ import com.phananh.e_commerce.productcatalog.domain.model.Category;
 import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.SpringDataCategoryRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryInfoUpdateRequest;
 import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryResponse updateCategory(CategoryUpdateRequest request) {
+    public CategoryResponse updateCategory(CategoryInfoUpdateRequest request) {
         Category category = springDataCategoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 

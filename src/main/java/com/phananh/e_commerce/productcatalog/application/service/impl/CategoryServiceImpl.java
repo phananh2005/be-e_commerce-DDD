@@ -1,16 +1,15 @@
 package com.phananh.e_commerce.productcatalog.application.service.impl;
 
-import com.phananh.e_commerce.core.util.StringUtils;
+import com.phananh.e_commerce.productcatalog.application.dto.query.CategorySearchQuery;
 import com.phananh.e_commerce.productcatalog.domain.repository.CategoryRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryInfoUpdateRequest;
 import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.productcatalog.application.mapper.CategoryMapper;
 import com.phananh.e_commerce.productcatalog.domain.model.Category;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.SpringDataCategoryRepository;
 import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
 import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
 import lombok.AccessLevel;
@@ -39,81 +38,107 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<CategoryResponse> getAllCategories(CategorySearchRequest request) {
+    public List<CategoryResponse> getEnabledCategories() {
+        return categoryRepository.getEnabled()
+                .stream()
+                .map(categoryMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CategoryResponse> getAllCategoriesBySearch(CategorySearchRequest request) {
         Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
                 Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
 
-        if (StringUtils.isBlank(request.getKeyword())) {
-            return categoryRepository.getAll(pageable)
-                    .map(categoryMapper::toResponse);
-        }
-        else return categoryRepository
-                .getAllBySearch(request.getKeyword().trim(), pageable)
+        CategorySearchQuery query = CategorySearchQuery.builder()
+                .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
+                .createdDateFrom(request.getCreatedDateFrom())
+                .createdDateTo(request.getCreatedDateTo())
+                .modifiedDateFrom(request.getModifiedDateFrom())
+                .modifiedDateTo(request.getModifiedDateTo())
+                .pageable(pageable)
+                .build();
+
+        return categoryRepository.getAllBySearch(query)
                 .map(categoryMapper::toResponse);
     }
 
     @Override
     @Transactional
-    public CategoryResponse createCategory(CategoryCreateRequest request) {
-        String normalizedName = normalizeName(request.getCategoryName());
-        if (springDataCategoryRepository.existsByNameIgnoreCase(normalizedName)) {
+    public void createCategory(CategoryCreateRequest request) {
+        if (categoryRepository.existsByNameIgnoreCase(request.getCategoryName().trim())) {
             throw new AppException(ErrorCode.CONFLICT);
         }
 
-        Category category = Category.builder()
-                .name(request.getCategoryName())
-                .description(request.getCategoryDescription())
-                .build();
-        category = springDataCategoryRepository.saveAndFlush(category);
+        Category category = Category.create(request.getCategoryName(), request.getCategoryDescription());
+        category = categoryRepository.saveAndFlush(category);
+
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             try {
-                String publicId = buildCategoryAvatarPublicId(category.getId());
+                String publicId = category.buildCategoryAvatarPublicId();
                 String imageUrl = cloudinaryService.uploadFile(request.getImage(), "categories", publicId);
-                category.setImageUrl(imageUrl);
+                category.updateImage(imageUrl);
             } catch (IOException e) {
                 log.error("Error uploading category image", e);
                 throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
             }
         }
 
-        return categoryMapper.toResponse(category);
+        categoryRepository.save(category);
     }
 
     @Override
     @Transactional
-    public CategoryResponse updateCategory(CategoryUpdateRequest request) {
-        Category category = springDataCategoryRepository.findById(request.getCategoryId())
+    public void updateCategoryInfo(CategoryInfoUpdateRequest request) {
+        Category category = categoryRepository.getById(request.getCategoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        String normalizedName = normalizeName(request.getCategoryName());
-        category.setName(normalizedName);
-        category.setDescription(request.getCategoryDescription());
+        category.updateName(request.getCategoryName().trim());
+        category.updateDescription(request.getCategoryDescription());
+
+        categoryRepository.save(category);
+    }
+
+    @Override
+    @Transactional
+    public void updateCategoryImage(com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryImageUpdateRequest request) {
+        Category category = categoryRepository.getById(request.getCategoryId())
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        String publicId = category.buildCategoryAvatarPublicId();
 
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             try {
-                String publicId = buildCategoryAvatarPublicId(category.getId());
                 String imageUrl = cloudinaryService.uploadFile(request.getImage(), "categories", publicId);
-                category.setImageUrl(imageUrl);
+                category.updateImage(imageUrl);
             } catch (IOException e) {
                 log.error("Error uploading category image", e);
                 throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
             }
+        } else {
+            try {
+                cloudinaryService.deleteFile("categories/" + publicId);
+                category.removeImage();
+            } catch (IOException e) {
+                log.error("Error deleting category image", e);
+                throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+            }
         }
 
-        category = springDataCategoryRepository.save(category);
-        return categoryMapper.toResponse(category);
+        categoryRepository.save(category);
     }
 
-    private String normalizeName(String name) {
-        String normalizedName = name == null ? "" : name.trim();
-        if (normalizedName.isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_REQUEST);
-        }
-        return normalizedName;
-    }
+    @Override
+    @Transactional
+    public void updateCategoryStatus(com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryStatusUpdateRequest request) {
+        Category category = categoryRepository.getById(request.getCategoryId())
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-    private String buildCategoryAvatarPublicId(Long categoryId) {
-        return "category-" + categoryId + "-avatar";
+        if (request.getStatus()) category.active();
+        else category.inactive();
+
+        categoryRepository.save(category);
     }
 }
 

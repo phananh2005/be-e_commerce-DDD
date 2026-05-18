@@ -1,12 +1,9 @@
 package com.phananh.e_commerce.productcatalog.domain.model;
 
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
-import com.phananh.e_commerce.product.domain.model.entity.Product;
+import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "categories")
@@ -28,7 +25,58 @@ public class Category extends BaseEntity{
     private String imageUrl;
 
     @Column(nullable = false)
-    private Boolean enabled;
+    private Boolean isEnabled;
+
+    public static Category create(String name, String description) {
+        if (StringUtils.isBlank(name)) {
+            throw new IllegalArgumentException("Category name cannot be null or blank");
+        }
+        if (description != null) {
+            if (description.isBlank()) {
+                throw new IllegalArgumentException("Category description cannot be blank");
+            }
+            description = description.trim();
+        }
+        return Category.builder()
+                .name(name.trim())
+                .description(description)
+                .isEnabled(true)
+                .build();
+    }
+
+    public String buildCategoryAvatarPublicId() {
+        return "category-" + id + "-avatar";
+    }
+
+    public void updateImage(String imageUrl) {
+        if (StringUtils.isBlank(imageUrl)) {
+            throw new IllegalArgumentException("Category image url cannot be null or blank");
+        }
+        this.imageUrl = imageUrl.trim();
+    }
+
+    public void removeImage() {
+        this.imageUrl = null;
+    }
+
+    public void updateName(String name) {
+        if (StringUtils.isBlank(name)) {
+            throw new IllegalArgumentException("Category name cannot be null or blank");
+        }
+        this.name = name.trim();
+    }
+
+    public void updateDescription(String description) {
+        this.description = StringUtils.isBlank(description) ? null : description.trim();
+    }
+
+    public void active() {
+        this.isEnabled = true;
+    }
+
+    public void inactive() {
+        this.isEnabled = false;
+    }
 }
 
 

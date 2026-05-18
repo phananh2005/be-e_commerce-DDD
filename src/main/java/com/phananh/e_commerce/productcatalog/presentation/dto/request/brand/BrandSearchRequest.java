@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -13,9 +14,21 @@ import java.time.LocalDateTime;
 public class BrandSearchRequest {
 
     private String keyword;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateFrom;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateTo;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime modifiedDateFrom;
+
+    @JsonSetter(nulls = Nulls.SKIP)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime modifiedDateTo;
 
     @Min(value = 1, message = "Page must be >= 0")

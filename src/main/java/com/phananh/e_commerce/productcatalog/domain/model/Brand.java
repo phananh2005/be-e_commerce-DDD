@@ -61,7 +61,7 @@ public class Brand extends BaseEntity{
     }
 
     public void updateDescription(String description){
-        this.description = description == null ? "" : description.trim();
+        this.description = StringUtils.isBlank(description) ? null : description.trim();
     }
 
     public void active() {this.isEnabled = true;}

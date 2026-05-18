@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
                 Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
 
         UserSearchQuery userSearchQuery = UserSearchQuery.builder()
-                .keyword(request.getKeyword())
+                .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
                 .roleNames(request.getRoleNames())
                 .enabled(request.getEnabled())
                 .createdDateFrom(request.getCreatedDateFrom())

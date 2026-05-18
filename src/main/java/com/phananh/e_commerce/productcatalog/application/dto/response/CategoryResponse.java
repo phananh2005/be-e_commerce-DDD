@@ -12,6 +12,7 @@ public class CategoryResponse {
     private String categoryName;
     private String categoryDescription;
     private String imageUrl;
+    private Boolean isEnabled;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String createdBy;

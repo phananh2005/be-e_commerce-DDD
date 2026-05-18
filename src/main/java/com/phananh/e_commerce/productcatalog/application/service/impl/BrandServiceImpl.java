@@ -47,8 +47,14 @@ public class BrandServiceImpl implements BrandService {
         Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
                 Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
 
-        BrandSearchQuery query = brandMapper.toSearchQuery(request);
-        query.setPageable(pageable);
+        BrandSearchQuery query = BrandSearchQuery.builder()
+                .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
+                .createdDateFrom(request.getCreatedDateFrom())
+                .createdDateTo(request.getCreatedDateTo())
+                .modifiedDateFrom(request.getModifiedDateFrom())
+                .modifiedDateTo(request.getModifiedDateTo())
+                .pageable(pageable)
+                .build();
 
         return brandRepository.getListBrandBySearch(query)
                 .map(brandMapper::toResponse);

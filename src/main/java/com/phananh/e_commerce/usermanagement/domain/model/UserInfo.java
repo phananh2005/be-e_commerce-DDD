@@ -26,8 +26,8 @@ public record UserInfo(
         }
 
         this.fullName = fullName.trim();
-        this.email = email.isBlank() ? null : email;
+        this.email = StringUtils.isBlank(email) ? null : email.trim();
         this.address = address.trim();
-        this.phoneNumber = phoneNumber.isBlank() ? null : phoneNumber;
+        this.phoneNumber = StringUtils.isBlank(phoneNumber) ? null : phoneNumber.trim();
     }
 }

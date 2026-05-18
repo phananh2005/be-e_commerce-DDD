@@ -1,9 +1,7 @@
 package com.phananh.e_commerce.productcatalog.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.*;
 import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,9 +27,9 @@ public class CategoryController {
 
     // customer
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<CategoryResponse>>> getAllCategories(@Valid @ModelAttribute CategorySearchRequest categorySearchRequest) {
-        Page<CategoryResponse> categories = categoryService.getAllCategories(categorySearchRequest);
-        ApiResponse<Page<CategoryResponse>> apiResponse = ApiResponse.<Page<CategoryResponse>>builder()
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getEnabledCategories() {
+        List<CategoryResponse> categories = categoryService.getEnabledCategories();
+        ApiResponse<List<CategoryResponse>> apiResponse = ApiResponse.<List<CategoryResponse>>builder()
                 .message("Categories retrieved successfully")
                 .result(categories)
                 .build();
@@ -39,20 +37,38 @@ public class CategoryController {
     }
 
     // admin
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<CategoryResponse>>> getAllCategoriesBySearch(@Valid @ModelAttribute CategorySearchRequest categorySearchRequest) {
+        Page<CategoryResponse> categories = categoryService.getAllCategoriesBySearch(categorySearchRequest);
+        ApiResponse<Page<CategoryResponse>> apiResponse = ApiResponse.<Page<CategoryResponse>>builder()
+                .message("Categories retrieved successfully")
+                .result(categories)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @ModelAttribute CategoryCreateRequest request) {
-        return ResponseEntity.ok(ApiResponse.<CategoryResponse>builder()
-                .message("Category created successfully")
-                .result(categoryService.createCategory(request))
-                .build());
+    public ResponseEntity<?> createCategory(@Valid @ModelAttribute CategoryCreateRequest request) {
+        categoryService.createCategory(request);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(@Valid @ModelAttribute CategoryUpdateRequest request) {
-        return ResponseEntity.ok(ApiResponse.<CategoryResponse>builder()
-                .message("Category updated successfully")
-                .result(categoryService.updateCategory(request))
-                .build());
+    public ResponseEntity<?> updateCategoryInfo(@Valid @ModelAttribute CategoryInfoUpdateRequest request) {
+        categoryService.updateCategoryInfo(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateCategoryImage(@Valid @ModelAttribute CategoryImageUpdateRequest request) {
+        categoryService.updateCategoryImage(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/update-status")
+    public ResponseEntity<?> updateCategoryStatus(@RequestBody @Valid CategoryStatusUpdateRequest request) {
+        categoryService.updateCategoryStatus(request);
+        return ResponseEntity.noContent().build();
     }
 }
 

@@ -16,8 +16,6 @@ public interface BrandMapper {
     @Mapping(target = "brandImage", source = "imageUrl")
     @Mapping(target = "isEnabled", source = "isEnabled")
     BrandResponse toResponse(Brand brand);
-
-    BrandSearchQuery toSearchQuery(BrandSearchRequest request);
 }
 
 

@@ -16,7 +16,6 @@ public class CategoryCreateRequest {
     @NotBlank(message = "Category name is required")
     private String categoryName;
 
-    @NotBlank(message = "Category description is required")
     private String categoryDescription;
 
     private MultipartFile image;

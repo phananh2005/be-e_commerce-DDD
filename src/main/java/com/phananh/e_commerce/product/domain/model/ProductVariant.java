@@ -1,6 +1,7 @@
 package com.phananh.e_commerce.product.domain.model;
 
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
+import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,8 +44,37 @@ public class ProductVariant extends BaseEntity{
     )
     private Set<AttributeValue> attributeValues = new HashSet<>();
 
-    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VariantImage> images = new HashSet<>();
+
+    public static ProductVariant create(Product product,
+                                        String skuCode,
+                                        BigDecimal price,
+                                        Integer stockQuantity,
+                                        Set<VariantImage> images,
+                                        Set<AttributeValue> attributeValues) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+        if (StringUtils.isBlank(skuCode)) {
+            throw new IllegalArgumentException("SKU code cannot be null or blank");
+        }
+        if (price == null || price.signum() < 0) {
+            throw new IllegalArgumentException("Price must be >= 0");
+        }
+        if (stockQuantity == null || stockQuantity < 0) {
+            throw new IllegalArgumentException("Stock quantity must be >= 0");
+        }
+
+        return ProductVariant.builder()
+                .product(product)
+                .skuCode(skuCode.trim())
+                .price(price)
+                .stockQuantity(stockQuantity)
+                .images(images == null ? new HashSet<>() : images)
+                .attributeValues(attributeValues == null ? new HashSet<>() : attributeValues)
+                .build();
+    }
 }
 
 

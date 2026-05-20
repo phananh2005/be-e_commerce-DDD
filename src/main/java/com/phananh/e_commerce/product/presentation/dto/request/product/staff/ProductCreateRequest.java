@@ -28,7 +28,7 @@ public class ProductCreateRequest {
     private Long brandId;
 
     @NotNull(message = "Images are required")
-    private MultipartFile avatar;
+    private MultipartFile productAvatar;
 
     @NotNull(message = "Variants are required")
     @Valid
@@ -48,6 +48,10 @@ public class ProductCreateRequest {
         private Integer stockQuantity;
 
         private Map<String, String> attributes;
+
+        private MultipartFile variantAvatar;
+
+        private List<MultipartFile> variantImages;
     }
 }
 

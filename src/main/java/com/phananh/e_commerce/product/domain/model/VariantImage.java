@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.product.domain.model;
 
+import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,21 @@ public class VariantImage {
 
     @Column(name = "is_avatar", nullable = false)
     private boolean isAvatar = false;
+
+    public static VariantImage create(ProductVariant variant, String imageUrl, boolean isAvatar) {
+        if (variant == null) {
+            throw new IllegalArgumentException("Variant cannot be null");
+        }
+        if (StringUtils.isBlank(imageUrl)) {
+            throw new IllegalArgumentException("Image url cannot be null or blank");
+        }
+
+        return VariantImage.builder()
+                .variant(variant)
+                .imageUrl(imageUrl.trim())
+                .isAvatar(isAvatar)
+                .build();
+    }
 }
 
 

@@ -1,7 +1,9 @@
 package com.phananh.e_commerce.product.domain.repository;
 
 import com.phananh.e_commerce.product.application.dto.query.ProductSearchQuery;
+import com.phananh.e_commerce.product.application.dto.query.StaffProductSearchQuery;
 import com.phananh.e_commerce.product.domain.model.Product;
+import com.phananh.e_commerce.product.domain.model.ProductVariant;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -10,6 +12,9 @@ import java.util.Optional;
 public interface ProductRepository {
     Page<Product> getProductsActiveBySearch(ProductSearchQuery productSearchQuery);
     Optional<Product> getById(Long id);
-    List<Product> getAllProductsBySearch(ProductSearchQuery productSearchQuery);
+    Page<Product> getAllProductsBySearch(StaffProductSearchQuery productSearchQuery);
+    List<ProductVariant> getVariantsByProductId(Long productId);
+    Product saveAndFlush(Product product);
+    void save(Product product);
 }
 

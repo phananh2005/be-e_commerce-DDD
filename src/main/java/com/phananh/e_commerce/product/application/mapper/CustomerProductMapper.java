@@ -2,9 +2,9 @@ package com.phananh.e_commerce.product.application.mapper;
 
 import com.phananh.e_commerce.product.application.dto.response.customer.ProductDetailResponse;
 import com.phananh.e_commerce.product.application.dto.response.customer.ProductSummaryResponse;
+import com.phananh.e_commerce.product.domain.model.AttributeValue;
 import com.phananh.e_commerce.product.domain.model.Product;
 import com.phananh.e_commerce.product.domain.model.ProductVariant;
-import com.phananh.e_commerce.product.domain.model.AttributeValue;
 import com.phananh.e_commerce.product.domain.model.VariantImage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface ProductMapper {
+public interface CustomerProductMapper {
 
     default BigDecimal getMinPrice(Product product) {
         if (product.getVariants() == null || product.getVariants().isEmpty()) {
@@ -42,8 +42,6 @@ public interface ProductMapper {
     @Mapping(source = "avatarUrl", target = "avatarUrl")
     ProductSummaryResponse toProductSummaryResponse(Product product);
 
-
-
     @Mapping(target = "productId", source = "id")
     @Mapping(target = "productName", source = "name")
     @Mapping(target = "productDescription", source = "description")
@@ -56,16 +54,14 @@ public interface ProductMapper {
     @Mapping(target = "variants", expression = "java(variantsToVariantResponseSet(product.getVariants()))")
     ProductDetailResponse toProductDetailResponse(Product product);
 
-    // Mapper for ProductVariant -> ProductDetailResponse.ProductVariantDetail
     @Mapping(source = "id", target = "variantId")
     @Mapping(source = "skuCode", target = "variantSkuCode")
     @Mapping(source = "price", target = "variantPrice")
     @Mapping(target = "stockQuantity", source = "stockQuantity")
-    @Mapping(expression = "java(imagesToImageResponseSet(variant.getimages()))", target = "variantImageUrl")
+    @Mapping(expression = "java(imagesToImageResponseSet(variant.getImages()))", target = "variantImageUrl")
     @Mapping(expression = "java(attributesToAttributeResponseSet(variant.getAttributeValues()))", target = "attributes")
     ProductDetailResponse.ProductVariantDetail toProductVariantResponse(ProductVariant variant);
 
-    // Convert Set<ProductVariant> to Set<ProductDetailResponse.ProductVariantDetail>
     default Set<ProductDetailResponse.ProductVariantDetail> variantsToVariantResponseSet(Set<ProductVariant> variants) {
         if (variants == null) {
             return Set.of();
@@ -75,13 +71,11 @@ public interface ProductMapper {
                 .collect(Collectors.toSet());
     }
 
-    // Mapper for VariantImage -> ProductDetailResponse.ProductVariantDetail.Image
     @Mapping(source = "id", target = "imageId")
     @Mapping(source = "imageUrl", target = "imageUrl")
-    @Mapping(source = "isAvatar", target = "isAvatar")
+    @Mapping(source = "avatar", target = "avatar")
     ProductDetailResponse.ProductVariantDetail.Image toVariantImageResponse(VariantImage image);
 
-    // Convert Set<VariantImage> to Set<ProductDetailResponse.ProductVariantDetail.Image>
     default Set<ProductDetailResponse.ProductVariantDetail.Image> imagesToImageResponseSet(Set<VariantImage> images) {
         if (images == null) {
             return Set.of();
@@ -91,13 +85,11 @@ public interface ProductMapper {
                 .collect(Collectors.toSet());
     }
 
-    // Mapper for AttributeValue -> ProductDetailResponse.ProductVariantDetail.Attribute
     @Mapping(source = "attribute.id", target = "attributeId")
     @Mapping(source = "attribute.name", target = "attributeName")
     @Mapping(source = "valueName", target = "attributeValue")
     ProductDetailResponse.ProductVariantDetail.Attribute toAttributeResponse(AttributeValue attributeValue);
 
-    // Convert Set<AttributeValue> to Set<ProductDetailResponse.ProductVariantDetail.Attribute>
     default Set<ProductDetailResponse.ProductVariantDetail.Attribute> attributesToAttributeResponseSet(Set<AttributeValue> attributes) {
         if (attributes == null) {
             return Set.of();
@@ -107,6 +99,5 @@ public interface ProductMapper {
                 .collect(Collectors.toSet());
     }
 }
-
 
 

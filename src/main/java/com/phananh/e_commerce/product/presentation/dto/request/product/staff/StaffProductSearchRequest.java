@@ -1,9 +1,5 @@
 package com.phananh.e_commerce.product.presentation.dto.request.product.staff;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -28,21 +24,15 @@ public class StaffProductSearchRequest {
     @Max(value = 5, message = "Min rating must be <= 5")
     private Integer minRating;
 
-    @Min(value = 1, message = "Page must be >= 0")
-    @JsonSetter(nulls = Nulls.SKIP)
-    private Integer page = 1;
+    @Min(value = 0, message = "Page must be >= 0")
+    private Integer page;
 
     @Min(value = 1, message = "Size must be >= 1")
-    @JsonSetter(nulls = Nulls.SKIP)
-    private Integer size = 50;
+    private Integer size;
 
-    @JsonSetter(nulls = Nulls.SKIP)
-    @JsonDeserialize(using = StringUtils.class)
-    private String sortBy = "createdAt";
+    private String sortBy;
 
-    @JsonSetter(nulls = Nulls.SKIP)
-    @JsonDeserialize(using = StringUtils.class)
-    private String sortType = "desc";
+    private String sortType;
 }
 
 

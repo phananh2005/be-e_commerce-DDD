@@ -1,10 +1,9 @@
 package com.phananh.e_commerce.product.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.product.application.dto.response.customer.ProductDetailResponse;
-import com.phananh.e_commerce.product.application.dto.response.customer.ProductSummaryResponse;
-import com.phananh.e_commerce.product.application.service.ProductService;
-import com.phananh.e_commerce.product.presentation.dto.request.product.customer.CustomerProductSearchRequest;
+import com.phananh.e_commerce.product.application.dto.response.staff.ProductResponse;
+import com.phananh.e_commerce.product.application.dto.response.staff.ProductVariantResponse;
+import com.phananh.e_commerce.product.application.service.StaffProductService;
 import com.phananh.e_commerce.product.presentation.dto.request.product.staff.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,94 +15,95 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@RequestMapping("/staff")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Sản phẩm", description = "Các API quản lý thông tin sản phẩm")
-public class ProductController {
+public class StaffProductController {
 
-    ProductService productService;
+    StaffProductService staffProductService;
 
-    //customer
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<ProductSummaryResponse>>> getProductsActiveBySearch(@ModelAttribute @Valid CustomerProductSearchRequest customerProductSearchRequest) {
-        Page<ProductSummaryResponse> productSummaryResponses = productService.getProductsActiveBySearch(customerProductSearchRequest);
-        ApiResponse<Page<ProductSummaryResponse>> response = ApiResponse.<Page<ProductSummaryResponse>>builder()
-                .message("Get list product successfully")
-                .result(productSummaryResponses)
+    @GetMapping("/product/search")
+    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProductsBySearch(@ModelAttribute @Valid StaffProductSearchRequest staffProductSearchRequest) {
+        Page<ProductResponse> products = staffProductService.getAllProductsBySearch(staffProductSearchRequest);
+        ApiResponse<Page<ProductResponse>> response = ApiResponse.<Page<ProductResponse>>builder()
+                .message("Get product successfully")
+                .result(products)
                 .build();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/product/{id}")
-    public ResponseEntity<ApiResponse<ProductDetailResponse>> getProductById(@PathVariable Long id) {
-        ProductDetailResponse product = productService.getProductById(id);
-        ApiResponse<ProductDetailResponse> response = ApiResponse.<ProductDetailResponse>builder()
+    public ResponseEntity<ApiResponse<ProductResponse>> getStaffProductById(@PathVariable Long id) {
+        ProductResponse product = staffProductService.getStaffProductById(id);
+        ApiResponse<ProductResponse> response = ApiResponse.<ProductResponse>builder()
                 .message("Get product successfully")
                 .result(product)
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    //staff
-    @GetMapping("/staff/product/search")
-    public ResponseEntity<ApiResponse<java.util.List<ProductSummaryResponse>>> getAllProductsBySearch(@ModelAttribute @Valid CustomerProductSearchRequest customerProductSearchRequest) {
-        java.util.List<ProductSummaryResponse> products = productService.getAllProductsBySearch(customerProductSearchRequest);
-        ApiResponse<java.util.List<ProductSummaryResponse>> response = ApiResponse.<java.util.List<ProductSummaryResponse>>builder()
-                .message("Get all products successfully")
-                .result(products)
+    @GetMapping("/product/{productId}/variants")
+    public ResponseEntity<ApiResponse<List<ProductVariantResponse>>> getStaffProductVariantsByProductId(@PathVariable Long productId) {
+        List<ProductVariantResponse> variants = staffProductService.getStaffProductVariantsByProductId(productId);
+        ApiResponse<List<ProductVariantResponse>> response = ApiResponse.<List<ProductVariantResponse>>builder()
+                .message("Get product variants successfully")
+                .result(variants)
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/staff/product/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Void>> createProduct(@ModelAttribute @Valid ProductCreateRequest productCreateRequest) {
-        productService.createProduct(productCreateRequest);
+    @PostMapping(value = "/product/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createProduct(@ModelAttribute @Valid ProductCreateRequest productCreateRequest) {
+        staffProductService.createProduct(productCreateRequest);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Product created successfully")
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/staff/variant/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/variant/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Void>> createVariantImage(@ModelAttribute @Valid VariantImageCreateRequest variantImageCreateRequest) {
-        productService.createVariantImage(variantImageCreateRequest);
+        staffProductService.createVariantImage(variantImageCreateRequest);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Variant image created successfully")
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/staff/product/update")
+    @PutMapping("/product/update")
     public ResponseEntity<ApiResponse<Void>> updateProduct(@ModelAttribute @Valid ProductUpdateRequest productUpdateRequest) {
-        productService.updateProduct(productUpdateRequest);
+        staffProductService.updateProduct(productUpdateRequest);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Product updated successfully")
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/staff/variant/image")
+    @PutMapping("/variant/image")
     public ResponseEntity<ApiResponse<Void>> updateVariantImage(@ModelAttribute @Valid VariantImageUpdateRequest variantImageUpdateRequest) {
-        productService.updateVariantImage(variantImageUpdateRequest);
+        staffProductService.updateVariantImage(variantImageUpdateRequest);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Variant image updated successfully")
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/staff/product/{productId}/{status}")
+    @PatchMapping("/product/{productId}/{status}")
     public ResponseEntity<ApiResponse<Void>> updateProductStatus(@PathVariable Long productId, @PathVariable String status) {
-        productService.updateProductStatus(productId, status);
+        staffProductService.updateProductStatus(productId, status);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Product status updated successfully")
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/staff/variant/{variantId}/{stockQuantity}")
+    @PatchMapping("/variant/{variantId}/{stockQuantity}")
     public ResponseEntity<ApiResponse<Void>> updateVariantStock(@PathVariable Long variantId, @PathVariable Integer stockQuantity) {
-        productService.updateVariantStock(variantId, stockQuantity);
+        staffProductService.updateVariantStock(variantId, stockQuantity);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Variant stock updated successfully")
                 .build();

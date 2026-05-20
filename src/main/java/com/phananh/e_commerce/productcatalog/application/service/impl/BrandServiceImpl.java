@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.productcatalog.application.service.impl;
 
+import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.productcatalog.application.dto.query.BrandSearchQuery;
 import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.*;
@@ -44,8 +45,12 @@ public class BrandServiceImpl implements BrandService {
     @Override
     @Transactional(readOnly = true)
     public Page<BrandResponse> getBrandsBySearch(BrandSearchRequest request) {
-        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
-                Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
+        int page = PageUtils.getPageNumber(request.getPage());
+        int size = PageUtils.getPageSize(request.getSize());
+        String sortBy = PageUtils.getSortBy(request.getSortBy());
+        String sortType = PageUtils.getSortType(request.getSortType());
+        Pageable pageable = PageRequest.of(page - 1, size,
+                Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         BrandSearchQuery query = BrandSearchQuery.builder()
                 .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
@@ -134,6 +139,17 @@ public class BrandServiceImpl implements BrandService {
         else brand.inactive();
 
         brandRepository.save(brand);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getBrandNameById(Long brandId) {
+        if (brandId == null) {
+            return null;
+        }
+        return brandRepository.getById(brandId)
+                .map(Brand::getName)
+                .orElse(null);
     }
 }
 

@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.productcatalog.application.service.impl;
 
+import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.productcatalog.application.dto.query.CategorySearchQuery;
 import com.phananh.e_commerce.productcatalog.domain.repository.CategoryRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
@@ -48,8 +49,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public Page<CategoryResponse> getAllCategoriesBySearch(CategorySearchRequest request) {
-        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
-                Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
+        int page = PageUtils.getPageNumber(request.getPage());
+        int size = PageUtils.getPageSize(request.getSize());
+        String sortBy = PageUtils.getSortBy(request.getSortBy());
+        String sortType = PageUtils.getSortType(request.getSortType());
+        Pageable pageable = PageRequest.of(page - 1, size,
+                Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         CategorySearchQuery query = CategorySearchQuery.builder()
                 .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
@@ -139,6 +144,17 @@ public class CategoryServiceImpl implements CategoryService {
         else category.inactive();
 
         categoryRepository.save(category);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getCategoryNameById(Long categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+        return categoryRepository.getById(categoryId)
+                .map(Category::getName)
+                .orElse(null);
     }
 }
 

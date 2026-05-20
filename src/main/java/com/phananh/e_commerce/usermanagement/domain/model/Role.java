@@ -2,10 +2,9 @@ package com.phananh.e_commerce.usermanagement.domain.model;
 
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "roles")

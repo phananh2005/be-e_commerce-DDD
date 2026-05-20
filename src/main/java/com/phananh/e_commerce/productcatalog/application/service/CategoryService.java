@@ -17,6 +17,14 @@ public interface CategoryService {
     void updateCategoryInfo(CategoryInfoUpdateRequest request);
     void updateCategoryImage(CategoryImageUpdateRequest request);
     void updateCategoryStatus(com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryStatusUpdateRequest request);
+
+    /**
+     * Lấy tên category từ category ID
+     *
+     * @param categoryId ID của category
+     * @return Tên category hoặc null nếu không tìm thấy
+     */
+    String getCategoryNameById(Long categoryId);
 }
 
 

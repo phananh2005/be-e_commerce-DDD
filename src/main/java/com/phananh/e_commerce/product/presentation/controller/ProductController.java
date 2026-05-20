@@ -1,9 +1,11 @@
 package com.phananh.e_commerce.product.presentation.controller;
 
-import com.phananh.e_commerce.modules.productcatalog.presentation.dto.request.product.*;
-import com.phananh.e_commerce.product.presentation.dto.request.product.*;
-import com.phananh.e_commerce.product.presentation.dto.response.product.ProductDetailResponse;
-import com.phananh.e_commerce.product.presentation.dto.response.product.ProductSummaryResponse;
+import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
+import com.phananh.e_commerce.product.application.dto.response.customer.ProductDetailResponse;
+import com.phananh.e_commerce.product.application.dto.response.customer.ProductSummaryResponse;
+import com.phananh.e_commerce.product.application.service.ProductService;
+import com.phananh.e_commerce.product.presentation.dto.request.product.customer.CustomerProductSearchRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.product.staff.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -15,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/products")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Sản phẩm", description = "Các API quản lý thông tin sản phẩm")
@@ -25,8 +26,8 @@ public class ProductController {
 
     //customer
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<ProductSummaryResponse>>> getProductsActiveBySearch(@ModelAttribute @Valid ProductSearchRequest productSearchRequest) {
-        Page<ProductSummaryResponse> productSummaryResponses = productService.getProductsActiveBySearch(productSearchRequest);
+    public ResponseEntity<ApiResponse<Page<ProductSummaryResponse>>> getProductsActiveBySearch(@ModelAttribute @Valid CustomerProductSearchRequest customerProductSearchRequest) {
+        Page<ProductSummaryResponse> productSummaryResponses = productService.getProductsActiveBySearch(customerProductSearchRequest);
         ApiResponse<Page<ProductSummaryResponse>> response = ApiResponse.<Page<ProductSummaryResponse>>builder()
                 .message("Get list product successfully")
                 .result(productSummaryResponses)
@@ -46,8 +47,8 @@ public class ProductController {
 
     //staff
     @GetMapping("/staff/product/search")
-    public ResponseEntity<ApiResponse<java.util.List<ProductSummaryResponse>>> getAllProductsBySearch(@ModelAttribute @Valid ProductSearchRequest productSearchRequest) {
-        java.util.List<ProductSummaryResponse> products = productService.getAllProductsBySearch(productSearchRequest);
+    public ResponseEntity<ApiResponse<java.util.List<ProductSummaryResponse>>> getAllProductsBySearch(@ModelAttribute @Valid CustomerProductSearchRequest customerProductSearchRequest) {
+        java.util.List<ProductSummaryResponse> products = productService.getAllProductsBySearch(customerProductSearchRequest);
         ApiResponse<java.util.List<ProductSummaryResponse>> response = ApiResponse.<java.util.List<ProductSummaryResponse>>builder()
                 .message("Get all products successfully")
                 .result(products)

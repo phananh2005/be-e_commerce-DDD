@@ -18,37 +18,27 @@ public class AdminUserQueryRequest {
     private Set<RoleName> roleNames;
     private Boolean enabled;
 
-    @JsonSetter(nulls = Nulls.SKIP)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateFrom;
 
-    @JsonSetter(nulls = Nulls.SKIP)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateTo;
 
-    @JsonSetter(nulls = Nulls.SKIP)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime modifiedDateFrom;
 
-    @JsonSetter(nulls = Nulls.SKIP)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime modifiedDateTo;
 
-    @Min(value = 1, message = "Page must be >= 0")
-    @JsonSetter(nulls = Nulls.SKIP)
-    private Integer page = 1;
+    @Min(value = 0, message = "Page must be >= 0")
+    private Integer page;
 
     @Min(value = 1, message = "Size must be >= 1")
-    @JsonSetter(nulls = Nulls.SKIP)
-    private Integer size = 50;
+    private Integer size;
 
-    @JsonSetter(nulls = Nulls.SKIP)
-    @JsonDeserialize(using = StringUtils.class)
-    private String sortBy = "id";
+    private String sortBy;
 
-    @JsonSetter(nulls = Nulls.SKIP)
-    @JsonDeserialize(using = StringUtils.class)
-    private String sortType = "acs";
+    private String sortType;
 }
 
 

@@ -2,7 +2,9 @@ package com.phananh.e_commerce.usermanagement.application.service.impl;
 
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.core.util.SecurityUtils;
+import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserResponse;
@@ -86,9 +88,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(AdminUserQueryRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(),
-                Sort.by(Sort.Direction.fromString(request.getSortType()), request.getSortBy()));
+        int page = PageUtils.getPageNumber(request.getPage());
+        int size = PageUtils.getPageSize(request.getSize());
+        String sortBy = PageUtils.getSortBy(request.getSortBy());
+        String sortType = PageUtils.getSortType(request.getSortType());
+        Pageable pageable = PageRequest.of(page - 1, size,
+                Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         UserSearchQuery userSearchQuery = UserSearchQuery.builder()
                 .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())

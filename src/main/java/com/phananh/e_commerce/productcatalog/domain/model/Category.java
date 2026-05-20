@@ -8,6 +8,7 @@ import lombok.*;
 @Entity
 @Table(name = "categories")
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category extends BaseEntity{

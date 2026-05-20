@@ -9,7 +9,6 @@ import com.phananh.e_commerce.order.presentation.dto.response.cart.CartItemRespo
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.ProductVariantRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

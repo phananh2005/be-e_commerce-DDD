@@ -5,11 +5,13 @@ import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "brands")
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Brand extends BaseEntity{

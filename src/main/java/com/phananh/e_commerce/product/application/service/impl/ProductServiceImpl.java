@@ -2,22 +2,30 @@ package com.phananh.e_commerce.product.application.service.impl;
 
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.product.application.dto.query.ProductSearchQuery;
+import com.phananh.e_commerce.product.application.dto.response.customer.ProductSummaryResponse;
 import com.phananh.e_commerce.product.application.mapper.ProductMapper;
 import com.phananh.e_commerce.product.application.service.ProductService;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.ProductRepository;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.springdata.ProductVariantRepository;
-import com.phananh.e_commerce.productcatalog.infrastructure.persistence.repository.specification.ProductSearchSpecification;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.product.*;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductDetailResponse;
-import com.phananh.e_commerce.productcatalog.presentation.dto.response.product.ProductSummaryResponse;
-import jakarta.transaction.Transactional;
+import com.phananh.e_commerce.product.domain.model.Product;
+import com.phananh.e_commerce.product.domain.model.ProductVariant;
+import com.phananh.e_commerce.product.domain.repository.ProductRepository;
+import com.phananh.e_commerce.product.presentation.dto.request.product.customer.CustomerProductSearchRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.product.staff.ProductCreateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.product.staff.ProductUpdateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.product.staff.VariantImageCreateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.product.staff.VariantImageUpdateRequest;
+import com.phananh.e_commerce.product.application.dto.response.customer.ProductDetailResponse;
+import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductVariantRepository;
+import com.phananh.e_commerce.productcatalog.application.service.BrandService;
+import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,47 +36,84 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     ProductRepository productRepository;
-    ProductVariantRepository productVariantRepository;
     ProductMapper productMapper;
+    BrandService brandService;
+    CategoryService categoryService;
+    SpringDataProductVariantRepository productVariantRepository;
 
     @Override
-    @Transactional()
-    public Page<ProductSummaryResponse> getProductsActiveBySearch(ProductSearchRequest productSearchRequest) {
-        Specification<Product> specification = Specification.where(ProductSearchSpecification.hasNameLike(productSearchRequest.getKeyword()))
-                .and(ProductSearchSpecification.hasCategoryId(productSearchRequest.getCategoryId()))
-                .and(ProductSearchSpecification.hasBrandId(productSearchRequest.getBrandId()))
-                .and(ProductSearchSpecification.hasPriceBetween(productSearchRequest.getMinPrice(), productSearchRequest.getMaxPrice()))
-                .and(ProductSearchSpecification.hasStatus("ACTIVE"));
+    @Transactional(readOnly = true)
+    public Page<ProductSummaryResponse> getProductsActiveBySearch(CustomerProductSearchRequest customerProductSearchRequest) {
+        int page = resolvePage(customerProductSearchRequest.getPage());
+        Pageable pageable = PageRequest.of(
+                page - 1,
+                customerProductSearchRequest.getSize(),
+                Sort.by(Sort.Direction.fromString(customerProductSearchRequest.getSortType()), customerProductSearchRequest.getSortBy())
+        );
 
-        int page = productSearchRequest.getPage();
-        int size = productSearchRequest.getSize();
-        Sort sort = Sort.by(Sort.Direction.fromString(productSearchRequest.getSortDirection()), productSearchRequest.getSortBy());
+        ProductSearchQuery query = ProductSearchQuery.builder()
+                .keyword(customerProductSearchRequest.getKeyword() == null ? null : customerProductSearchRequest.getKeyword().trim())
+                .categoryId(customerProductSearchRequest.getCategoryId())
+                .brandId(customerProductSearchRequest.getBrandId())
+                .minPrice(customerProductSearchRequest.getMinPrice())
+                .maxPrice(customerProductSearchRequest.getMaxPrice())
+                .pageable(pageable)
+                .build();
 
-        Page<Product> products = productRepository.findAll(specification, PageRequest.of(page, size, sort));
+        Page<Product> products = productRepository.getProductsActiveBySearch(query);
         return products.map(productMapper::toProductSummaryResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductDetailResponse getProductById(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(
-                () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)
-        );
+        Product product = productRepository.getById(id).orElseThrow(
+                () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        List<ProductVariant> variants = productVariantRepository.findByProduct_Id(product.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
+        // Kiểm tra product có variant không
+        if (product.getVariants() == null || product.getVariants().isEmpty()) {
+            throw new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND);
+        }
 
-        return productMapper.toProductDetailResponse(product);
+        // Map product sang ProductDetailResponse
+        ProductDetailResponse response = productMapper.toProductDetailResponse(product);
+
+        // Lấy brand name và category name từ BrandService và CategoryService
+        if (product.getBrandId() != null) {
+            response.setBrandName(brandService.getBrandNameById(product.getBrandId()));
+        }
+        if (product.getCategoryId() != null) {
+            response.setCategoryName(categoryService.getCategoryNameById(product.getCategoryId()));
+        }
+
+        return response;
     }
 
     @Override
-    public List<ProductSummaryResponse> getAllProductsBySearch(ProductSearchRequest productSearchRequest) {
-        Specification<Product> specification = Specification.where(ProductSearchSpecification.hasNameLike(productSearchRequest.getKeyword()))
-                .and(ProductSearchSpecification.hasCategoryId(productSearchRequest.getCategoryId()))
-                .and(ProductSearchSpecification.hasBrandId(productSearchRequest.getBrandId()))
-                .and(ProductSearchSpecification.hasPriceBetween(productSearchRequest.getMinPrice(), productSearchRequest.getMaxPrice()));
+    @Transactional(readOnly = true)
+    public List<ProductSummaryResponse> getAllProductsBySearch(CustomerProductSearchRequest customerProductSearchRequest) {
+        int page = resolvePage(customerProductSearchRequest.getPage());
+        Pageable pageable = PageRequest.of(
+                page - 1,
+                customerProductSearchRequest.getSize(),
+                Sort.by(Sort.Direction.fromString(customerProductSearchRequest.getSortType()), customerProductSearchRequest.getSortBy())
+        );
 
-        List<Product> products = productRepository.findAll(specification);
+        ProductSearchQuery query = ProductSearchQuery.builder()
+                .keyword(customerProductSearchRequest.getKeyword() == null ? null : customerProductSearchRequest.getKeyword().trim())
+                .categoryId(customerProductSearchRequest.getCategoryId())
+                .brandId(customerProductSearchRequest.getBrandId())
+                .minPrice(customerProductSearchRequest.getMinPrice())
+                .maxPrice(customerProductSearchRequest.getMaxPrice())
+                .pageable(pageable)
+                .build();
+
+        List<Product> products = productRepository.getAllProductsBySearch(query);
         return products.stream().map(productMapper::toProductSummaryResponse).toList();
+    }
+
+    private int resolvePage(Integer page) {
+        return page == null || page < 1 ? 1 : page;
     }
 
     @Override

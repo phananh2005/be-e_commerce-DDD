@@ -12,9 +12,7 @@ public interface BrandService {
 
     void createBrand(BrandCreateRequest request);
 
-    void updateBrandInfo(BrandInfoUpdateRequest request);
-
-    void updateBrandImage(BrandImageUpdateRequest request);
+    void updateBrand(BrandUpdateRequest request);
 
     void updateBrandStatus(BrandStatusUpdateRequest request);
 

@@ -53,15 +53,9 @@ public class BrandController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/update-info")
-    public ResponseEntity<?> updateBrand(@Valid @RequestBody BrandInfoUpdateRequest request) {
-        brandService.updateBrandInfo(request);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateBrandImage(@Valid @ModelAttribute BrandImageUpdateRequest request) {
-        brandService.updateBrandImage(request);
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateBrand(@Valid @ModelAttribute BrandUpdateRequest request) {
+        brandService.updateBrand(request);
         return ResponseEntity.noContent().build();
     }
 

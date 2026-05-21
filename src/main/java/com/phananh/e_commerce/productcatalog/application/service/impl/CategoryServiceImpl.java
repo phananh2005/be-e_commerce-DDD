@@ -5,7 +5,7 @@ import com.phananh.e_commerce.productcatalog.application.dto.query.CategorySearc
 import com.phananh.e_commerce.productcatalog.domain.repository.CategoryRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryInfoUpdateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
 import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
@@ -95,22 +95,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void updateCategoryInfo(CategoryInfoUpdateRequest request) {
+    public void updateCategory(CategoryUpdateRequest request) {
         Category category = categoryRepository.getById(request.getCategoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        category.updateName(request.getCategoryName().trim());
+        // Update category info (name and description)
+        category.updateName(request.getCategoryName());
         category.updateDescription(request.getCategoryDescription());
 
-        categoryRepository.save(category);
-    }
 
-    @Override
-    @Transactional
-    public void updateCategoryImage(com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryImageUpdateRequest request) {
-        Category category = categoryRepository.getById(request.getCategoryId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-
+        // Update category image
         String publicId = category.buildCategoryAvatarPublicId();
 
         if (request.getImage() != null && !request.getImage().isEmpty()) {

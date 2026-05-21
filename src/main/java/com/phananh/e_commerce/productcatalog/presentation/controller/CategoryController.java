@@ -54,14 +54,8 @@ public class CategoryController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateCategoryInfo(@Valid @ModelAttribute CategoryInfoUpdateRequest request) {
-        categoryService.updateCategoryInfo(request);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateCategoryImage(@Valid @ModelAttribute CategoryImageUpdateRequest request) {
-        categoryService.updateCategoryImage(request);
+    public ResponseEntity<?> updateCategory(@Valid @ModelAttribute CategoryUpdateRequest request) {
+        categoryService.updateCategory(request);
         return ResponseEntity.noContent().build();
     }
 

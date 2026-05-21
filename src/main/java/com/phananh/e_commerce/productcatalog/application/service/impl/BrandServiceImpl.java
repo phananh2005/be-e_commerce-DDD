@@ -92,23 +92,16 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     @Transactional
-    public void updateBrandInfo(BrandInfoUpdateRequest request) {
+    public void updateBrand(BrandUpdateRequest request) {
         Brand brand = brandRepository.getById(request.getBrandId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
+        // Update brand info
         brand.updateName(request.getName());
         brand.updateDescription(request.getDescription());
 
-        brandRepository.save(brand);
-    }
-
-    @Override
-    @Transactional
-    public void updateBrandImage(BrandImageUpdateRequest request) {
-        Brand brand = brandRepository.getById(request.getBrandId())
-                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
+        // Update image (if provided)
         String publicId = brand.buildBrandAvatarPublicId();
-
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             try {
                 String imageUrl = cloudinaryService.uploadFile(request.getImage(), "brands", publicId);
@@ -127,6 +120,8 @@ public class BrandServiceImpl implements BrandService {
                 throw new AppException(ErrorCode.FILE_DELETE_ERROR);
             }
         }
+
+        brandRepository.save(brand);
     }
 
     @Override

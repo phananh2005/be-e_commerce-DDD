@@ -59,9 +59,9 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/update-status")
-    public ResponseEntity<?> updateCategoryStatus(@RequestBody @Valid CategoryStatusUpdateRequest request) {
-        categoryService.updateCategoryStatus(request);
+    @PatchMapping("/{categoryId}/{status}")
+    public ResponseEntity<?> updateCategoryStatus(@PathVariable Long categoryId, @PathVariable String status) {
+        categoryService.updateCategoryStatus(categoryId, status);
         return ResponseEntity.noContent().build();
     }
 }

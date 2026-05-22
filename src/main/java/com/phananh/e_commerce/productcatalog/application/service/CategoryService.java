@@ -14,7 +14,7 @@ public interface CategoryService {
     void createCategory(CategoryCreateRequest request);
 
     void updateCategory(CategoryUpdateRequest request);
-    void updateCategoryStatus(com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryStatusUpdateRequest request);
+    void updateCategoryStatus(Long categoryId, String status);
 
     /**
      * Lấy tên category từ category ID

@@ -59,9 +59,9 @@ public class BrandController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/update-status")
-    public ResponseEntity<?> updateBrandStatus(@RequestBody @Valid BrandStatusUpdateRequest request) {
-        brandService.updateBrandStatus(request);
+    @PatchMapping("/{brandId}/{status}")
+    public ResponseEntity<?> updateBrandStatus(@PathVariable Long brandId, @PathVariable String status) {
+        brandService.updateBrandStatus(brandId, status);
         return ResponseEntity.noContent().build();
     }
 }

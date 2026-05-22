@@ -126,11 +126,11 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     @Transactional
-    public void updateBrandStatus(BrandStatusUpdateRequest request) {
-        Brand brand = brandRepository.getById(request.getBrandId())
+    public void updateBrandStatus(Long brandId, String status) {
+        Brand brand = brandRepository.getById(brandId)
                 .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
-        if(request.getStatus()) brand.active();
+        if("ACTIVE".equalsIgnoreCase(status)) brand.active();
         else brand.inactive();
 
         brandRepository.save(brand);

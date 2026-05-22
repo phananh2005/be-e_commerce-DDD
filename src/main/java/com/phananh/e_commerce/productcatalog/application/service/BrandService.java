@@ -14,7 +14,7 @@ public interface BrandService {
 
     void updateBrand(BrandUpdateRequest request);
 
-    void updateBrandStatus(BrandStatusUpdateRequest request);
+    void updateBrandStatus(Long brandId, String status);
 
     /**
      * Lấy tên brand từ brand ID

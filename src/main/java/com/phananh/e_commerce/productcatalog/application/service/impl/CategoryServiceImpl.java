@@ -130,11 +130,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void updateCategoryStatus(com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryStatusUpdateRequest request) {
-        Category category = categoryRepository.getById(request.getCategoryId())
+    public void updateCategoryStatus(Long categoryId, String status) {
+        Category category = categoryRepository.getById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        if (request.getStatus()) category.active();
+        if ("ACTIVE".equalsIgnoreCase(status)) category.active();
         else category.inactive();
 
         categoryRepository.save(category);

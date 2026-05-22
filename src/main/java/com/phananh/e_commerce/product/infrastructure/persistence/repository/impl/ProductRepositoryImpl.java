@@ -2,10 +2,14 @@ package com.phananh.e_commerce.product.infrastructure.persistence.repository.imp
 
 import com.phananh.e_commerce.product.application.dto.query.ProductSearchQuery;
 import com.phananh.e_commerce.product.application.dto.query.StaffProductSearchQuery;
+import com.phananh.e_commerce.product.domain.model.AttributeValue;
 import com.phananh.e_commerce.product.domain.model.Product;
+import com.phananh.e_commerce.product.domain.model.ProductAttribute;
 import com.phananh.e_commerce.product.domain.model.ProductVariant;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
+import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataAttributeValueRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductRepository;
+import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductAttributeRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductVariantRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.specification.ProductSearchSpecification;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     SpringDataProductRepository springDataProductRepository;
     SpringDataProductVariantRepository springDataProductVariantRepository;
+    SpringDataAttributeValueRepository springDataAttributeValueRepository;
+    SpringDataProductAttributeRepository springDataProductAttributeRepository;
 
     @Override
     public Page<Product> getProductsActiveBySearch(ProductSearchQuery productSearchQuery) {
@@ -64,6 +70,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public Optional<ProductAttribute> getProductAttributesByName(String name) {
+        return springDataProductAttributeRepository.findByName(name);
+    }
+
+    @Override
     public Product saveAndFlush(Product product) {
         return springDataProductRepository.saveAndFlush(product);
     }
@@ -71,6 +82,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public void save(Product product) {
         springDataProductRepository.save(product);
+    }
+
+    @Override
+    public void save(AttributeValue attributeValue) {
+        springDataAttributeValueRepository.save(attributeValue);
     }
 }
 

@@ -24,6 +24,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
     PRODUCT_NOT_FOUND(404, "Product not found", HttpStatus.NOT_FOUND),
     PRODUCT_VARIANT_NOT_FOUND(404, "Product variant not found", HttpStatus.NOT_FOUND),
+    ATTRIBUTE_NOT_FOUND(404, "Attribute not found", HttpStatus.NOT_FOUND),
     CATEGORY_NOT_FOUND(404, "Category not found", HttpStatus.NOT_FOUND),
     BRAND_NOT_FOUND(404, "Brand not found", HttpStatus.NOT_FOUND),
     ORDER_NOT_FOUND(404, "Order not found", HttpStatus.NOT_FOUND),

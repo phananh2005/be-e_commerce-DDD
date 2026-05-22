@@ -15,22 +15,16 @@ import java.util.Map;
 @Data
 public class ProductCreateRequest {
 
-    @NotBlank(message = "Product name is required")
     private String name;
 
-    @NotBlank(message = "Product description is required")
     private String description;
 
-    @NotNull(message = "Category id is required")
     private Long categoryId;
 
-    @NotNull(message = "Brand id is required")
     private Long brandId;
 
-    @NotNull(message = "Images are required")
     private MultipartFile productAvatar;
 
-    @NotNull(message = "Variants are required")
     @Valid
     private List<VariantCreateRequest> variants;
 

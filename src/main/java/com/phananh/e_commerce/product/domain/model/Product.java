@@ -2,6 +2,7 @@ package com.phananh.e_commerce.product.domain.model;
 
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import com.phananh.e_commerce.core.util.StringUtils;
+import com.phananh.e_commerce.product.application.dto.command.ProductCreateCommand;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,48 +30,31 @@ public class Product extends BaseEntity{
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column
     private String avatarUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status;
 
-    @Column(name = "category_id", nullable = false)
+    @Column(name = "category_id")
     private Long categoryId;
 
-    @Column(name = "brand_id", nullable = false)
+    @Column(name = "brand_id")
     private Long brandId;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST} )
     private Set<ProductVariant> variants = new HashSet<>();
 
-    public static Product create(String name,
-                                 String description,
-                                 Long categoryId,
-                                 Long brandId,
-                                 String avatarUrl,
-                                 ProductStatus status) {
-        if (StringUtils.isBlank(name)) {
-            throw new IllegalArgumentException("Product name cannot be null or blank");
-        }
-        if (categoryId == null) {
-            throw new IllegalArgumentException("Category id cannot be null");
-        }
-        if (brandId == null) {
-            throw new IllegalArgumentException("Brand id cannot be null");
-        }
-        if (StringUtils.isBlank(avatarUrl)) {
-            throw new IllegalArgumentException("Product avatar url cannot be null or blank");
-        }
+    public static Product create(ProductCreateCommand command) {
 
         return Product.builder()
-                .name(name.trim())
-                .description(StringUtils.isBlank(description) ? null : description.trim())
-                .avatarUrl(avatarUrl.trim())
-                .status(status == null ? ProductStatus.DRAFT : status)
-                .categoryId(categoryId)
-                .brandId(brandId)
+                .name(StringUtils.isBlank(command.getName()) ? "Empty" : command.getName().trim())
+                .description(StringUtils.isBlank(command.getDescription()) ? null : command.getDescription().trim())
+                .avatarUrl(null)
+                .status(ProductStatus.DRAFT)
+                .categoryId(command.getCategoryId())
+                .brandId(command.getBrandId())
                 .build();
     }
 
@@ -85,7 +69,8 @@ public class Product extends BaseEntity{
         this.avatarUrl = avatarUrl.trim();
     }
 
-    public void replaceVariants(Set<ProductVariant> variants) {
+    public void updateVariants(Set<ProductVariant> variants) {
+        this.variants.clear();
         this.variants = variants == null ? new HashSet<>() : variants;
     }
 }

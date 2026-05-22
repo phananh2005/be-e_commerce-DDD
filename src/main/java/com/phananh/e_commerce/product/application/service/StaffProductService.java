@@ -22,7 +22,6 @@ public interface StaffProductService {
 	// Staff - create/update operations
 	void createProduct(ProductCreateRequest productCreateRequest);
 
-	void createVariantImage(VariantImageCreateRequest variantImageCreateRequest);
 
 	void updateProduct(ProductUpdateRequest productUpdateRequest);
 

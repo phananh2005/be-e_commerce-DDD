@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.product.domain.model;
 
+import com.phananh.e_commerce.product.application.dto.command.ProductVariantCreateCommand;
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.*;
@@ -44,35 +45,24 @@ public class ProductVariant extends BaseEntity{
     )
     private Set<AttributeValue> attributeValues = new HashSet<>();
 
-    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     private Set<VariantImage> images = new HashSet<>();
 
-    public static ProductVariant create(Product product,
-                                        String skuCode,
-                                        BigDecimal price,
-                                        Integer stockQuantity,
-                                        Set<VariantImage> images,
-                                        Set<AttributeValue> attributeValues) {
-        if (product == null) {
+    public static ProductVariant create(ProductVariantCreateCommand command) {
+        if (command == null) {
+            throw new IllegalArgumentException("Command cannot be null");
+        }
+        if (command.getProduct() == null) {
             throw new IllegalArgumentException("Product cannot be null");
-        }
-        if (StringUtils.isBlank(skuCode)) {
-            throw new IllegalArgumentException("SKU code cannot be null or blank");
-        }
-        if (price == null || price.signum() < 0) {
-            throw new IllegalArgumentException("Price must be >= 0");
-        }
-        if (stockQuantity == null || stockQuantity < 0) {
-            throw new IllegalArgumentException("Stock quantity must be >= 0");
         }
 
         return ProductVariant.builder()
-                .product(product)
-                .skuCode(skuCode.trim())
-                .price(price)
-                .stockQuantity(stockQuantity)
-                .images(images == null ? new HashSet<>() : images)
-                .attributeValues(attributeValues == null ? new HashSet<>() : attributeValues)
+                .product(command.getProduct())
+                .skuCode(StringUtils.isBlank(command.getSkuCode()) ? "empty" : command.getSkuCode().trim())
+                .price(command.getPrice().signum() < 0 ? BigDecimal.ZERO : command.getPrice())
+                .stockQuantity(command.getStockQuantity() == null || command.getStockQuantity() < 0 ? 0 : command.getStockQuantity())
+                .images(command.getImages() == null ? new HashSet<>() : command.getImages())
+                .attributeValues(command.getAttributeValues() == null ? new HashSet<>() : command.getAttributeValues())
                 .build();
     }
 }

@@ -59,19 +59,7 @@ public class StaffProductController {
     @PostMapping(value = "/product/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(@ModelAttribute @Valid ProductCreateRequest productCreateRequest) {
         staffProductService.createProduct(productCreateRequest);
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .message("Product created successfully")
-                .build();
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping(value = "/variant/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Void>> createVariantImage(@ModelAttribute @Valid VariantImageCreateRequest variantImageCreateRequest) {
-        staffProductService.createVariantImage(variantImageCreateRequest);
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .message("Variant image created successfully")
-                .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/product/update")
@@ -110,5 +98,3 @@ public class StaffProductController {
         return ResponseEntity.ok(response);
     }
 }
-
-

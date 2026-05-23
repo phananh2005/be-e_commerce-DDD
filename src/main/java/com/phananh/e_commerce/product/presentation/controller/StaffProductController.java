@@ -71,27 +71,18 @@ public class StaffProductController {
     @PutMapping("/product/update")
     public ResponseEntity<?> updateProduct(@RequestBody @Valid ProductUpdateRequest productUpdateRequest) {
         staffProductService.updateProduct(productUpdateRequest);
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .message("Product updated successfully")
-                .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/product/{productId}/{status}")
-    public ResponseEntity<ApiResponse<Void>> updateProductStatus(@PathVariable Long productId, @PathVariable String status) {
+    public ResponseEntity<?> updateProductStatus(@PathVariable Long productId, @PathVariable String status) {
         staffProductService.updateProductStatus(productId, status);
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .message("Product status updated successfully")
-                .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/variant/{variantId}/{stockQuantity}")
     public ResponseEntity<ApiResponse<Void>> updateVariantStock(@PathVariable Long variantId, @PathVariable Integer stockQuantity) {
         staffProductService.updateVariantStock(variantId, stockQuantity);
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .message("Variant stock updated successfully")
-                .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
     }
 }

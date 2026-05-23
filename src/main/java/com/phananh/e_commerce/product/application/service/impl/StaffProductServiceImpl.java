@@ -14,6 +14,7 @@ import com.phananh.e_commerce.product.application.dto.response.staff.ProductVari
 import com.phananh.e_commerce.product.application.mapper.StaffProductMapper;
 import com.phananh.e_commerce.product.application.service.StaffProductService;
 import com.phananh.e_commerce.product.domain.model.*;
+import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
 import com.phananh.e_commerce.product.presentation.dto.request.product.staff.*;
 import lombok.AccessLevel;
@@ -314,12 +315,40 @@ public class StaffProductServiceImpl implements StaffProductService {
 
     @Override
     public void updateProductStatus(Long productId, String status) {
-        // Implementation placeholder for product status update
+        Product product = productRepository.getById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        if (StringUtils.isBlank(status)) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        ProductStatus productStatus;
+        try {
+            productStatus = ProductStatus.valueOf(status.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        switch (productStatus) {
+            case ACTIVE -> product.activate();
+            case INACTIVE -> product.inactivate();
+            case DRAFT -> product.isDraft();
+        }
+
+        productRepository.save(product);
     }
 
     @Override
     public void updateVariantStock(Long variantId, Integer stockQuantity) {
-        // Implementation placeholder for variant stock update
+        ProductVariant variant = productRepository.getVariantById(variantId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
+
+        if (stockQuantity == null || stockQuantity < 0) {
+            throw new AppException(ErrorCode.INVALID_QUANTITY);
+        }
+
+        variant.updateStockQuantity(stockQuantity);
+        productRepository.save(variant);
     }
 
 

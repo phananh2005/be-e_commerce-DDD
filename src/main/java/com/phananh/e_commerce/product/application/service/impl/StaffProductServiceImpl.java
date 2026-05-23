@@ -161,6 +161,64 @@ public class StaffProductServiceImpl implements StaffProductService {
         productRepository.save(product);
     }
 
+    @Override
+    @Transactional
+    public void createProductVariant(Long productId, ProductVariantCreateRequest request) {
+        Product product = productRepository.getById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        Set<VariantImage> images = new HashSet<>();
+        Set<AttributeValue> attributeValues = new HashSet<>();
+
+        ProductVariantCreateCommand variantCreateCommand = ProductVariantCreateCommand.builder()
+                .product(product)
+                .skuCode(request.getSkuCode())
+                .price(request.getPrice())
+                .stockQuantity(request.getStockQuantity())
+                .images(images)
+                .attributeValues(attributeValues)
+                .build();
+
+        ProductVariant variant = ProductVariant.create(variantCreateCommand);
+
+        if (!StringUtils.isBlank(request.getVariantAvatarUrl())) {
+            images.add(VariantImage.create(variant, request.getVariantAvatarUrl(), true));
+        }
+
+        if (!ListUtils.isNullOrEmpty(request.getVariantImageUrls())) {
+            for (String imageUrl : request.getVariantImageUrls()) {
+                if (!StringUtils.isBlank(imageUrl)) {
+                    images.add(VariantImage.create(variant, imageUrl, false));
+                }
+            }
+        }
+
+        if (request.getAttributes() != null && !request.getAttributes().isEmpty()) {
+            for (Map.Entry<String, String> attribute : request.getAttributes().entrySet()) {
+                String name = attribute.getKey();
+                String value = attribute.getValue();
+
+                ProductAttribute productAttribute = productRepository.getProductAttributesByName(name)
+                        .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+                Set<AttributeValue> existingValues = productAttribute.getAttributeValues();
+                AttributeValue attributeValue = existingValues.stream()
+                        .filter(v -> v.getValue().equals(value))
+                        .findFirst()
+                        .orElseGet(() -> {
+                            AttributeValue newValue = AttributeValue.create(value, productAttribute);
+                            productRepository.save(newValue);
+                            return newValue;
+                        });
+
+                attributeValues.add(attributeValue);
+            }
+        }
+
+        product.addVariant(variant);
+        productRepository.save(variant);
+        productRepository.save(product);
+    }
+
 
     @Override
     @Transactional

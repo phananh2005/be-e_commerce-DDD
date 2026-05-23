@@ -55,6 +55,13 @@ public class StaffProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/product/{productId}/variants")
+    public ResponseEntity<?> createProductVariant(@PathVariable Long productId,
+                                                  @RequestBody @Valid ProductVariantCreateRequest request) {
+        staffProductService.createProductVariant(productId, request);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/product/create")
     public ResponseEntity<?> createProduct(@RequestBody @Valid ProductCreateRequest productCreateRequest) {
         staffProductService.createProduct(productCreateRequest);

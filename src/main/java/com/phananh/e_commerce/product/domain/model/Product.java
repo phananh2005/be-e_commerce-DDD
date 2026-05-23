@@ -43,7 +43,7 @@ public class Product extends BaseEntity{
     @Column(name = "brand_id")
     private Long brandId;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST} )
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE} )
     private Set<ProductVariant> variants = new HashSet<>();
 
     public static Product create(ProductCreateCommand command) {
@@ -91,9 +91,8 @@ public class Product extends BaseEntity{
         this.brandId = brandId;
     }
 
-    public void updateVariants(Set<ProductVariant> variants) {
-        this.variants.clear();
-        this.variants = variants == null ? new HashSet<>() : variants;
+    public void addVariant(ProductVariant variant) {
+        this.variants.add(variant);
     }
 }
 

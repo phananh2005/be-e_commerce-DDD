@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,30 +17,21 @@ public class ProductUpdateRequest {
     @NotNull(message = "Product id is required")
     private Long productId;
 
-    @NotBlank(message = "Product name is required")
     private String name;
 
-    @NotBlank(message = "Product description is required")
     private String description;
 
-    @NotNull(message = "Category id is required")
     private Long categoryId;
 
-    @NotNull(message = "Brand id is required")
     private Long brandId;
 
-    @NotNull(message = "Images are required")
-    private MultipartFile avatar;
+    private String productAvatarUrl;
 
-    @NotNull(message = "Variants are required")
     @Valid
     private List<VariantUpdateRequest> variants;
 
     @Data
     public static class VariantUpdateRequest {
-        @NotNull(message = "Variant id is required")
-        private Long variantId;
-
         @NotBlank(message = "SKU code is required")
         private String skuCode;
 
@@ -54,6 +44,12 @@ public class ProductUpdateRequest {
         private Integer stockQuantity;
 
         private Map<String, String> attributes;
+
+        private String variantAvatarUrl;
+
+        private List<Long> variantImageIdsToDelete;
+
+        private List<String> variantImagesUrlsToAdd;
     }
 }
 

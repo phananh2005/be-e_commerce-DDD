@@ -1,26 +1,31 @@
 package com.phananh.e_commerce.core.infrastructure.service;
 
-import org.springframework.web.multipart.MultipartFile;
+import java.util.Map;
 
-import java.io.IOException;
-
+/**
+ * Cloudinary-related operations exposed to application code.
+ *
+ * NOTE: this service now focuses on generating signatures for client-side
+ * direct uploads. Upload/delete operations should be handled by dedicated
+ * server-side helpers or by the client using the generated signature.
+ */
 public interface CloudinaryService {
-    /**
-     * Upload a file to Cloudinary with a specific public ID
-     *
-     * @param file the file to upload
-     * @param folder the folder in Cloudinary where the file will be stored
-     * @param publicId the public ID for the uploaded file
-     * @return the URL of the uploaded file
-     * @throws IOException if an error occurs during upload
-     */
-    String uploadFile(MultipartFile file, String folder, String publicId) throws IOException;
+
 
     /**
-     * Delete a file from Cloudinary by public ID
-     *
-     * @param publicId the public ID of the file to delete
-     * @throws IOException if an error occurs during deletion
+     * Convenience helper to generate an upload signature for a given folder.
+     * Returns a map containing signature, timestamp, apiKey, cloudName and folder.
      */
-    void deleteFile(String publicId) throws IOException;
+    Map<String, Object> generateUploadSignature(String folder);
+
+    /**
+     * Delete a resource on Cloudinary by its public id.
+     * publicId should be the path-like id used when uploading (folder/sub/name)
+     */
+    void deleteFile(String publicId);
+
+    /**
+     * Convenience: delete resource by URL (extracts publicId then deletes).
+     */
+    void deleteFileByUrl(String url);
 }

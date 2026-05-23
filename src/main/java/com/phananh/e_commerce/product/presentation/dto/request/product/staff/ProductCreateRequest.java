@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,7 +22,11 @@ public class ProductCreateRequest {
 
     private Long brandId;
 
-    private MultipartFile productAvatar;
+    /**
+     * URL of the product avatar image already uploaded to Cloudinary.
+     * Front-end uploads directly to Cloudinary and sends the resulting URL here.
+     */
+    private String productAvatarUrl;
 
     @Valid
     private List<VariantCreateRequest> variants;
@@ -43,9 +46,15 @@ public class ProductCreateRequest {
 
         private Map<String, String> attributes;
 
-        private MultipartFile variantAvatar;
+        /**
+         * URL of the variant avatar image (primary image) already uploaded to Cloudinary.
+         */
+        private String variantAvatarUrl;
 
-        private List<MultipartFile> variantImages;
+        /**
+         * List of URLs for variant gallery images, already uploaded to Cloudinary.
+         */
+        private List<String> variantImageUrls;
     }
 }
 

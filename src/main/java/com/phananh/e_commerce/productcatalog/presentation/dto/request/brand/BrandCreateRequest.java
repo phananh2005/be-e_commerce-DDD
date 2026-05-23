@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
+ 
 
 @Data
 @Builder
@@ -18,7 +18,12 @@ public class BrandCreateRequest {
 
     private String description;
 
-    private MultipartFile image;
+    /**
+     * URL of the image already uploaded to Cloudinary (or another CDN).
+     * The front-end should upload the file directly to Cloudinary and send
+     * the resulting URL here. No MultipartFile is expected anymore.
+     */
+    private String imageUrl;
 }
 
 

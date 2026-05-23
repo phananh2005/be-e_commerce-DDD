@@ -47,14 +47,14 @@ public class CategoryController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createCategory(@Valid @ModelAttribute CategoryCreateRequest request) {
+    @PostMapping
+    public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryCreateRequest request) {
         categoryService.createCategory(request);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateCategory(@Valid @ModelAttribute CategoryUpdateRequest request) {
+    @PutMapping
+    public ResponseEntity<?> updateCategory(@Valid @RequestBody CategoryUpdateRequest request) {
         categoryService.updateCategory(request);
         return ResponseEntity.noContent().build();
     }

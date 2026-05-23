@@ -11,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,26 +55,17 @@ public class StaffProductController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/product/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createProduct(@ModelAttribute @Valid ProductCreateRequest productCreateRequest) {
+    @PostMapping("/product/create")
+    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductCreateRequest productCreateRequest) {
         staffProductService.createProduct(productCreateRequest);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/product/update")
-    public ResponseEntity<ApiResponse<Void>> updateProduct(@ModelAttribute @Valid ProductUpdateRequest productUpdateRequest) {
+    public ResponseEntity<?> updateProduct(@RequestBody @Valid ProductUpdateRequest productUpdateRequest) {
         staffProductService.updateProduct(productUpdateRequest);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Product updated successfully")
-                .build();
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/variant/image")
-    public ResponseEntity<ApiResponse<Void>> updateVariantImage(@ModelAttribute @Valid VariantImageUpdateRequest variantImageUpdateRequest) {
-        staffProductService.updateVariantImage(variantImageUpdateRequest);
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .message("Variant image updated successfully")
                 .build();
         return ResponseEntity.ok(response);
     }

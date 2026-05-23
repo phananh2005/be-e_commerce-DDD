@@ -16,9 +16,11 @@ public interface ProductRepository {
     Optional<Product> getById(Long id);
     Page<Product> getAllProductsBySearch(StaffProductSearchQuery productSearchQuery);
     List<ProductVariant> getVariantsByProductId(Long productId);
+    Optional<ProductVariant> getVariantBySkuCode(String skuCode);
     Optional<ProductAttribute> getProductAttributesByName(String name);
     Product saveAndFlush(Product product);
     void save(Product product);
     void save(AttributeValue attributeValue);
+    void save(ProductVariant variant);
 }
 

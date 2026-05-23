@@ -65,6 +65,22 @@ public class ProductVariant extends BaseEntity{
                 .attributeValues(command.getAttributeValues() == null ? new HashSet<>() : command.getAttributeValues())
                 .build();
     }
+
+    public void updatePrice(BigDecimal price) {
+        this.price = price != null && price.signum() >= 0 ? price : BigDecimal.ZERO;
+    }
+
+    public void updateStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity != null && stockQuantity >= 0 ? stockQuantity : 0;
+    }
+
+    public void updateAttributeValues(Set<AttributeValue> attributeValues) {
+        this.attributeValues = attributeValues == null ? new HashSet<>() : attributeValues;
+    }
+
+    public void updateImages(Set<VariantImage> images) {
+        this.images = images == null ? new HashSet<>() : images;
+    }
 }
 
 

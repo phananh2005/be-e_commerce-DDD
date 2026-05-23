@@ -51,7 +51,7 @@ public class Product extends BaseEntity{
         return Product.builder()
                 .name(StringUtils.isBlank(command.getName()) ? "Empty" : command.getName().trim())
                 .description(StringUtils.isBlank(command.getDescription()) ? null : command.getDescription().trim())
-                .avatarUrl(null)
+                .avatarUrl(StringUtils.isBlank(command.getAvatarUrl()) ? null : command.getAvatarUrl().trim())
                 .status(ProductStatus.DRAFT)
                 .categoryId(command.getCategoryId())
                 .brandId(command.getBrandId())
@@ -67,6 +67,22 @@ public class Product extends BaseEntity{
             throw new IllegalArgumentException("Product avatar url cannot be null or blank");
         }
         this.avatarUrl = avatarUrl.trim();
+    }
+
+    public void updateName(String name) {
+        this.name = StringUtils.isBlank(name) ? "Empty" : name.trim();
+    }
+
+    public void updateDescription(String description) {
+        this.description = StringUtils.isBlank(description) ? null : description.trim();
+    }
+
+    public void updateCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public void updateBrandId(Long brandId) {
+        this.brandId = brandId;
     }
 
     public void updateVariants(Set<ProductVariant> variants) {

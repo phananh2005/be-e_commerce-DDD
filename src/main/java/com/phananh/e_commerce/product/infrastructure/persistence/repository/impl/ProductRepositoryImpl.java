@@ -70,6 +70,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public Optional<ProductVariant> getVariantBySkuCode(String skuCode) {
+        return springDataProductVariantRepository.findBySkuCode(skuCode);
+    }
+
+    @Override
     public Optional<ProductAttribute> getProductAttributesByName(String name) {
         return springDataProductAttributeRepository.findByName(name);
     }
@@ -87,6 +92,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public void save(AttributeValue attributeValue) {
         springDataAttributeValueRepository.save(attributeValue);
+    }
+
+    @Override
+    public void save(ProductVariant variant) {
+        springDataProductVariantRepository.save(variant);
     }
 }
 

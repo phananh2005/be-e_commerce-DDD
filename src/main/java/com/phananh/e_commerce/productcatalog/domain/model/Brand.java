@@ -31,21 +31,22 @@ public class Brand extends BaseEntity{
     @Column(nullable = false)
     private Boolean isEnabled;
 
-    public static Brand create(String name, String description) {
+    public static Brand create(String name, String description, String imageUrl) {
         if(StringUtils.isBlank(name)) throw new IllegalArgumentException("Brand name cannot be null or blank");
         if(description != null){
             if(description.isBlank()) throw new IllegalArgumentException("Brand description cannot be blank");
             description = description.trim();
         }
+        if(imageUrl != null){
+            if(imageUrl.isBlank()) throw new IllegalArgumentException("Brand image url cannot be blank");
+            imageUrl = imageUrl.trim();
+        }
         return Brand.builder()
                 .name(name.trim())
                 .description(description)
+                .imageUrl(imageUrl)
                 .isEnabled(true)
                 .build();
-    }
-
-    public String buildBrandAvatarPublicId() {
-        return "brand-" + id + "-avatar";
     }
 
     public void updateImage(String imageUrl){

@@ -47,14 +47,14 @@ public class BrandController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createBrand(@Valid @ModelAttribute BrandCreateRequest request) {
+    @PostMapping
+    public ResponseEntity<?> createBrand(@Valid @RequestBody BrandCreateRequest request) {
         brandService.createBrand(request);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateBrand(@Valid @ModelAttribute BrandUpdateRequest request) {
+    @PatchMapping("/update")
+    public ResponseEntity<?> updateBrand(@Valid @RequestBody BrandUpdateRequest request) {
         brandService.updateBrand(request);
         return ResponseEntity.noContent().build();
     }

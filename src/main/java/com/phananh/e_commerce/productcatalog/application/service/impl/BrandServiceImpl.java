@@ -72,20 +72,7 @@ public class BrandServiceImpl implements BrandService {
             throw new AppException(ErrorCode.CONFLICT);
         }
 
-        Brand brand = Brand.create(request.getName(), request.getDescription());
-
-        brand = brandRepository.saveAndFlush(brand);
-
-        if (request.getImage() != null && !request.getImage().isEmpty()) {
-            try {
-                String publicId = brand.buildBrandAvatarPublicId();
-                String imageUrl = cloudinaryService.uploadFile(request.getImage(), "brands", publicId);
-                brand.updateImage(imageUrl);
-            } catch (IOException e) {
-                log.error("Error uploading brand image", e);
-                throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
-            }
-        }
+        Brand brand = Brand.create(request.getName(), request.getDescription(), request.getImageUrl());
 
         brandRepository.save(brand);
     }
@@ -100,24 +87,24 @@ public class BrandServiceImpl implements BrandService {
         brand.updateName(request.getName());
         brand.updateDescription(request.getDescription());
 
-        // Update image (if provided)
-        String publicId = brand.buildBrandAvatarPublicId();
-        if (request.getImage() != null && !request.getImage().isEmpty()) {
-            try {
-                String imageUrl = cloudinaryService.uploadFile(request.getImage(), "brands", publicId);
+        // Update image handling using imageUrl semantics:
+        // - imageUrl == null => keep existing image
+        // - imageUrl is non-empty => set this new URL
+        // - imageUrl is empty string ("") => remove existing image
+        String imageUrl = request.getImageUrl();
+        if (imageUrl != null) {
+            if (!imageUrl.isBlank()) {
+                // Set provided URL directly
                 brand.updateImage(imageUrl);
-            } catch (IOException e) {
-                log.error("Error uploading brand image", e);
-                throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
-            }
-        }
-        else {
-            try {
-                cloudinaryService.deleteFile("brands/" + publicId);
+            } else {
+                // empty string => remove existing image and delete from Cloudinary
+                try {
+                    cloudinaryService.deleteFileByUrl(imageUrl);
+                } catch (Exception e) {
+                    log.error("Error deleting brand image", e);
+                    throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+                }
                 brand.removeImage();
-            } catch (IOException e) {
-                log.error("Error deleting brand image", e);
-                throw new AppException(ErrorCode.FILE_DELETE_ERROR);
             }
         }
 

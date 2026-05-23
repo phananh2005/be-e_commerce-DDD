@@ -28,7 +28,7 @@ public class Category extends BaseEntity{
     @Column(nullable = false)
     private Boolean isEnabled;
 
-    public static Category create(String name, String description) {
+    public static Category create(String name, String description, String imageUrl) {
         if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("Category name cannot be null or blank");
         }
@@ -38,9 +38,16 @@ public class Category extends BaseEntity{
             }
             description = description.trim();
         }
+        if (imageUrl != null) {
+            if (imageUrl.isBlank()) {
+                throw new IllegalArgumentException("Category image url cannot be blank");
+            }
+            imageUrl = imageUrl.trim();
+        }
         return Category.builder()
                 .name(name.trim())
                 .description(description)
+                .imageUrl(imageUrl)
                 .isEnabled(true)
                 .build();
     }

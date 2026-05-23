@@ -24,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -76,19 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AppException(ErrorCode.CONFLICT);
         }
 
-        Category category = Category.create(request.getCategoryName(), request.getCategoryDescription());
-        category = categoryRepository.saveAndFlush(category);
-
-        if (request.getImage() != null && !request.getImage().isEmpty()) {
-            try {
-                String publicId = category.buildCategoryAvatarPublicId();
-                String imageUrl = cloudinaryService.uploadFile(request.getImage(), "categories", publicId);
-                category.updateImage(imageUrl);
-            } catch (IOException e) {
-                log.error("Error uploading category image", e);
-                throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
-            }
-        }
+        Category category = Category.create(request.getCategoryName(), request.getCategoryDescription(), request.getImageUrl());
 
         categoryRepository.save(category);
     }
@@ -103,25 +90,24 @@ public class CategoryServiceImpl implements CategoryService {
         category.updateName(request.getCategoryName());
         category.updateDescription(request.getCategoryDescription());
 
-
-        // Update category image
-        String publicId = category.buildCategoryAvatarPublicId();
-
-        if (request.getImage() != null && !request.getImage().isEmpty()) {
-            try {
-                String imageUrl = cloudinaryService.uploadFile(request.getImage(), "categories", publicId);
+        // Update image handling using imageUrl semantics:
+        // - imageUrl == null => keep existing image
+        // - imageUrl is non-empty => set this new URL
+        // - imageUrl is empty string ("") => remove existing image
+        String imageUrl = request.getImageUrl();
+        if (imageUrl != null) {
+            if (!imageUrl.isBlank()) {
+                // Set provided URL directly
                 category.updateImage(imageUrl);
-            } catch (IOException e) {
-                log.error("Error uploading category image", e);
-                throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
-            }
-        } else {
-            try {
-                cloudinaryService.deleteFile("categories/" + publicId);
+            } else {
+                // empty string => remove existing image and delete from Cloudinary
+                try {
+                    cloudinaryService.deleteFileByUrl(imageUrl);
+                } catch (Exception e) {
+                    log.error("Error deleting category image", e);
+                    throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+                }
                 category.removeImage();
-            } catch (IOException e) {
-                log.error("Error deleting category image", e);
-                throw new AppException(ErrorCode.FILE_DELETE_ERROR);
             }
         }
 

@@ -27,8 +27,6 @@ public interface StaffProductService {
 
 	void updateProduct(ProductUpdateRequest productUpdateRequest);
 
-	void updateVariantImage(VariantImageUpdateRequest variantImageUpdateRequest);
-
 	void updateProductStatus(Long productId, String status);
 
 	void updateVariantStock(Long variantId, Integer stockQuantity);

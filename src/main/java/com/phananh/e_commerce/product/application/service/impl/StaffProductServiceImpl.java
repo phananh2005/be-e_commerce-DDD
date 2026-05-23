@@ -309,11 +309,6 @@ public class StaffProductServiceImpl implements StaffProductService {
     }
 
     @Override
-    public void updateVariantImage(VariantImageUpdateRequest variantImageUpdateRequest) {
-        // Implementation placeholder for variant image update
-    }
-
-    @Override
     public void updateProductStatus(Long productId, String status) {
         Product product = productRepository.getById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));

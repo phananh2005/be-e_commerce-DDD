@@ -2,6 +2,8 @@ package com.phananh.e_commerce.product.application.service.impl;
 
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
+import com.phananh.e_commerce.core.util.ListUtils;
 import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.product.application.dto.command.ProductCreateCommand;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,7 @@ public class StaffProductServiceImpl implements StaffProductService {
 
     ProductRepository productRepository;
     StaffProductMapper staffProductMapper;
+    CloudinaryService cloudinaryService;
 
     @Override
     @Transactional(readOnly = true)
@@ -99,57 +103,60 @@ public class StaffProductServiceImpl implements StaffProductService {
 
         Product product = Product.create(productCreateCommand);
 
-        for (ProductCreateRequest.VariantCreateRequest variantRequest : request.getVariants()) {
-            Set<VariantImage> images = new HashSet<>();
-            Set<AttributeValue> attributeValues = new HashSet<>();
-            ProductVariantCreateCommand variantCreateCommand = ProductVariantCreateCommand.builder()
-                    .product(product)
-                    .skuCode(variantRequest.getSkuCode())
-                    .price(variantRequest.getPrice())
-                    .stockQuantity(variantRequest.getStockQuantity())
-                    .images(images)
-                    .attributeValues(attributeValues)
-                    .build();
-            ProductVariant variant = ProductVariant.create(variantCreateCommand);
+        if (!ListUtils.isNullOrEmpty(request.getVariants())) {
+            for (ProductCreateRequest.VariantCreateRequest variantRequest : request.getVariants()) {
+                Set<VariantImage> images = new HashSet<>();
+                Set<AttributeValue> attributeValues = new HashSet<>();
+                ProductVariantCreateCommand variantCreateCommand = ProductVariantCreateCommand.builder()
+                        .product(product)
+                        .skuCode(variantRequest.getSkuCode())
+                        .price(variantRequest.getPrice())
+                        .stockQuantity(variantRequest.getStockQuantity())
+                        .images(images)
+                        .attributeValues(attributeValues)
+                        .build();
+                ProductVariant variant = ProductVariant.create(variantCreateCommand);
 
-            // Add variant avatar (primary image) if URL is provided
-            if (!StringUtils.isBlank(variantRequest.getVariantAvatarUrl())) {
-                images.add(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
-            }
+                // Add variant avatar (primary image) if URL is provided
+                if (!StringUtils.isBlank(variantRequest.getVariantAvatarUrl())) {
+                    images.add(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
+                }
 
-            // Add variant gallery images if URLs are provided
-            if (variantRequest.getVariantImageUrls() != null && !variantRequest.getVariantImageUrls().isEmpty()) {
-                for (String imageUrl : variantRequest.getVariantImageUrls()) {
-                    if (!StringUtils.isBlank(imageUrl)) {
-                        images.add(VariantImage.create(variant, imageUrl, false));
+                // Add variant gallery images if URLs are provided
+                if (!ListUtils.isNullOrEmpty(variantRequest.getVariantImageUrls())) {
+                    for (String imageUrl : variantRequest.getVariantImageUrls()) {
+                        if (!StringUtils.isBlank(imageUrl)) {
+                            images.add(VariantImage.create(variant, imageUrl, false));
+                        }
                     }
                 }
-            }
 
-            // Process attributes if provided
-            if (variantRequest.getAttributes() != null && !variantRequest.getAttributes().isEmpty()) {
-                for(Map.Entry<String, String> attribute : variantRequest.getAttributes().entrySet()) {
-                String name = attribute.getKey();
-                String value = attribute.getValue();
+                // Process attributes if provided
+                if (variantRequest.getAttributes() != null && !variantRequest.getAttributes().isEmpty()) {
+                    for (Map.Entry<String, String> attribute : variantRequest.getAttributes().entrySet()) {
+                        String name = attribute.getKey();
+                        String value = attribute.getValue();
 
-                ProductAttribute productAttribute = productRepository.getProductAttributesByName(name)
-                        .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
-                Set<AttributeValue> existingValues = productAttribute.getAttributeValues();
-                AttributeValue attributeValue = existingValues.stream()
-                        .filter(v -> v.getValue().equals(value))
-                        .findFirst()
-                        .orElseGet(() -> {
-                            AttributeValue newValue = AttributeValue.create(value, productAttribute);
-                            productRepository.save(newValue);
-                            return newValue;
-                        });
+                        ProductAttribute productAttribute = productRepository.getProductAttributesByName(name)
+                                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+                        Set<AttributeValue> existingValues = productAttribute.getAttributeValues();
+                        AttributeValue attributeValue = existingValues.stream()
+                                .filter(v -> v.getValue().equals(value))
+                                .findFirst()
+                                .orElseGet(() -> {
+                                    AttributeValue newValue = AttributeValue.create(value, productAttribute);
+                                    productRepository.save(newValue);
+                                    return newValue;
+                                });
 
-                attributeValues.add(attributeValue);
+                        attributeValues.add(attributeValue);
+                    }
                 }
-            }
 
-            variants.add(variant);
+                variants.add(variant);
+            }
         }
+
 
         productRepository.save(product);
     }
@@ -161,35 +168,55 @@ public class StaffProductServiceImpl implements StaffProductService {
         Product product = productRepository.getById(productUpdateRequest.getProductId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        // Update product basic info
-        if (productUpdateRequest.getName() != null && !productUpdateRequest.getName().isBlank()) {
-            product.updateName(productUpdateRequest.getName());
-        }
-        if (productUpdateRequest.getDescription() != null) {
-            product.updateDescription(productUpdateRequest.getDescription());
-        }
-        if (productUpdateRequest.getCategoryId() != null) {
-            product.updateCategoryId(productUpdateRequest.getCategoryId());
-        }
-        if (productUpdateRequest.getBrandId() != null) {
-            product.updateBrandId(productUpdateRequest.getBrandId());
-        }
-        if (productUpdateRequest.getProductAvatarUrl() != null && !productUpdateRequest.getProductAvatarUrl().isBlank()) {
+        product.updateName(productUpdateRequest.getName());
+        product.updateDescription(productUpdateRequest.getDescription());
+        product.updateCategoryId(productUpdateRequest.getCategoryId());
+        product.updateBrandId(productUpdateRequest.getBrandId());
+
+        // Update image handling using imageUrl semantics:
+        // - imageUrl == null => keep existing image
+        // - imageUrl is non-empty => set this new URL
+        // - imageUrl is empty string ("") => remove existing image
+        if(productUpdateRequest.getProductAvatarUrl() != null){
             product.updateAvatarUrl(productUpdateRequest.getProductAvatarUrl());
         }
 
         // Update variants
-        if (productUpdateRequest.getVariants() != null && !productUpdateRequest.getVariants().isEmpty()) {
+        if (!ListUtils.isNullOrEmpty(productUpdateRequest.getVariants())) {
             for (ProductUpdateRequest.VariantUpdateRequest variantRequest : productUpdateRequest.getVariants()) {
-                ProductVariant variant = productRepository.getVariantBySkuCode(variantRequest.getSkuCode())
+                ProductVariant variant = productRepository.getVariantById(variantRequest.getVariantId())
                         .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
 
                 // Update variant basic info
-                if (variantRequest.getPrice() != null) {
-                    variant.updatePrice(variantRequest.getPrice());
+                variant.updateSkuCode(variantRequest.getSkuCode());
+                variant.updatePrice(variantRequest.getPrice());
+                variant.updateStockQuantity(variantRequest.getStockQuantity());
+
+                // Delete images by ID
+                if (ListUtils.isNullOrEmpty(variantRequest.getVariantImageIdsToDelete())) {
+                    List<VariantImage> variantImages = productRepository
+                            .getVariantImagesById(variantRequest.getVariantImageIdsToDelete());
+                    variant.removeListImages(variantImages);
+
+                    List<String> imageUrls = variantImages.stream().map(VariantImage::getImageUrl).toList();
+                    for(String url : imageUrls) cloudinaryService.deleteFileByUrl(url);
                 }
-                if (variantRequest.getStockQuantity() != null) {
-                    variant.updateStockQuantity(variantRequest.getStockQuantity());
+
+                // Handle avatar URL update
+                // - imageUrl == null => keep existing image
+                // - imageUrl is non-empty => set this new URL
+                // - imageUrl is empty string ("") => remove existing image
+                if (variantRequest.getVariantAvatarUrl() != null) {
+                    if(variantRequest.getVariantAvatarUrl().isBlank()) variant.removeAvatar();
+                    else variant.updateAvatar(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
+                }
+
+                // Add new gallery images
+                if (!ListUtils.isNullOrEmpty(variantRequest.getVariantImagesUrlsToAdd())) {
+                    variant.addListImage(variantRequest.getVariantImagesUrlsToAdd().stream()
+                            .filter(url -> !StringUtils.isBlank(url))
+                            .map(url -> VariantImage.create(variant, url, false))
+                            .toList());
                 }
 
                 // Update variant attributes
@@ -215,35 +242,6 @@ public class StaffProductServiceImpl implements StaffProductService {
                     variant.updateAttributeValues(attributeValues);
                 }
 
-                // Update variant images
-                Set<VariantImage> images = new HashSet<>(variant.getImages());
-
-                // Delete images by ID
-                if (variantRequest.getVariantImageIdsToDelete() != null && !variantRequest.getVariantImageIdsToDelete().isEmpty()) {
-                    images.removeIf(img -> variantRequest.getVariantImageIdsToDelete().contains(img.getId()));
-                }
-
-                // Handle avatar URL update
-                if (variantRequest.getVariantAvatarUrl() != null && !variantRequest.getVariantAvatarUrl().isBlank()) {
-                    // Remove old avatar if exists
-                    images.stream()
-                            .filter(VariantImage::isAvatar)
-                            .findFirst()
-                            .ifPresent(images::remove);
-                    // Add new avatar
-                    images.add(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
-                }
-
-                // Add new gallery images
-                if (variantRequest.getVariantImagesUrlsToAdd() != null && !variantRequest.getVariantImagesUrlsToAdd().isEmpty()) {
-                    for (String imageUrl : variantRequest.getVariantImagesUrlsToAdd()) {
-                        if (imageUrl != null && !imageUrl.isBlank()) {
-                            images.add(VariantImage.create(variant, imageUrl, false));
-                        }
-                    }
-                }
-
-                variant.updateImages(images);
                 productRepository.save(variant);
             }
         }

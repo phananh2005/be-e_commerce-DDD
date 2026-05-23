@@ -36,33 +36,5 @@ public class CloudinaryController {
                 .build();
         return ResponseEntity.ok(response);
     }
-
-    @DeleteMapping("/file/{publicId}")
-    public ResponseEntity<Void> deleteFile(@PathVariable String publicId) {
-        try {
-            cloudinaryService.deleteFile(publicId);
-            return ResponseEntity.noContent().build();
-        } catch (AppException ex) {
-            throw ex; // Let global exception handler translate
-        } catch (Exception ex) {
-            throw new AppException(ErrorCode.FILE_DELETE_ERROR);
-        }
-    }
-
-    /**
-     * Delete a Cloudinary resource by its public URL.
-     * Example: DELETE /cloudinary/file?url=https://res.cloudinary.com/.../upload/v12345/folder/name.jpg
-     */
-    @DeleteMapping("/file")
-    public ResponseEntity<Void> deleteFileByUrl(@RequestParam String url) {
-        try {
-            cloudinaryService.deleteFileByUrl(url);
-            return ResponseEntity.noContent().build();
-        } catch (AppException ex) {
-            throw ex; // Let global exception handler translate
-        } catch (Exception ex) {
-            throw new AppException(ErrorCode.FILE_DELETE_ERROR);
-        }
-    }
 }
 

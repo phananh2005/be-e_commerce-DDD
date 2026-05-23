@@ -1,8 +1,9 @@
 package com.phananh.e_commerce.product.domain.model;
 
-import com.phananh.e_commerce.product.application.dto.command.ProductVariantCreateCommand;
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
+import com.phananh.e_commerce.core.util.ListUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
+import com.phananh.e_commerce.product.application.dto.command.ProductVariantCreateCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -45,7 +47,7 @@ public class ProductVariant extends BaseEntity{
     )
     private Set<AttributeValue> attributeValues = new HashSet<>();
 
-    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<VariantImage> images = new HashSet<>();
 
     public static ProductVariant create(ProductVariantCreateCommand command) {
@@ -66,6 +68,10 @@ public class ProductVariant extends BaseEntity{
                 .build();
     }
 
+    public void updateSkuCode(String skuCode) {
+        this.skuCode = StringUtils.isBlank(skuCode) ? "empty" : skuCode.trim();
+    }
+
     public void updatePrice(BigDecimal price) {
         this.price = price != null && price.signum() >= 0 ? price : BigDecimal.ZERO;
     }
@@ -75,11 +81,30 @@ public class ProductVariant extends BaseEntity{
     }
 
     public void updateAttributeValues(Set<AttributeValue> attributeValues) {
+        this.attributeValues.clear();
         this.attributeValues = attributeValues == null ? new HashSet<>() : attributeValues;
     }
 
-    public void updateImages(Set<VariantImage> images) {
-        this.images = images == null ? new HashSet<>() : images;
+    public void removeAvatar(){
+        this.images.removeIf(VariantImage::isAvatar);
+    }
+
+    public void updateAvatar(VariantImage variantImage) {
+        if(variantImage == null) throw new IllegalArgumentException("Image is null");
+        this.removeAvatar();
+        this.images.add(variantImage);
+    }
+
+    public void removeListImages(List<VariantImage> variantImages) {
+        if(ListUtils.isNullOrEmpty(variantImages)) throw new IllegalArgumentException("List image is empty");
+        for(VariantImage image : variantImages) {
+            this.images.remove(image);
+        }
+    }
+
+    public void addListImage(List<VariantImage> images) {
+        if(ListUtils.isNullOrEmpty(images)) throw new IllegalArgumentException("List image is empty");
+        this.images.addAll(images);
     }
 }
 

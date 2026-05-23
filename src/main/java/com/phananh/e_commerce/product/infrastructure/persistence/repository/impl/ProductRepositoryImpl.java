@@ -2,15 +2,13 @@ package com.phananh.e_commerce.product.infrastructure.persistence.repository.imp
 
 import com.phananh.e_commerce.product.application.dto.query.ProductSearchQuery;
 import com.phananh.e_commerce.product.application.dto.query.StaffProductSearchQuery;
-import com.phananh.e_commerce.product.domain.model.AttributeValue;
-import com.phananh.e_commerce.product.domain.model.Product;
-import com.phananh.e_commerce.product.domain.model.ProductAttribute;
-import com.phananh.e_commerce.product.domain.model.ProductVariant;
+import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataAttributeValueRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductAttributeRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductVariantRepository;
+import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataVariantImageRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.specification.ProductSearchSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +29,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     SpringDataProductVariantRepository springDataProductVariantRepository;
     SpringDataAttributeValueRepository springDataAttributeValueRepository;
     SpringDataProductAttributeRepository springDataProductAttributeRepository;
+    SpringDataVariantImageRepository springDataVariantImageRepository;
 
     @Override
     public Page<Product> getProductsActiveBySearch(ProductSearchQuery productSearchQuery) {
@@ -70,8 +69,8 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public Optional<ProductVariant> getVariantBySkuCode(String skuCode) {
-        return springDataProductVariantRepository.findBySkuCode(skuCode);
+    public Optional<ProductVariant> getVariantById(Long id) {
+        return springDataProductVariantRepository.findById(id);
     }
 
     @Override
@@ -80,8 +79,8 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public Product saveAndFlush(Product product) {
-        return springDataProductRepository.saveAndFlush(product);
+    public List<VariantImage> getVariantImagesById(List<Long> id) {
+        return springDataVariantImageRepository.findByIdIn(id);
     }
 
     @Override

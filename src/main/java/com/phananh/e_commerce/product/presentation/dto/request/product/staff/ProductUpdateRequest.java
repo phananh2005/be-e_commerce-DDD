@@ -32,6 +32,9 @@ public class ProductUpdateRequest {
 
     @Data
     public static class VariantUpdateRequest {
+        @NotNull(message = "Variant id is required")
+        private Long variantId;
+
         @NotBlank(message = "SKU code is required")
         private String skuCode;
 
@@ -43,9 +46,13 @@ public class ProductUpdateRequest {
         @PositiveOrZero(message = "Stock quantity must be >= 0")
         private Integer stockQuantity;
 
-        private Map<String, String> attributes;
-
+        /**
+         * URL of the image already uploaded to Cloudinary. If null -> keep existing image.
+         * If empty string ("") -> remove existing image.
+         */
         private String variantAvatarUrl;
+
+        private Map<String, String> attributes;
 
         private List<Long> variantImageIdsToDelete;
 

@@ -55,18 +55,8 @@ public class Product extends BaseEntity{
                 .status(ProductStatus.DRAFT)
                 .categoryId(command.getCategoryId())
                 .brandId(command.getBrandId())
+                .variants(command.getVariants())
                 .build();
-    }
-
-    public String buildProductAvatarPublicId() {
-        return "product-" + id + "-avatar";
-    }
-
-    public void updateAvatarUrl(String avatarUrl) {
-        if (StringUtils.isBlank(avatarUrl)) {
-            throw new IllegalArgumentException("Product avatar url cannot be null or blank");
-        }
-        this.avatarUrl = avatarUrl.trim();
     }
 
     public void updateName(String name) {
@@ -75,6 +65,22 @@ public class Product extends BaseEntity{
 
     public void updateDescription(String description) {
         this.description = StringUtils.isBlank(description) ? null : description.trim();
+    }
+
+    public void updateAvatarUrl(String avatarUrl) {
+        this.avatarUrl = StringUtils.isBlank(avatarUrl) ? null : avatarUrl.trim();
+    }
+
+    public void inactivate() {
+        this.status = ProductStatus.INACTIVE;
+    }
+
+    public void activate() {
+        this.status = ProductStatus.ACTIVE;
+    }
+
+    public void isDraft() {
+        this.status = ProductStatus.DRAFT;
     }
 
     public void updateCategoryId(Long categoryId) {

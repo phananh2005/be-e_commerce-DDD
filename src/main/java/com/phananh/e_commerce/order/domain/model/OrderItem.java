@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.order.domain.model.entity;
+package com.phananh.e_commerce.order.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "order_items")
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,9 +20,8 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "variant_id", nullable = false)
-    private ProductVariant variant;
+    @Column(nullable = false)
+    private Long variantId;
 
     @Column(nullable = false)
     private Integer quantity;

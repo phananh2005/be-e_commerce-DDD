@@ -24,7 +24,6 @@ public interface StaffProductService {
 
 	void createProductVariant(Long productId, ProductVariantCreateRequest productVariantCreateRequest);
 
-
 	void updateProduct(ProductUpdateRequest productUpdateRequest);
 
 	void updateProductStatus(Long productId, String status);

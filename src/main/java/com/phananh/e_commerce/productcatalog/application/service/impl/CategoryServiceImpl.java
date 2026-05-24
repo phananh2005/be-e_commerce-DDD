@@ -1,6 +1,7 @@
 package com.phananh.e_commerce.productcatalog.application.service.impl;
 
 import com.phananh.e_commerce.core.util.PageUtils;
+import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.productcatalog.application.dto.query.CategorySearchQuery;
 import com.phananh.e_commerce.productcatalog.domain.repository.CategoryRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
@@ -120,8 +121,12 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.getById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
+        if (StringUtils.isBlank(status)) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
         if ("ACTIVE".equalsIgnoreCase(status)) category.active();
-        else category.inactive();
+        else if ("INACTIVE".equalsIgnoreCase(status)) category.inactive();
 
         categoryRepository.save(category);
     }

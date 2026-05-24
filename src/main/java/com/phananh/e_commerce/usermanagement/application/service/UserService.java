@@ -10,9 +10,10 @@ public interface UserService {
     void updateMyInfo(UserInfoUpdateRequest userInfoUpdateRequest);
     void changePassword(UserChangePasswordRequest userChangePasswordRequest);
     UserInfoResponse getUserInfo(Long id);
+    Long getIdByUserName(String userName);
     Page<UserResponse> getAllUsers(AdminUserQueryRequest adminUserQueryRequest);
     void updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest);
-    void updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest);
+    void updateUserStatus(Long userId, String status);
 }
 
 

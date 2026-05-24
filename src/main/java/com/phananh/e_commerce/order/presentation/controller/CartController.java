@@ -27,6 +27,11 @@ public class CartController {
     @GetMapping("/my-cart")
     public ResponseEntity<ApiResponse<List<CartItemResponse>>> getMyCart() {
         List<CartItemResponse> cartItems = cartItemService.getMyCart();
+        if (cartItems == null)
+            return ResponseEntity.ok(ApiResponse.<List<CartItemResponse>>builder()
+                    .message("Cart is empty")
+                    .build());
+
         return ResponseEntity.ok(ApiResponse.<List<CartItemResponse>>builder()
                 .message("Get cart successfully")
                 .result(cartItems)
@@ -34,27 +39,20 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Void>> addProductToCart(@RequestBody @Valid CartAddItemRequest cartAddItemRequest) {
+    public ResponseEntity<?> addProductToCart(@RequestBody @Valid CartAddItemRequest cartAddItemRequest) {
         cartItemService.addProductToCart(cartAddItemRequest);
-        return ResponseEntity.ok(ApiResponse.<Void>builder()
-                .message("Add product to cart successfully")
-                .build());
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/remove/{cartItemId}")
-    public ResponseEntity<ApiResponse<Void>> removeProductFromCart(@PathVariable List<Long> cartItemId) {
-        cartItemService.removeProductFromCart(cartItemId);
-        return ResponseEntity.ok(ApiResponse.<Void>builder()
-                .message("Remove product from cart successfully")
-                .build());
+    @DeleteMapping("/remove/{ids}")
+    public ResponseEntity<ApiResponse<Void>> removeProductFromCart(@PathVariable List<Long> ids) {
+        cartItemService.removeProductFromCart(ids);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<ApiResponse<CartItemResponse>> updateCartItem(@RequestBody @Valid CartUpdateItemRequest cartUpdateItemRequest) {
-        CartItemResponse cartItemResponse = cartItemService.updateCartItem(cartUpdateItemRequest);
-        return ResponseEntity.ok(ApiResponse.<CartItemResponse>builder()
-                .message("Update cart item successfully")
-                .result(cartItemResponse)
-                .build());
+    public ResponseEntity<?> updateCartItem(@RequestBody @Valid CartUpdateItemRequest cartUpdateItemRequest) {
+        String message = cartItemService.updateCartItem(cartUpdateItemRequest);
+        return ResponseEntity.ok(message);
     }
 }

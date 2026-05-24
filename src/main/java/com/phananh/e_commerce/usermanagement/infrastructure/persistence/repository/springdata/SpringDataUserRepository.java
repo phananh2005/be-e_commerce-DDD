@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface SpringDataUserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
-    Optional<User> findByCredentialsUsername(String username);
+    Optional<User> findByCredentials_Username(String username);
 
     boolean existsByCredentialsUsername(String username);
 

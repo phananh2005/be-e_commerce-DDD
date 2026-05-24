@@ -4,6 +4,7 @@ import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.core.util.SecurityUtils;
+// ...existing imports...
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
@@ -87,6 +88,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public Long getIdByUserName(String userName) {
+        User user = userRepository.getByUserName(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return user.getId();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(AdminUserQueryRequest request) {
         int page = PageUtils.getPageNumber(request.getPage());
         int size = PageUtils.getPageSize(request.getSize());
@@ -124,12 +133,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest) {
-        User user = userRepository.getById(userStatusUpdateRequest.getUserId())
+    public void updateUserStatus(Long userId, String status) {
+        User user = userRepository.getById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        if (userStatusUpdateRequest.getStatus()) user.activate();
-        else user.inactive();
+        if (StringUtils.isBlank(status)) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        if ("ACTIVE".equalsIgnoreCase(status)) user.active();
+        else if ("INACTIVE".equalsIgnoreCase(status)) user.inactive();
 
         userRepository.save(user);
     }

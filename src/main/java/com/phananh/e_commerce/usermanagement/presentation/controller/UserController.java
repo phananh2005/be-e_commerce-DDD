@@ -79,9 +79,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/update-status")
-    public ResponseEntity<?> updateUserStatus(@RequestBody @Valid UserRoleUpdateRequest userRoleUpdateRequest) {
-        userService.updateUserRole(userRoleUpdateRequest);
+    @PatchMapping("/{id}/{status}")
+    public ResponseEntity<?> updateUserStatus(@PathVariable("id") Long userId,
+                                              @PathVariable String status) {
+        userService.updateUserStatus(userId, status);
         return ResponseEntity.noContent().build();
     }
 }

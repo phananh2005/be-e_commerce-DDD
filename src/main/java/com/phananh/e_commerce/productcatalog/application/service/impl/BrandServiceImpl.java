@@ -1,6 +1,7 @@
 package com.phananh.e_commerce.productcatalog.application.service.impl;
 
 import com.phananh.e_commerce.core.util.PageUtils;
+import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.productcatalog.application.dto.query.BrandSearchQuery;
 import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.*;
@@ -117,8 +118,12 @@ public class BrandServiceImpl implements BrandService {
         Brand brand = brandRepository.getById(brandId)
                 .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
-        if("ACTIVE".equalsIgnoreCase(status)) brand.active();
-        else brand.inactive();
+        if (StringUtils.isBlank(status)) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        if ("ACTIVE".equalsIgnoreCase(status)) brand.active();
+        else if ("INACTIVE".equalsIgnoreCase(status)) brand.inactive();
 
         brandRepository.save(brand);
     }

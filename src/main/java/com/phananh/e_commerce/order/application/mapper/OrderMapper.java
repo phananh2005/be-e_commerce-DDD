@@ -1,6 +1,6 @@
 package com.phananh.e_commerce.order.application.mapper;
 
-import com.phananh.e_commerce.order.domain.model.entity.Order;
+import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.presentation.dto.response.order.OrderSummaryResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

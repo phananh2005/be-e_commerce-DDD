@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.order.domain.model.entity;
+package com.phananh.e_commerce.order.domain.model;
 
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
 import com.phananh.e_commerce.order.domain.model.enums.PaymentMethod;
@@ -15,7 +15,6 @@ import java.util.Set;
 @Entity
 @Table(name = "orders")
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,9 +23,8 @@ public class Order extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private Long userId;
 
     @Column(name = "total_price", precision = 19, scale = 2, nullable = false)
     private BigDecimal totalPrice;

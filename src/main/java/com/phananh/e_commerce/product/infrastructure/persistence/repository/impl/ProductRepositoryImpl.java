@@ -46,7 +46,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public Optional<Product> getById(Long id) {
+    public Optional<Product> getProductById(Long id) {
         return springDataProductRepository.findById(id);
     }
 
@@ -96,6 +96,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public void save(ProductVariant variant) {
         springDataProductVariantRepository.save(variant);
+    }
+
+    @Override
+    public Optional<Product> findByProductVariants_Id(Long variantId) {
+        return springDataProductRepository.findByVariants_Id(variantId);
     }
 }
 

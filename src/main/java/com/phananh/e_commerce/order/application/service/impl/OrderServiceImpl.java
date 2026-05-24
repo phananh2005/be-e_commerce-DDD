@@ -1,10 +1,8 @@
 package com.phananh.e_commerce.order.application.service.impl;
 
-import com.phananh.e_commerce.order.domain.model.entity.Order;
-import com.phananh.e_commerce.order.domain.model.entity.OrderItem;
+import com.phananh.e_commerce.order.domain.model.Order;
+import com.phananh.e_commerce.order.domain.model.OrderItem;
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
-import com.phananh.e_commerce.order.infrastructure.persistence.repository.OrderRepository;
-import com.phananh.e_commerce.order.infrastructure.persistence.repository.OrderItemRepository;
 import com.phananh.e_commerce.order.application.service.OrderService;
 import com.phananh.e_commerce.order.presentation.dto.request.order.CheckoutRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewRequest;

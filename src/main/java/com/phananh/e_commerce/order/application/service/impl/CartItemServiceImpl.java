@@ -1,13 +1,25 @@
 package com.phananh.e_commerce.order.application.service.impl;
 
-import com.phananh.e_commerce.order.domain.model.entity.CartItem;
-import com.phananh.e_commerce.order.infrastructure.persistence.repository.CartItemRepository;
+import com.phananh.e_commerce.core.exception.AppException;
+import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.core.util.ListUtils;
+import com.phananh.e_commerce.core.util.SecurityUtils;
+import com.phananh.e_commerce.order.application.mapper.CartItemMapper;
 import com.phananh.e_commerce.order.application.service.CartItemService;
+import com.phananh.e_commerce.order.domain.model.CartItem;
+import com.phananh.e_commerce.order.domain.repository.CartItemRepository;
 import com.phananh.e_commerce.order.presentation.dto.request.cart.CartAddItemRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.cart.CartUpdateItemRequest;
 import com.phananh.e_commerce.order.presentation.dto.response.cart.CartItemResponse;
-import com.phananh.e_commerce.core.exception.AppException;
-import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.product.application.dto.response.internal.ProductInfoResponse;
+import com.phananh.e_commerce.product.application.service.ProductInternalService;
+import com.phananh.e_commerce.product.domain.model.Product;
+import com.phananh.e_commerce.product.domain.model.ProductVariant;
+import com.phananh.e_commerce.product.domain.model.VariantImage;
+import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
+import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductVariantRepository;
+import com.phananh.e_commerce.usermanagement.application.service.UserService;
+import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -24,98 +37,108 @@ import java.util.Optional;
 public class CartItemServiceImpl implements CartItemService {
 
     CartItemRepository cartItemRepository;
-    ProductVariantRepository productVariantRepository;
-    SpringDataUserRepository springDataUserRepository;
 
-    @Override
-    @Transactional
-    public Optional<CartItem> addToCart(Long userId, Long variantId, Integer quantity) {
-        if (quantity <= 0) {
-            throw new AppException(ErrorCode.INVALID_QUANTITY);
-        }
-
-        var user = springDataUserRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-        var variant = productVariantRepository.findById(variantId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
-
-        if (variant.getStockQuantity() < quantity) {
-            throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
-        }
-
-        CartItem cartItem = CartItem.builder()
-                .user(user)
-                .variant(variant)
-                .quantity(quantity)
-                .build();
-
-        return Optional.of(cartItemRepository.save(cartItem));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<List<CartItem>> getCartItems(String username) {
-        return cartItemRepository.findByUser_Username(username);
-    }
-
-    @Override
-    @Transactional
-    public void removeCartItem(Long cartItemId) {
-        if (!cartItemRepository.existsById(cartItemId)) {
-            throw new AppException(ErrorCode.CART_ITEM_NOT_FOUND);
-        }
-        cartItemRepository.deleteById(cartItemId);
-    }
-
-    @Override
-    @Transactional
-    public void removeCartItems(List<Long> cartItemIds) {
-        cartItemRepository.deleteByIdIn(cartItemIds);
-    }
-
-    @Override
-    @Transactional
-    public CartItem updateCartItemQuantity(Long cartItemId, Integer quantity) {
-        if (quantity <= 0) {
-            throw new AppException(ErrorCode.INVALID_QUANTITY);
-        }
-
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new AppException(ErrorCode.CART_ITEM_NOT_FOUND));
-
-        if (cartItem.getVariant().getStockQuantity() < quantity) {
-            throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
-        }
-
-        cartItem.setQuantity(quantity);
-        return cartItemRepository.save(cartItem);
-    }
+    CartItemMapper cartItemMapper;
+    ProductInternalService productService;
+    UserService userService;
 
     @Override
     @Transactional(readOnly = true)
     public List<CartItemResponse> getMyCart() {
-        // TODO: Implement get my cart logic
-        return List.of();
+        Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
+        List<CartItem> cartItems = cartItemRepository.getByUserId(userId);
+
+        if (ListUtils.isNullOrEmpty(cartItems)) return null;
+        else {
+            return cartItems.stream()
+                    .map(cartItem -> {
+                        ProductInfoResponse productInfo = productService.getProductInfoByVariantId(cartItem.getVariantId());
+                        return cartItemMapper.toResponse(cartItem, productInfo);
+                    })
+                    .toList();
+        }
     }
 
     @Override
     @Transactional
     public void addProductToCart(CartAddItemRequest cartAddItemRequest) {
-        // TODO: Implement add product to cart logic
+        Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
+        Optional<CartItem> cartItem = cartItemRepository.getByUserIdAndVariantId(userId, cartAddItemRequest.getVariantId());
+        if(cartItem.isEmpty()){
+            if(cartAddItemRequest.getQuantity() > productService.getStockQuantityByVariantId(cartAddItemRequest.getVariantId())){
+                throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+            }
+            CartItem newCartItem = CartItem.addItem(userId, cartAddItemRequest.getVariantId(), cartAddItemRequest.getQuantity());
+            cartItemRepository.save(newCartItem);
+        }
+        else {
+            CartItem existingCartItem = cartItem.get();
+            Integer newQuantity = existingCartItem.getQuantity() + cartAddItemRequest.getQuantity();
+            if(newQuantity > productService.getStockQuantityByVariantId(cartAddItemRequest.getVariantId())){
+                throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+            }
+            existingCartItem.updateQuantity(newQuantity);
+            cartItemRepository.save(existingCartItem);
+        }
     }
 
     @Override
     @Transactional
     public void removeProductFromCart(List<Long> cartItemIds) {
-        // TODO: Implement remove product from cart logic
+        if (cartItemIds == null || cartItemIds.isEmpty()) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
+        List<CartItem> cartItems = cartItemRepository.getByListId(cartItemIds);
+        if (ListUtils.isNullOrEmpty(cartItems)) {
+            throw new AppException(ErrorCode.CART_ITEM_NOT_FOUND);
+        }
+        if(cartItems.stream().anyMatch(item -> !item.getUserId().equals(userId))) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        cartItemRepository.deleteAll(cartItems);
     }
 
     @Override
     @Transactional
-    public CartItemResponse updateCartItem(CartUpdateItemRequest cartUpdateItemRequest) {
-        // TODO: Implement update cart item logic
-        return null;
+    public String updateCartItem(CartUpdateItemRequest cartUpdateItemRequest){
+        if (cartUpdateItemRequest == null) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
+        CartItem cartItems = cartItemRepository.getById(cartUpdateItemRequest.getCartItemId())
+                .orElseThrow(() -> new AppException(ErrorCode.CART_ITEM_NOT_FOUND));
+        if(!cartItems.getUserId().equals(userId)) throw new AppException(ErrorCode.UNAUTHORIZED);
+
+        Optional<CartItem> existingCartItem = cartItemRepository.getByUserIdAndVariantId(userId, cartUpdateItemRequest.getVariantId());
+        if(existingCartItem.isEmpty()){
+            cartItems.updateVariant(cartUpdateItemRequest.getVariantId());
+
+            if(cartUpdateItemRequest.getQuantity() > productService.getStockQuantityByVariantId(cartUpdateItemRequest.getVariantId())){
+                throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+            }
+            cartItems.updateQuantity(cartUpdateItemRequest.getQuantity());
+
+            cartItemRepository.save(cartItems);
+
+            return "Update successful";
+        }
+        else {
+            cartItemRepository.delete(cartItems);
+            CartItem cartItemUpdate = existingCartItem.get();
+            Integer newQuantity = cartItemUpdate.getQuantity() + cartUpdateItemRequest.getQuantity();
+            Integer stockQuantity = productService.getStockQuantityByVariantId(cartUpdateItemRequest.getVariantId());
+            if(newQuantity > stockQuantity){
+                newQuantity = stockQuantity;
+            }
+            cartItemUpdate.updateQuantity(newQuantity);
+            cartItemRepository.save(cartItemUpdate);
+
+            return "Update successful, variant existing in cart and quantity has been adjusted to " + newQuantity;
+        }
     }
 }
 

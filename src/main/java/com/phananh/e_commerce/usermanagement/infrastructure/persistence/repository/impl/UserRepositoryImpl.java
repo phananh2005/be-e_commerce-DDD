@@ -1,5 +1,7 @@
 package com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.impl;
 
+import com.phananh.e_commerce.core.exception.AppException;
+import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
@@ -32,7 +34,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> getByUserName(String userName) {
-        return springDataUserRepository.findByCredentialsUsername(userName);
+        return springDataUserRepository.findByCredentials_Username(userName);
     }
 
     @Override

@@ -73,11 +73,15 @@ public class ProductVariant extends BaseEntity{
     }
 
     public void updatePrice(BigDecimal price) {
-        this.price = price != null && price.signum() >= 0 ? price : BigDecimal.ZERO;
+        if(price == null) throw new IllegalArgumentException("Price is null");
+        if(price.signum() < 0) throw new IllegalArgumentException("Price >= 0");
+        this.price = price;
     }
 
     public void updateStockQuantity(Integer stockQuantity) {
-        this.stockQuantity = stockQuantity != null && stockQuantity >= 0 ? stockQuantity : 0;
+        if(stockQuantity == null) throw new IllegalArgumentException("Stock quantity is null");
+        if(stockQuantity < 0) throw new IllegalArgumentException("Stock quantity >= 0");
+        this.stockQuantity = stockQuantity;
     }
 
     public void updateAttributeValues(Set<AttributeValue> attributeValues) {

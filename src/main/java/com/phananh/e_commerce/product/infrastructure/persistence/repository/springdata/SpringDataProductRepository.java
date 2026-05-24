@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface SpringDataProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     List<Product> findByNameContainingIgnoreCase(String name);
+    Product findByVariants_Id(Long variantId);
 }
 
 

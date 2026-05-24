@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ProductRepository {
     Page<Product> getProductsActiveBySearch(ProductSearchQuery productSearchQuery);
-    Optional<Product> getById(Long id);
+    Optional<Product> getProductById(Long id);
     Page<Product> getAllProductsBySearch(StaffProductSearchQuery productSearchQuery);
     List<ProductVariant> getVariantsByProductId(Long productId);
     Optional<ProductVariant> getVariantById(Long id);
@@ -19,5 +19,7 @@ public interface ProductRepository {
     void save(Product product);
     void save(AttributeValue attributeValue);
     void save(ProductVariant variant);
+
+    Optional<Product> findByProductVariants_Id(Long variantId);
 }
 

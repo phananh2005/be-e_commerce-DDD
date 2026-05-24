@@ -5,8 +5,8 @@ import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewR
 import com.phananh.e_commerce.order.presentation.dto.response.order.CustomerOrderDetailResponse;
 import com.phananh.e_commerce.order.presentation.dto.response.order.OrderPreviewDetailResponse;
 import com.phananh.e_commerce.order.presentation.dto.response.order.OrderSummaryResponse;
-import com.phananh.e_commerce.order.domain.model.entity.Order;
-import com.phananh.e_commerce.order.domain.model.entity.OrderItem;
+import com.phananh.e_commerce.order.domain.model.Order;
+import com.phananh.e_commerce.order.domain.model.OrderItem;
 
 import java.util.List;
 import java.util.Optional;

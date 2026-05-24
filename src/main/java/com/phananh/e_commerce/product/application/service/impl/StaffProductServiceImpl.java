@@ -70,7 +70,7 @@ public class StaffProductServiceImpl implements StaffProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductResponse getStaffProductById(Long id) {
-        Product product = productRepository.getById(id).orElseThrow(
+        Product product = productRepository.getProductById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return staffProductMapper.toStaffProductResponse(product);
@@ -79,7 +79,7 @@ public class StaffProductServiceImpl implements StaffProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductVariantResponse> getStaffProductVariantsByProductId(Long productId) {
-        if (productRepository.getById(productId).isEmpty()) {
+        if (productRepository.getProductById(productId).isEmpty()) {
             throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 
@@ -165,7 +165,7 @@ public class StaffProductServiceImpl implements StaffProductService {
     @Override
     @Transactional
     public void createProductVariant(Long productId, ProductVariantCreateRequest request) {
-        Product product = productRepository.getById(productId)
+        Product product = productRepository.getProductById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         Set<VariantImage> images = new HashSet<>();
@@ -224,7 +224,7 @@ public class StaffProductServiceImpl implements StaffProductService {
     @Override
     @Transactional
     public void updateProduct(ProductUpdateRequest productUpdateRequest) {
-        Product product = productRepository.getById(productUpdateRequest.getProductId())
+        Product product = productRepository.getProductById(productUpdateRequest.getProductId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         product.updateName(productUpdateRequest.getName());
@@ -310,7 +310,7 @@ public class StaffProductServiceImpl implements StaffProductService {
 
     @Override
     public void updateProductStatus(Long productId, String status) {
-        Product product = productRepository.getById(productId)
+        Product product = productRepository.getProductById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         if (StringUtils.isBlank(status)) {

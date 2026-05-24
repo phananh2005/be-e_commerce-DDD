@@ -2,6 +2,7 @@ package com.phananh.e_commerce.usermanagement.domain.model;
 
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
@@ -9,18 +10,17 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@Getter
 @NoArgsConstructor
 public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SuppressWarnings("unused")
     private Long id;
 
     @Embedded
     private UserCredentials credentials;
 
     @Embedded
-    @SuppressWarnings("unused")
     private UserInfo info;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -44,7 +44,7 @@ public class User extends BaseEntity{
         this.roles = roles;
     }
 
-    public void activate(){this.credentials = this.credentials.activeUser();}
+    public void active(){this.credentials = this.credentials.activeUser();}
 
     public void inactive(){this.credentials = this.credentials.inactiveUser();}
 }

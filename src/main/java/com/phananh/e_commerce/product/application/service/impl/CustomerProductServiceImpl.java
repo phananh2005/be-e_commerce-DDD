@@ -60,7 +60,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductDetailResponse getProductById(Long id) {
-        Product product = productRepository.getById(id).orElseThrow(
+        Product product = productRepository.getProductById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         if (product.getVariants() == null || product.getVariants().isEmpty()) {

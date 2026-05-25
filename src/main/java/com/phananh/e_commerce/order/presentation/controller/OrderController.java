@@ -34,12 +34,10 @@ public class OrderController {
                 .build());
     }
 
-    @PatchMapping("/checkout")
-    public ResponseEntity<ApiResponse<Void>> checkout(@RequestBody @Valid CheckoutRequest checkoutRequest) {
+    @PostMapping("/checkout")
+    public ResponseEntity<?> checkout(@RequestBody @Valid CheckoutRequest checkoutRequest) {
         orderService.checkout(checkoutRequest);
-        return ResponseEntity.ok(ApiResponse.<Void>builder()
-                .message("Checkout successfully")
-                .build());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/my-orders")
@@ -51,7 +49,7 @@ public class OrderController {
                 .build());
     }
 
-    @GetMapping("{orderId}")
+    @GetMapping("/my-orders/{orderId}")
     public ResponseEntity<ApiResponse<CustomerOrderDetailResponse>> getOrderDetail(@PathVariable Long orderId) {
         CustomerOrderDetailResponse response = orderService.getOrderDetail(orderId);
         return ResponseEntity.ok(ApiResponse.<CustomerOrderDetailResponse>builder()
@@ -61,10 +59,8 @@ public class OrderController {
     }
 
     @PatchMapping("{orderId}/{status}")
-    public ResponseEntity<ApiResponse<Void>> updateOrderStatus(@PathVariable Long orderId, @PathVariable String status) {
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @PathVariable String status) {
         orderService.updateOrderStatus(orderId, status);
-        return ResponseEntity.ok(ApiResponse.<Void>builder()
-                .message("Update order status successfully")
-                .build());
+        return ResponseEntity.noContent().build();
     }
 }

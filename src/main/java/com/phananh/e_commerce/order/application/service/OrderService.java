@@ -12,16 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
-    Optional<Order> getOrderById(Long orderId);
-
-    List<Order> getOrdersByUsername(String username);
-
-    Order createOrder(Order order);
-
-    Order updateOrderStatus(Long orderId, String status);
-
-    List<OrderItem> getOrderItems(Long orderId);
-
     OrderPreviewDetailResponse previewOrder(List<OrderPreviewRequest> orderPreviewRequest);
 
     void checkout(CheckoutRequest checkoutRequest);
@@ -29,6 +19,8 @@ public interface OrderService {
     List<OrderSummaryResponse> getMyOrder();
 
     CustomerOrderDetailResponse getOrderDetail(Long orderId);
+
+    Order updateOrderStatus(Long orderId, String status);
 }
 
 

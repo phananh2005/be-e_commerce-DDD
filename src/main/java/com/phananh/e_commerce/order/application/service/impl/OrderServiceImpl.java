@@ -1,24 +1,37 @@
 package com.phananh.e_commerce.order.application.service.impl;
 
+import com.phananh.e_commerce.core.util.ListUtils;
+import com.phananh.e_commerce.order.application.dto.command.OrderItemCreateCommand;
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.model.OrderItem;
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
+import com.phananh.e_commerce.order.domain.model.enums.PaymentMethod;
 import com.phananh.e_commerce.order.application.service.OrderService;
+import com.phananh.e_commerce.order.application.dto.command.OrderCreateCommand;
 import com.phananh.e_commerce.order.presentation.dto.request.order.CheckoutRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewRequest;
 import com.phananh.e_commerce.order.presentation.dto.response.order.CustomerOrderDetailResponse;
 import com.phananh.e_commerce.order.presentation.dto.response.order.OrderPreviewDetailResponse;
 import com.phananh.e_commerce.order.presentation.dto.response.order.OrderSummaryResponse;
+import com.phananh.e_commerce.order.domain.repository.OrderRepository;
+import com.phananh.e_commerce.order.domain.repository.OrderItemRepository;
+import com.phananh.e_commerce.product.application.service.ProductInternalService;
+import com.phananh.e_commerce.product.application.service.StaffProductService;
+import com.phananh.e_commerce.product.application.dto.response.internal.ProductInfoResponse;
+import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.core.util.SecurityUtils;
+import com.phananh.e_commerce.order.application.mapper.OrderMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,27 +40,141 @@ public class OrderServiceImpl implements OrderService {
 
     OrderRepository orderRepository;
     OrderItemRepository orderItemRepository;
-    ProductVariantRepository productVariantRepository;
+
+    ProductInternalService productService;
+    StaffProductService staffProductService;
+    UserService userService;
+    OrderMapper orderMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Order> getOrderById(Long orderId) {
-        return orderRepository.findById(orderId);
-    }
+    public OrderPreviewDetailResponse previewOrder(List<OrderPreviewRequest> orderPreviewRequest) {
+        if (ListUtils.isNullOrEmpty(orderPreviewRequest)) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Order> getOrdersByUsername(String username) {
-        return orderRepository.findByUser_Username(username);
+        var userInfo = userService.getMyInfo();
+
+        List<OrderPreviewDetailResponse.Item> items = new ArrayList<>();
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (OrderPreviewRequest req : orderPreviewRequest) {
+            ProductInfoResponse productInfo = productService.getProductInfoByVariantId(req.getVariantId());
+            if (req.getQuantity() == null || req.getQuantity() <= 0) throw new AppException(ErrorCode.INVALID_REQUEST);
+            if (req.getQuantity() > productInfo.getStockQuantity()) throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+
+            BigDecimal line = productInfo.getVariantPrice().multiply(BigDecimal.valueOf(req.getQuantity()));
+            total = total.add(line);
+
+            items.add(orderMapper.toOrderPreviewItem(productInfo));
+        }
+
+        OrderPreviewDetailResponse response = orderMapper.toOrderPreviewDetailResponse(userInfo);
+        response.setShippingFee(BigDecimal.ZERO);
+        response.setTotalPrice(total);
+        response.setItems(items);
+        response.setPaymentMethods(Arrays.asList(PaymentMethod.values()));
+
+        return response;
     }
 
     @Override
     @Transactional
-    public Order createOrder(Order order) {
-        if (order.getTotalPrice() == null || order.getTotalPrice().signum() < 0) {
+    public void checkout(CheckoutRequest checkoutRequest) {
+        if (checkoutRequest == null || checkoutRequest.getItems() == null || checkoutRequest.getItems().isEmpty()) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
-        return orderRepository.save(order);
+
+        PaymentMethod paymentMethod;
+        try {
+            paymentMethod = PaymentMethod.valueOf(checkoutRequest.getPaymentMethod().trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
+        Boolean isPaid = paymentMethod != PaymentMethod.COD;
+        OrderCreateCommand orderCreateCommand = OrderCreateCommand.builder()
+                .userId(userId)
+                .fullName(checkoutRequest.getFullName())
+                .phoneNumber(checkoutRequest.getPhoneNumber())
+                .shippingAddress(checkoutRequest.getShippingAddress())
+                .paymentMethod(paymentMethod)
+                .isPaid(isPaid)
+                .build();
+
+        Order order = Order.createFirst(orderCreateCommand);
+        order = orderRepository.save(order);
+
+        BigDecimal total = BigDecimal.ZERO;
+        Set<OrderItem> itemsToSave = new HashSet<>();
+
+        for (CheckoutRequest.Item item : checkoutRequest.getItems()) {
+            ProductInfoResponse productInfo = productService.getProductInfoByVariantId(item.getVariantId());
+            if (item.getQuantity() == null || item.getQuantity() <= 0) throw new AppException(ErrorCode.INVALID_REQUEST);
+            Integer currentStock = productInfo.getStockQuantity();
+            if (item.getQuantity() > currentStock) throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+
+            BigDecimal price = productInfo.getVariantPrice();
+            BigDecimal line = price.multiply(BigDecimal.valueOf(item.getQuantity()));
+            total = total.add(line);
+
+            OrderItemCreateCommand orderItemCreateCommand = OrderItemCreateCommand.builder()
+                    .order(order)
+                    .variantId(item.getVariantId())
+                    .quantity(item.getQuantity())
+                    .price(price)
+                    .build();
+            OrderItem orderItem = OrderItem.create(orderItemCreateCommand);
+            orderItemRepository.save(orderItem);
+
+            int newStock = currentStock - item.getQuantity();
+            staffProductService.updateVariantStock(item.getVariantId(), Math.max(newStock, 0));
+            itemsToSave.add(orderItem);
+        }
+        order.updateTotalPrice(total);
+        order.updateShippingFee(BigDecimal.ZERO);
+        order.addOrderItems(itemsToSave);
+        orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderSummaryResponse> getMyOrder() {
+        Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
+        List<Order> orders = orderRepository.findByUserId(userId);
+
+        return orders.stream().map(order -> {
+            List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(order.getId());
+            List<OrderSummaryResponse.Item> items = orderItems.stream()
+                    .map(oi -> orderMapper.toOrderSummaryItem(
+                            oi,
+                            productService.getProductInfoByVariantId(oi.getVariantId())
+                    ))
+                    .collect(Collectors.toList());
+
+            OrderSummaryResponse response = orderMapper.toOrderSummaryResponse(order);
+            response.setItems(items);
+            return response;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomerOrderDetailResponse getOrderDetail(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(order.getId());
+
+        List<CustomerOrderDetailResponse.Item> items = orderItems.stream().map(oi -> {
+            ProductInfoResponse p = productService.getProductInfoByVariantId(oi.getVariantId());
+            return orderMapper.toCustomerOrderDetailItem(oi, p);
+        }).collect(Collectors.toList());
+
+        CustomerOrderDetailResponse response = orderMapper.toCustomerOrderDetailResponse(order);
+        response.setItems(items);
+        return response;
     }
 
     @Override
@@ -55,47 +182,14 @@ public class OrderServiceImpl implements OrderService {
     public Order updateOrderStatus(Long orderId, String status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-        
+
         try {
-            order.setStatus(OrderStatus.valueOf(status));
+            order.updateStatus(OrderStatus.valueOf(status));
         } catch (IllegalArgumentException e) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
-        
+
         return orderRepository.save(order);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<OrderItem> getOrderItems(Long orderId) {
-        return orderItemRepository.findByOrder_Id(orderId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public OrderPreviewDetailResponse previewOrder(List<OrderPreviewRequest> orderPreviewRequest) {
-        // TODO: Implement preview order logic
-        return null;
-    }
-
-    @Override
-    @Transactional
-    public void checkout(CheckoutRequest checkoutRequest) {
-        // TODO: Implement checkout logic
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<OrderSummaryResponse> getMyOrder() {
-        // TODO: Implement get my order logic
-        return List.of();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public CustomerOrderDetailResponse getOrderDetail(Long orderId) {
-        // TODO: Implement get order detail logic
-        return null;
     }
 }
 

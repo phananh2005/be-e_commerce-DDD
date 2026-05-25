@@ -31,6 +31,7 @@ public enum ErrorCode {
     ORDER_ITEM_NOT_FOUND(404, "Order item not found", HttpStatus.NOT_FOUND),
     CART_ITEM_NOT_FOUND(404, "Cart item not found", HttpStatus.NOT_FOUND),
     CONFLICT(409, "Conflict", HttpStatus.CONFLICT),
+    CONCURRENT_UPDATE_ERROR(409, "Concurrent update error", HttpStatus.CONFLICT),
     USER_ALREADY_EXISTS(409, "User already exists", HttpStatus.CONFLICT),
     USERNAME_ALREADY_EXISTS(409, "Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS(409, "Email already exists", HttpStatus.CONFLICT),

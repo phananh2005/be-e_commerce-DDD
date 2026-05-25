@@ -39,6 +39,9 @@ public class ProductVariant extends BaseEntity{
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
 
+    @Version
+    private Long version;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "variant_attribute_values",

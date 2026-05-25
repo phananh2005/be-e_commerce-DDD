@@ -12,13 +12,5 @@ public interface SpringDataCartItemRepository extends JpaRepository<CartItem, Lo
     Optional<CartItem> getByUserIdAndVariantId(Long userId, Long variantId);
 
     List<CartItem> findByIdIn(List<Long> ids);
-
-    Optional<CartItem> findByIdAndUser_CredentialsUsername(Long id, String username);
-
-    Optional<CartItem> findByUser_CredentialsUsernameAndVariant_Id(String username, Long variantId);
-
-    List<CartItem> findByUser_CredentialsUsernameAndIdIn(String username, java.util.List<Long> ids);
-
-    void deleteByIdIn(java.util.List<Long> ids);
 }
 

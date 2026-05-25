@@ -1,7 +1,7 @@
 package com.phananh.e_commerce.order.application.mapper;
 
 import com.phananh.e_commerce.order.domain.model.CartItem;
-import com.phananh.e_commerce.order.presentation.dto.response.cart.CartItemResponse;
+import com.phananh.e_commerce.order.application.dto.response.cart.CartItemResponse;
 import com.phananh.e_commerce.product.application.dto.response.internal.ProductInfoResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

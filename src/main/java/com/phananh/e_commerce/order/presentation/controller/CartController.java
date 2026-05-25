@@ -2,7 +2,7 @@ package com.phananh.e_commerce.order.presentation.controller;
 
 import com.phananh.e_commerce.order.presentation.dto.request.cart.CartAddItemRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.cart.CartUpdateItemRequest;
-import com.phananh.e_commerce.order.presentation.dto.response.cart.CartItemResponse;
+import com.phananh.e_commerce.order.application.dto.response.cart.CartItemResponse;
 import com.phananh.e_commerce.order.application.service.CartItemService;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -10,17 +10,10 @@ import com.phananh.e_commerce.order.domain.model.CartItem;
 import com.phananh.e_commerce.order.domain.repository.CartItemRepository;
 import com.phananh.e_commerce.order.presentation.dto.request.cart.CartAddItemRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.cart.CartUpdateItemRequest;
-import com.phananh.e_commerce.order.presentation.dto.response.cart.CartItemResponse;
+import com.phananh.e_commerce.order.application.dto.response.cart.CartItemResponse;
 import com.phananh.e_commerce.product.application.dto.response.internal.ProductInfoResponse;
 import com.phananh.e_commerce.product.application.service.ProductInternalService;
-import com.phananh.e_commerce.product.domain.model.Product;
-import com.phananh.e_commerce.product.domain.model.ProductVariant;
-import com.phananh.e_commerce.product.domain.model.VariantImage;
-import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
-import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductVariantRepository;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
-import com.phananh.e_commerce.usermanagement.domain.model.User;
-import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

@@ -14,16 +14,10 @@ public interface CartItemRepository {
 
     Optional<CartItem> getById(Long id);
 
-    boolean existsById(Long id);
-
     CartItem save(CartItem cartItem);
-
-    void deleteByIdIn(java.util.List<Long> ids);
 
     void delete(CartItem cartItem);
 
     void deleteAll(Iterable<CartItem> cartItems);
-
-    void deleteById(Long id);
 }
 

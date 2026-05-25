@@ -38,18 +38,8 @@ public class CartItemRepositoryImpl implements CartItemRepository {
     }
 
     @Override
-    public boolean existsById(Long id) {
-        return springDataCartItemRepository.existsById(id);
-    }
-
-    @Override
     public CartItem save(CartItem cartItem) {
         return springDataCartItemRepository.save(cartItem);
-    }
-
-    @Override
-    public void deleteByIdIn(List<Long> ids) {
-        springDataCartItemRepository.deleteByIdIn(ids);
     }
 
     @Override
@@ -60,11 +50,6 @@ public class CartItemRepositoryImpl implements CartItemRepository {
     @Override
     public void deleteAll(Iterable<CartItem> cartItems) {
         springDataCartItemRepository.deleteAll(cartItems);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        springDataCartItemRepository.deleteById(id);
     }
 }
 

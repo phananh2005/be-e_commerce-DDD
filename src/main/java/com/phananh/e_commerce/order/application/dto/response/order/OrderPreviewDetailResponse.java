@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.order.application.dto.response;
+package com.phananh.e_commerce.order.application.dto.response.order;
 
 import com.phananh.e_commerce.order.domain.model.enums.PaymentMethod;
 import lombok.Builder;
@@ -29,3 +29,5 @@ public class OrderPreviewDetailResponse {
         private String variantImageUrl;
     }
 }
+
+

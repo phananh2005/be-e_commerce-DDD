@@ -2,25 +2,22 @@ package com.phananh.e_commerce.order.application.mapper;
 
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.model.OrderItem;
-import com.phananh.e_commerce.order.presentation.dto.response.order.CustomerOrderDetailResponse;
-import com.phananh.e_commerce.order.presentation.dto.response.order.OrderPreviewDetailResponse;
-import com.phananh.e_commerce.order.presentation.dto.response.order.OrderSummaryResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.CustomerOrderDetailResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.OrderPreviewDetailResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.OrderSummaryResponse;
 import com.phananh.e_commerce.product.application.dto.response.internal.ProductInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class OrderMapper {
+@Mapper(componentModel = "spring")
+public interface OrderMapper {
 
-    public OrderSummaryResponse toOrderSummaryResponse(Order order) {
-        return OrderSummaryResponse.builder()
-                .orderId(order.getId())
-                .totalPrice(order.getTotalPrice())
-                .status(order.getStatus() != null ? order.getStatus().toString() : null)
-                .build();
-    }
+    @Mapping(target = "orderId", source = "id")
+    @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
+    OrderSummaryResponse toOrderSummaryResponse(Order order);
 
-    public OrderSummaryResponse.Item toOrderSummaryItem(OrderItem orderItem, ProductInfoResponse productInfo) {
+    default OrderSummaryResponse.Item toOrderSummaryItem(OrderItem orderItem, ProductInfoResponse productInfo) {
         return OrderSummaryResponse.Item.builder()
                 .productName(productInfo.getProductName())
                 .skuCode(productInfo.getVariantSkuCode())
@@ -30,7 +27,7 @@ public class OrderMapper {
                 .build();
     }
 
-    public CustomerOrderDetailResponse.Item toCustomerOrderDetailItem(OrderItem orderItem, ProductInfoResponse productInfo) {
+    default CustomerOrderDetailResponse.Item toCustomerOrderDetailItem(OrderItem orderItem, ProductInfoResponse productInfo) {
         return CustomerOrderDetailResponse.Item.builder()
                 .productId(productInfo.getProductId())
                 .productName(productInfo.getProductName())
@@ -41,26 +38,14 @@ public class OrderMapper {
                 .build();
     }
 
-    public CustomerOrderDetailResponse toCustomerOrderDetailResponse(Order order) {
-        return CustomerOrderDetailResponse.builder()
-                .orderId(order.getId())
-                .createdAt(order.getCreatedAt())
-                .modifiedAt(order.getModifiedAt())
-                .createdBy(order.getCreatedBy())
-                .modifiedBy(order.getModifiedBy())
-                .fullName(order.getFullName())
-                .isPaid(order.getIsPaid())
-                .paymentDate(order.getPaymentDate())
-                .paymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod().toString() : null)
-                .phoneNumber(order.getPhoneNumber())
-                .shippingAddress(order.getShippingAddress())
-                .shippingFee(order.getShippingFee())
-                .status(order.getStatus() != null ? order.getStatus().toString() : null)
-                .totalPrice(order.getTotalPrice())
-                .build();
-    }
+    @Mapping(target = "orderId", source = "id")
+    @Mapping(target = "isPaid", source = "isPaid")
+    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod() != null ? order.getPaymentMethod().toString() : null)")
+    @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
+    @Mapping(target = "items", ignore = true)
+    CustomerOrderDetailResponse toCustomerOrderDetailResponse(Order order);
 
-    public OrderPreviewDetailResponse.Item toOrderPreviewItem(ProductInfoResponse productInfo) {
+    default OrderPreviewDetailResponse.Item toOrderPreviewItem(ProductInfoResponse productInfo) {
         return OrderPreviewDetailResponse.Item.builder()
                 .skuCode(productInfo.getVariantSkuCode())
                 .productId(productInfo.getProductId())
@@ -69,13 +54,10 @@ public class OrderMapper {
                 .build();
     }
 
-    public OrderPreviewDetailResponse toOrderPreviewDetailResponse(UserInfoResponse userInfo) {
-        return OrderPreviewDetailResponse.builder()
-                .fullName(userInfo.getFullName())
-                .phoneNumber(userInfo.getPhoneNumber())
-                .shippingAddress(userInfo.getAddress())
-                .build();
-    }
+    @Mapping(target = "fullName", source = "fullName")
+    @Mapping(target = "phoneNumber", source = "phoneNumber")
+    @Mapping(target = "shippingAddress", source = "address")
+    OrderPreviewDetailResponse toOrderPreviewDetailResponse(UserInfoResponse userInfo);
 }
 
 

@@ -2,9 +2,9 @@ package com.phananh.e_commerce.order.presentation.controller;
 
 import com.phananh.e_commerce.order.presentation.dto.request.order.CheckoutRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewRequest;
-import com.phananh.e_commerce.order.presentation.dto.response.order.CustomerOrderDetailResponse;
-import com.phananh.e_commerce.order.presentation.dto.response.order.OrderPreviewDetailResponse;
-import com.phananh.e_commerce.order.presentation.dto.response.order.OrderSummaryResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.CustomerOrderDetailResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.OrderPreviewDetailResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.OrderSummaryResponse;
 import com.phananh.e_commerce.order.application.service.OrderService;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

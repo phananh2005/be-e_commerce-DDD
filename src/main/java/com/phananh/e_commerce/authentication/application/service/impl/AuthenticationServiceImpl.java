@@ -3,12 +3,16 @@ package com.phananh.e_commerce.authentication.application.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.AuthenticationRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.auth.IntrospectRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.RegisterRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.AuthTokenResponse;
+import com.phananh.e_commerce.authentication.presentation.dto.response.auth.IntrospectResponse;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.LogoutResponse;
+import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
+import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
@@ -16,13 +20,13 @@ import com.phananh.e_commerce.usermanagement.infrastructure.persistence.reposito
 import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.Base64;
@@ -43,7 +47,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private final SpringDataUserRepository springDataUserRepository;
 	private final SpringDataRoleRepository springDataRoleRepository;
-	private final PasswordEncoder passwordEncoder;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final byte[] jwtSecret;
 	private final long accessTokenExpirationSeconds;
@@ -54,14 +57,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public AuthenticationServiceImpl(
 			SpringDataUserRepository springDataUserRepository,
 			SpringDataRoleRepository springDataRoleRepository,
-			PasswordEncoder passwordEncoder,
 			@Value("${application.security.jwt.secret-key}") String jwtSecret,
 			@Value("${application.security.jwt.expiration}") long accessTokenExpirationSeconds,
 			@Value("${application.security.jwt.refresh-expiration}") long refreshTokenExpirationSeconds
 	) {
 		this.springDataUserRepository = springDataUserRepository;
 		this.springDataRoleRepository = springDataRoleRepository;
-		this.passwordEncoder = passwordEncoder;
 		this.jwtSecret = jwtSecret.getBytes(StandardCharsets.UTF_8);
 		this.accessTokenExpirationSeconds = accessTokenExpirationSeconds;
 		this.refreshTokenExpirationSeconds = refreshTokenExpirationSeconds;
@@ -69,14 +70,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public AuthTokenResponse login(AuthenticationRequest request) {
-		User user = springDataUserRepository.findByUserName(request.getUsername())
+		User user = springDataUserRepository.findByCredentials_Username(request.getUsername())
 				.orElseThrow(() -> unauthorized("Invalid username or password"));
 
-		if (!Boolean.TRUE.equals(user.getEnabled())) {
+		if (user.getCredentials() == null || !Boolean.TRUE.equals(user.getCredentials().isEnabled())) {
 			throw unauthorized("Account is disabled");
 		}
 
-		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+		if (!PasswordUtils.matches(request.getPassword(), user.getCredentials().password())) {
 			throw unauthorized("Invalid username or password");
 		}
 
@@ -85,25 +86,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public AuthTokenResponse register(RegisterRequest request) {
-		if (springDataUserRepository.existsByUsername(request.getUsername())) {
+		if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 		}
 
-		if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByEmail(request.getEmail())) {
+		if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
 		}
 
-	Role customerRole = springDataRoleRepository.findByName(RoleName.USER)
-			.orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.USER).build()));
+		Role customerRole = springDataRoleRepository.findByName(RoleName.ROLE_CUSTOMER)
+				.orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.ROLE_CUSTOMER).build()));
 
-		User user = User.builder()
-				.username(request.getUsername())
-				.password(passwordEncoder.encode(request.getPassword()))
-				.email(request.getEmail())
-				.fullName(request.getFullName())
-				.enabled(true)
-				.roles(new HashSet<>(Set.of(customerRole)))
-				.build();
+		User user = new User();
+		setField(user, "credentials", new UserCredentials(request.getUsername(), request.getPassword(), true));
+		setField(user, "info", null);
+		setField(user, "roles", new HashSet<>(Set.of(customerRole)));
 
 		User savedUser = springDataUserRepository.save(user);
 		return issueTokenPair(savedUser);
@@ -114,10 +111,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		TokenClaims claims = parseAndValidateToken(request.getRefreshToken(), REFRESH_TYPE);
 		invalidatedTokens.add(request.getRefreshToken());
 
-		User user = springDataUserRepository.findByUserName(claims.username())
+		User user = springDataUserRepository.findByCredentials_Username(claims.username())
 				.orElseThrow(() -> unauthorized("User not found"));
 
-		if (!Boolean.TRUE.equals(user.getEnabled())) {
+		if (user.getCredentials() == null || !Boolean.TRUE.equals(user.getCredentials().isEnabled())) {
 			throw unauthorized("Account is disabled");
 		}
 
@@ -128,6 +125,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public LogoutResponse logout(LogoutRequest request) {
 		invalidatedTokens.add(request.getToken());
 		return LogoutResponse.builder().success(true).build();
+	}
+
+	@Override
+	public IntrospectResponse introspect(IntrospectRequest request) {
+		try {
+			TokenClaims claims = parseAndValidateToken(request.getToken(), null);
+			return IntrospectResponse.builder()
+					.active(true)
+					.username(claims.username())
+					.tokenType(claims.tokenType())
+					.expiresAt(claims.expiresAt())
+					.build();
+		} catch (ResponseStatusException ex) {
+			return IntrospectResponse.builder().active(false).build();
+		}
 	}
 
 //	@Override
@@ -150,9 +162,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 //	}
 
 	private AuthTokenResponse issueTokenPair(User user) {
-		String username = user.getUsername();
+		String username = user.getCredentials().username();
 		String roles = user.getRoles().stream()
-				.map(role -> role.getName().name())
+				.map(this::extractRoleName)
 				.reduce((left, right) -> left + " " + right)
 				.orElse("");
 
@@ -286,6 +298,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private ResponseStatusException unauthorized(String message) {
 		return new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
+	}
+
+	private void setField(Object target, String fieldName, Object value) {
+		try {
+			Field field = target.getClass().getDeclaredField(fieldName);
+			field.setAccessible(true);
+			field.set(target, value);
+		} catch (ReflectiveOperationException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot set user field", ex);
+		}
+	}
+
+	private String extractRoleName(Role role) {
+		try {
+			Field field = role.getClass().getDeclaredField("name");
+			field.setAccessible(true);
+			Object value = field.get(role);
+			return value == null ? "" : value.toString();
+		} catch (ReflectiveOperationException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot read role name", ex);
+		}
 	}
 
 	private record TokenClaims(String username, String tokenType, long expiresAt) {

@@ -13,6 +13,7 @@ public interface UserRepository {
     Optional<User> getById(Long id);
     Optional<User> getByUserName(String userName);
     void save(User user);
+    long count();
     Page<User> getListUsersBySearch(UserSearchQuery userSearchQuery);
     Set<Role> getRolesByRoleNames(Set<RoleName> roleNames);
 }

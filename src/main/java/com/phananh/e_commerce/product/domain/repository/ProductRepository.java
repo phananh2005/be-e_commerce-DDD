@@ -19,6 +19,7 @@ public interface ProductRepository {
     void save(Product product);
     void save(AttributeValue attributeValue);
     void save(ProductVariant variant);
+    long count();
 
     Optional<Product> findByProductVariants_Id(Long variantId);
 }

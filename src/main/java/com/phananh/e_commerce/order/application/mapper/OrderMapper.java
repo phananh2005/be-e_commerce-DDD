@@ -2,6 +2,7 @@ package com.phananh.e_commerce.order.application.mapper;
 
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.model.OrderItem;
+import com.phananh.e_commerce.order.application.dto.response.order.OrderStatisticsResponse;
 import com.phananh.e_commerce.order.application.dto.response.order.CustomerOrderDetailResponse;
 import com.phananh.e_commerce.order.application.dto.response.order.OrderPreviewDetailResponse;
 import com.phananh.e_commerce.order.application.dto.response.order.OrderSummaryResponse;
@@ -16,6 +17,11 @@ public interface OrderMapper {
     @Mapping(target = "orderId", source = "id")
     @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
     OrderSummaryResponse toOrderSummaryResponse(Order order);
+
+    @Mapping(target = "orderId", source = "id")
+    @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
+    @Mapping(target = "isPaid", source = "isPaid")
+    OrderStatisticsResponse toOrderStatisticsResponse(Order order);
 
     default OrderSummaryResponse.Item toOrderSummaryItem(OrderItem orderItem, ProductInfoResponse productInfo) {
         return OrderSummaryResponse.Item.builder()

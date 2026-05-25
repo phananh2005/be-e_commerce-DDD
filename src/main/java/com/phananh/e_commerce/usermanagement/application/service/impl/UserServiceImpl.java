@@ -38,6 +38,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public long countUsers() {
+        return userRepository.count();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public UserInfoResponse getMyInfo() {
         String userName = SecurityUtils.getCurrentUserName();
         User user = userRepository.getByUserName(userName)

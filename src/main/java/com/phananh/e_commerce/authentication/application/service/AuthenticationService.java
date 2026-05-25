@@ -1,10 +1,12 @@
 package com.phananh.e_commerce.authentication.application.service;
 
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.AuthenticationRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.auth.IntrospectRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.RegisterRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.AuthTokenResponse;
+import com.phananh.e_commerce.authentication.presentation.dto.response.auth.IntrospectResponse;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.LogoutResponse;
 
 public interface AuthenticationService {
@@ -16,7 +18,7 @@ public interface AuthenticationService {
 
 	LogoutResponse logout(LogoutRequest request);
 
-//	IntrospectResponse introspect(IntrospectRequest request);
+	IntrospectResponse introspect(IntrospectRequest request);
 }
 
 

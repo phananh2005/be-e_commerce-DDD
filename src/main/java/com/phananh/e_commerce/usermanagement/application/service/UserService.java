@@ -6,6 +6,8 @@ import com.phananh.e_commerce.usermanagement.presentation.dto.request.*;
 import org.springframework.data.domain.Page;
 
 public interface UserService {
+    long countUsers();
+
     UserInfoResponse getMyInfo();
     void updateMyInfo(UserInfoUpdateRequest userInfoUpdateRequest);
     void changePassword(UserChangePasswordRequest userChangePasswordRequest);

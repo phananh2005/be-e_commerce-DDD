@@ -8,6 +8,10 @@ import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
 import com.phananh.e_commerce.order.domain.model.enums.PaymentMethod;
 import com.phananh.e_commerce.order.application.service.OrderService;
 import com.phananh.e_commerce.order.application.dto.command.OrderCreateCommand;
+import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenuePeriodProjection;
+import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenueSummaryProjection;
+import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsOverviewProjection;
+import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsRangeProjection;
 import com.phananh.e_commerce.order.presentation.dto.request.order.CheckoutRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewRequest;
 import com.phananh.e_commerce.order.application.dto.response.order.CustomerOrderDetailResponse;
@@ -30,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,6 +50,30 @@ public class OrderServiceImpl implements OrderService {
     StaffProductService staffProductService;
     UserService userService;
     OrderMapper orderMapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderStatisticsOverviewProjection getStatisticsOverview() {
+        return orderRepository.getStatisticsOverview();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderStatisticsRangeProjection getStatisticsByDateRange(LocalDateTime fromDate, LocalDateTime toDate) {
+        return orderRepository.getStatisticsByDateRange(fromDate, toDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderRevenueSummaryProjection getRevenueSummary(LocalDateTime fromDate, LocalDateTime toDate) {
+        return orderRepository.getRevenueSummary(fromDate, toDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderRevenuePeriodProjection> getRevenueReport(LocalDateTime fromDate, LocalDateTime toDate, String groupBy) {
+        return orderRepository.getRevenueReport(fromDate, toDate, groupBy);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -179,7 +208,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order updateOrderStatus(Long orderId, String status) {
+    public void updateOrderStatus(Long orderId, String status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
@@ -189,8 +218,6 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        return orderRepository.save(order);
+        orderRepository.save(order);
     }
 }
-
-

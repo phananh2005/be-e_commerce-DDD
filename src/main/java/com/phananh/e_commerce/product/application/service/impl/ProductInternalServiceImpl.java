@@ -37,4 +37,10 @@ public class ProductInternalServiceImpl implements ProductInternalService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
         return productVariant.getStockQuantity();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countProducts() {
+        return productRepository.count();
+    }
 }

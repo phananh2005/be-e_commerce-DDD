@@ -5,4 +5,5 @@ import com.phananh.e_commerce.product.application.dto.response.internal.ProductI
 public interface ProductInternalService {
     ProductInfoResponse getProductInfoByVariantId(Long variantId);
     Integer getStockQuantityByVariantId(Long variantId);
+    long countProducts();
 }

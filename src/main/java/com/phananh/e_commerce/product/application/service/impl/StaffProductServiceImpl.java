@@ -44,6 +44,7 @@ public class StaffProductServiceImpl implements StaffProductService {
     StaffProductMapper staffProductMapper;
     CloudinaryService cloudinaryService;
 
+
     @Override
     @Transactional(readOnly = true)
     public Page<ProductResponse> getAllProductsBySearch(StaffProductSearchRequest staffProductSearchRequest) {

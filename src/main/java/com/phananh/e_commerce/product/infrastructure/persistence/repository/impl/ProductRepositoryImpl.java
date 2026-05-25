@@ -99,8 +99,13 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public long count() {
+        return springDataProductRepository.count();
+    }
+
+    @Override
     public Optional<Product> findByProductVariants_Id(Long variantId) {
-        return springDataProductRepository.findByVariants_Id(variantId);
+        return Optional.ofNullable(springDataProductRepository.findByVariants_Id(variantId));
     }
 }
 

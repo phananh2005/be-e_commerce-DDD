@@ -1,10 +1,12 @@
 package com.phananh.e_commerce.authentication.presentation.controller;
 
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.AuthenticationRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.auth.IntrospectRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.auth.RegisterRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.AuthTokenResponse;
+import com.phananh.e_commerce.authentication.presentation.dto.response.auth.IntrospectResponse;
 import com.phananh.e_commerce.authentication.presentation.dto.response.auth.LogoutResponse;
 import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
@@ -61,6 +63,15 @@ public class AuthenticationController {
         return ApiResponse.<LogoutResponse>builder()
                 .message("Logout successful")
                 .result(authenticationService.logout(request))
+                .build();
+    }
+
+    @Operation(summary = "Kiểm tra token")
+    @PostMapping("/introspect")
+    public ApiResponse<IntrospectResponse> introspect(@Valid @RequestBody IntrospectRequest request) {
+        return ApiResponse.<IntrospectResponse>builder()
+                .message("Introspect token successful")
+                .result(authenticationService.introspect(request))
                 .build();
     }
 }

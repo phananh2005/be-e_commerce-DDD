@@ -1,7 +1,5 @@
 package com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.impl;
 
-import com.phananh.e_commerce.core.exception.AppException;
-import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
@@ -40,6 +38,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void save(User user) {
         springDataUserRepository.save(user);
+    }
+
+    @Override
+    public long count() {
+        return springDataUserRepository.count();
     }
 
     @Override

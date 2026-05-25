@@ -21,5 +21,5 @@ public class DashboardRevenueReportRequest {
     private LocalDate toDate;
 
     @Builder.Default
-    private String groupBy = "DAY";
+    private RevenueGroupBy groupBy = RevenueGroupBy.DAY;
 }

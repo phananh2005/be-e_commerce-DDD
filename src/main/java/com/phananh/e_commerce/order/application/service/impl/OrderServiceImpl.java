@@ -14,9 +14,10 @@ import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatis
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsRangeProjection;
 import com.phananh.e_commerce.order.presentation.dto.request.order.CheckoutRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewRequest;
-import com.phananh.e_commerce.order.application.dto.response.order.CustomerOrderDetailResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.OrderDetailResponse;
 import com.phananh.e_commerce.order.application.dto.response.order.OrderPreviewDetailResponse;
 import com.phananh.e_commerce.order.application.dto.response.order.OrderSummaryResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.StaffOrderResponse;
 import com.phananh.e_commerce.order.domain.repository.OrderRepository;
 import com.phananh.e_commerce.order.domain.repository.OrderItemRepository;
 import com.phananh.e_commerce.product.application.service.ProductInternalService;
@@ -32,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -73,6 +76,13 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderRevenuePeriodProjection> getRevenueReport(LocalDateTime fromDate, LocalDateTime toDate, String groupBy) {
         return orderRepository.getRevenueReport(fromDate, toDate, groupBy);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<StaffOrderResponse> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::toStaffOrderResponse);
     }
 
     @Override
@@ -190,18 +200,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public CustomerOrderDetailResponse getOrderDetail(Long orderId) {
+    public OrderDetailResponse getOrderDetail(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(order.getId());
 
-        List<CustomerOrderDetailResponse.Item> items = orderItems.stream().map(oi -> {
+        List<OrderDetailResponse.Item> items = orderItems.stream().map(oi -> {
             ProductInfoResponse p = productService.getProductInfoByVariantId(oi.getVariantId());
             return orderMapper.toCustomerOrderDetailItem(oi, p);
         }).collect(Collectors.toList());
 
-        CustomerOrderDetailResponse response = orderMapper.toCustomerOrderDetailResponse(order);
+        OrderDetailResponse response = orderMapper.toCustomerOrderDetailResponse(order);
         response.setItems(items);
         return response;
     }

@@ -1,8 +1,8 @@
 package com.phananh.e_commerce.dashboard.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.dashboard.application.dto.request.DashboardOrderStatisticRequest;
-import com.phananh.e_commerce.dashboard.application.dto.request.DashboardRevenueReportRequest;
+import com.phananh.e_commerce.dashboard.presentation.dto.request.DashboardOrderStatisticRequest;
+import com.phananh.e_commerce.dashboard.presentation.dto.request.DashboardRevenueReportRequest;
 import com.phananh.e_commerce.dashboard.application.dto.response.DashboardResponse;
 import com.phananh.e_commerce.dashboard.application.dto.response.SalesStatsResponse;
 import com.phananh.e_commerce.dashboard.application.dto.response.StatisticsResponse;

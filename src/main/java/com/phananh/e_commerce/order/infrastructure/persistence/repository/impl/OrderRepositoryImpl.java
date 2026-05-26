@@ -9,6 +9,8 @@ import com.phananh.e_commerce.order.domain.repository.OrderRepository;
 import com.phananh.e_commerce.order.infrastructure.persistence.repository.springdata.SpringDataOrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -35,6 +37,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public List<Order> findByUserId(Long userId) {
         return springDataOrderRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Page<Order> findAll(Pageable pageable) {
+        return springDataOrderRepository.findAll(pageable);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.dashboard.application.dto.request;
+package com.phananh.e_commerce.dashboard.presentation.dto.request;
 
 public enum RevenueGroupBy {
     DAY,

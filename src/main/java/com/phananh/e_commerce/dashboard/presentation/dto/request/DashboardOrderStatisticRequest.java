@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.dashboard.application.dto.request;
+package com.phananh.e_commerce.dashboard.presentation.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,14 +12,11 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DashboardRevenueReportRequest {
+public class DashboardOrderStatisticRequest {
 
     @NotNull(message = "From date is required")
     private LocalDate fromDate;
 
     @NotNull(message = "To date is required")
     private LocalDate toDate;
-
-    @Builder.Default
-    private RevenueGroupBy groupBy = RevenueGroupBy.DAY;
 }

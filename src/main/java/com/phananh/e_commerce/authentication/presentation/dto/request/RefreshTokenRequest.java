@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.authentication.presentation.dto.request.auth;
+package com.phananh.e_commerce.authentication.presentation.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IntrospectRequest {
+public class RefreshTokenRequest {
 
-    @NotBlank(message = "Token is required")
-    private String token;
+    @NotBlank(message = "Refresh token is required")
+    private String refreshToken;
 }
 
 

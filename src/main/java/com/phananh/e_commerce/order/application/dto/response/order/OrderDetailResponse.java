@@ -9,15 +9,15 @@ import java.util.List;
 
 @Data
 @Builder
-public class CustomerOrderDetailResponse {
-
+public class OrderDetailResponse {
     private Long orderId;
+    private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String createdBy;
     private String modifiedBy;
     private String fullName;
-    private boolean isPaid;
+    private Boolean isPaid;
     private LocalDateTime paymentDate;
     private String paymentMethod;
     private String phoneNumber;

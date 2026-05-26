@@ -87,7 +87,7 @@ public interface CustomerProductMapper {
 
     @Mapping(source = "attribute.id", target = "attributeId")
     @Mapping(source = "attribute.name", target = "attributeName")
-    @Mapping(source = "valueName", target = "attributeValue")
+    @Mapping(source = "value", target = "attributeValue")
     ProductDetailResponse.ProductVariantDetail.Attribute toAttributeResponse(AttributeValue attributeValue);
 
     default Set<ProductDetailResponse.ProductVariantDetail.Attribute> attributesToAttributeResponseSet(Set<AttributeValue> attributes) {

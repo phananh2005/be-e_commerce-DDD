@@ -12,9 +12,9 @@ import java.util.Set;
 @Mapper(componentModel = "spring")
 public interface ProductInternalMapper {
 
-	@Mapping(target = "productId", expression = "product.id")
-	@Mapping(target = "productName", expression = "product.name")
-	@Mapping(target = "productStatus", expression = "product.status.name()")
+	@Mapping(target = "productId", expression = "java(product.getId())")
+	@Mapping(target = "productName", expression = "java(product.getName())")
+	@Mapping(target = "productStatus", expression = "java(product.getStatus() == null ? null : product.getStatus().name())")
 	@Mapping(target = "variantSkuCode", expression = "java(resolveVariant(product, variantId).getSkuCode())")
 	@Mapping(target = "variantImageUrl", expression = "java(resolveVariantImageUrl(resolveVariant(product, variantId).getImages()))")
 	@Mapping(target = "variantPrice", expression = "java(resolveVariant(product, variantId).getPrice())")

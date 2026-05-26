@@ -1,7 +1,9 @@
 package com.phananh.e_commerce.productcatalog.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.*;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
 import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,33 +12,18 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("admin/categories")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Danh mục", description = "Các API quản lý danh mục sản phẩm")
-public class CategoryController {
+@Tag(name = "Quản trị - Danh mục", description = "API quản trị danh mục sản phẩm")
+public class AdminCategoryController {
 
     CategoryService categoryService;
 
-    // customer
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getEnabledCategories() {
-        List<CategoryResponse> categories = categoryService.getEnabledCategories();
-        ApiResponse<List<CategoryResponse>> apiResponse = ApiResponse.<List<CategoryResponse>>builder()
-                .message("Categories retrieved successfully")
-                .result(categories)
-                .build();
-        return ResponseEntity.ok(apiResponse);
-    }
-
-    // admin
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<CategoryResponse>>> getAllCategoriesBySearch(@Valid @ModelAttribute CategorySearchRequest categorySearchRequest) {
         Page<CategoryResponse> categories = categoryService.getAllCategoriesBySearch(categorySearchRequest);
@@ -65,5 +52,4 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 }
-
 

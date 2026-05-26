@@ -1,10 +1,6 @@
 package com.phananh.e_commerce.core.presentation.controller;
 
 import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
-import com.phananh.e_commerce.core.exception.AppException;
-import com.phananh.e_commerce.core.exception.ErrorCode;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -27,6 +23,7 @@ public class CloudinaryController {
 
     CloudinaryService cloudinaryService;
 
+    //admin, staff
     @GetMapping("/signature")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getUploadSignature(@RequestParam String folder) {
         Map<String, Object> signature = cloudinaryService.generateUploadSignature(folder);

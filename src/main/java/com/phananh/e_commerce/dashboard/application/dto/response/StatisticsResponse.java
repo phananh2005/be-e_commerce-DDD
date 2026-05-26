@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,9 +12,5 @@ import java.math.BigDecimal;
 public class StatisticsResponse {
     private Long totalUsers;
     private Long totalProducts;
-    private Long totalOrders;
-    private Long paidOrders;
-    private Long pendingOrders;
-    private BigDecimal totalRevenue;
 }
 

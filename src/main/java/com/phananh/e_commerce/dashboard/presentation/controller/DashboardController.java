@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/statistics")
+@RequestMapping("admin/statistics")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Thống kê", description = "Quản lý dữ liệu tổng hợp")
@@ -28,6 +28,7 @@ public class DashboardController {
 
 	StatisticsService statisticsService;
 
+	//admin
 	@GetMapping("/overview")
 	public ResponseEntity<ApiResponse<StatisticsResponse>> getStatistics() {
 		StatisticsResponse response = statisticsService.getStatistics();

@@ -1,25 +1,30 @@
-# E-Commerce Backend — Documentation Index
+# E-Commerce Backend
 
-Tóm tắt ngắn gọn và liên kết tới các tài liệu chính của dự án.
+Spring Boot backend cho hệ thống thương mại điện tử, tổ chức theo bounded context:
+- `productcatalog`
+- `order`
+- `usermanagement`
+- `authentication`
+- `dashboard`
+- `core`
 
-Overview
-- Mục tiêu: hướng dẫn modularization, migration và tài liệu nhanh cho developer.
+## Tài liệu chính
+- Kiến trúc tổng quan: `BOUNDED_CONTEXT_STRUCTURE.md`
+- Sơ đồ package / luồng layer: `ARCHITECTURE_DIAGRAM.md`
+- Tích hợp Cloudinary: `CLOUDINARY_IMPLEMENTATION.md`
+- Hỗ trợ nhanh: `HELP.md`
+- Danh mục tài liệu đang dùng: `docs/README.md`
 
-Các tài liệu chính
-- Bounded Context (chi tiết): `BOUNDED_CONTEXT_STRUCTURE.md`
-- Migration guide: `MIGRATION_GUIDE.md`
-- Quick reference (archived): `docs/archived/QUICK_REFERENCE.md`
-- Architecture diagrams: `ARCHITECTURE_DIAGRAM.md`
-- Help & implementation notes: `HELP.md`, `CLOUDINARY_IMPLEMENTATION.md`
+## Chạy ứng dụng
+```powershell
+.\mvnw.cmd spring-boot:run
+```
 
-Lưu trữ (archived)
-- Các báo cáo session, tệp nháp và tài liệu cũ đã được chuyển vào: `docs/archived/`
-- Nếu bạn thấy một tệp DEPRECATED ở root, hãy mở bản lưu trữ trong `docs/archived/`.
+## Build nhanh
+```powershell
+.\mvnw.cmd -DskipTests=true compile
+```
 
-Quick start
-1. Đọc `BOUNDED_CONTEXT_STRUCTURE.md` để hiểu kiến trúc
-2. Đọc `MIGRATION_GUIDE.md` để biết cách di chuyển mã
-3. Sử dụng `docs/archived/QUICK_REFERENCE.md` khi cần tra cứu nhanh
-
-Liên hệ
-- Nếu cần trợ giúp, mở issue hoặc hỏi người quản lý dự án.
+## Ghi chú
+- Tài liệu cũ, báo cáo session và bản nháp đã được gom vào `docs/archived/`.
+- Nếu cần tra cứu nhanh theo chủ đề, mở `docs/README.md` trước.

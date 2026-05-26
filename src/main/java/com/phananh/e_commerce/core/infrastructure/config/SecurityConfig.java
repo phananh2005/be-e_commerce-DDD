@@ -3,7 +3,6 @@ package com.phananh.e_commerce.core.infrastructure.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,16 +35,6 @@ public class SecurityConfig {
 
     private final CustomJwtDecoder customJwtDecoder;
 
-    private final String[] PUBLIC_POST_ENDPOINTS = {
-            "/auth/login", "/auth/register", "/auth/logout", "/auth/refresh", "/auth/introspect"
-    };
-
-    private final String[] PUBLIC_GET_ENDPOINTS = {
-            "/auth/verify", "/brands/search", "/categories/**", "/events/**",
-            "/images/**", "/search", "/product/**",
-            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
-    };
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -53,12 +42,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/orders/*/*").hasAnyRole("STAFF", "ADMIN")
-                        .requestMatchers("/staff/**", "/statistics/**").hasAnyRole("STAFF", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/brands/**", "/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/brands/**", "/categories/**").hasRole("ADMIN")
+                        .requestMatchers("/cloudinary/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/staff/**").hasAnyRole("STAFF")
+                        .anyRequest().hasAnyRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

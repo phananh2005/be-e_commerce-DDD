@@ -25,6 +25,7 @@ public class StaffProductController {
 
     StaffProductService staffProductService;
 
+    //staff
     @GetMapping("/product/search")
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProductsBySearch(@ModelAttribute @Valid StaffProductSearchRequest staffProductSearchRequest) {
         Page<ProductResponse> products = staffProductService.getAllProductsBySearch(staffProductSearchRequest);

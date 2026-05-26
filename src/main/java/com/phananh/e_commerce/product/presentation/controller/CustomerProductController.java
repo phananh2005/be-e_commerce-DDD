@@ -25,6 +25,7 @@ public class CustomerProductController {
 
     CustomerProductService customerProductService;
 
+    //customer
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<ProductSummaryResponse>>> getProductsActiveBySearch(@ModelAttribute @Valid CustomerProductSearchRequest customerProductSearchRequest) {
         Page<ProductSummaryResponse> productSummaryResponses = customerProductService.getProductsActiveBySearch(customerProductSearchRequest);

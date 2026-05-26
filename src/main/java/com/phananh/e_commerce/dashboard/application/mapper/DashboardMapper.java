@@ -5,9 +5,10 @@ import com.phananh.e_commerce.dashboard.application.dto.response.SalesStatsRespo
 import com.phananh.e_commerce.dashboard.application.dto.response.StatisticsResponse;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenuePeriodProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenueSummaryProjection;
-import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsOverviewProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsRangeProjection;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,83 +16,83 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface DashboardMapper {
 
-    default StatisticsResponse toStatisticsResponse(long totalUsers,
-                                                    long totalProducts,
-                                                    OrderStatisticsOverviewProjection orderStats) {
-        return StatisticsResponse.builder()
-                .totalUsers(totalUsers)
-                .totalProducts(totalProducts)
-                .totalOrders(orderStats.getTotalOrders())
-                .paidOrders(orderStats.getPaidOrders())
-                .pendingOrders(orderStats.getPendingOrders())
-                .totalRevenue(orderStats.getTotalRevenue())
-                .build();
-    }
+    @Mapping(target = "totalUsers", source = "totalUsers")
+    @Mapping(target = "totalProducts", source = "totalProducts")
+    StatisticsResponse toStatisticsResponse(long totalUsers, long totalProducts);
 
     default DashboardResponse.StatusStatistic toStatusStatistic(String status, long count) {
-        return DashboardResponse.StatusStatistic.builder()
-                .status(status)
-                .count(count)
-                .build();
+        DashboardResponse.StatusStatistic statusStatistic = new DashboardResponse.StatusStatistic();
+        statusStatistic.setStatus(status);
+        statusStatistic.setCount(count);
+        return statusStatistic;
     }
 
     default List<DashboardResponse.StatusStatistic> toStatusStatistics(OrderStatisticsRangeProjection projection) {
         return List.of(
-                toStatusStatistic("PENDING", safeLong(projection.getPendingOrders())),
-                toStatusStatistic("CONFIRMED", safeLong(projection.getConfirmedOrders())),
-                toStatusStatistic("SHIPPING", safeLong(projection.getShippingOrders())),
-                toStatusStatistic("DELIVERED", safeLong(projection.getDeliveredOrders())),
-                toStatusStatistic("CANCELLED", safeLong(projection.getCancelledOrders())),
-                toStatusStatistic("RETURNED", safeLong(projection.getReturnedOrders()))
+                toStatusStatistic("PENDING", zeroIfNull(projection.getPendingOrders())),
+                toStatusStatistic("CONFIRMED", zeroIfNull(projection.getConfirmedOrders())),
+                toStatusStatistic("SHIPPING", zeroIfNull(projection.getShippingOrders())),
+                toStatusStatistic("DELIVERED", zeroIfNull(projection.getDeliveredOrders())),
+                toStatusStatistic("CANCELLED", zeroIfNull(projection.getCancelledOrders())),
+                toStatusStatistic("RETURNED", zeroIfNull(projection.getReturnedOrders()))
         );
     }
+
+    @Mapping(target = "fromDate", ignore = true)
+    @Mapping(target = "toDate", ignore = true)
+    @Mapping(target = "totalOrders", source = "totalOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "paidOrders", source = "paidOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "pendingOrders", source = "pendingOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "confirmedOrders", source = "confirmedOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "shippingOrders", source = "shippingOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "deliveredOrders", source = "deliveredOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "cancelledOrders", source = "cancelledOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "returnedOrders", source = "returnedOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "totalRevenue", source = "totalRevenue")
+    @Mapping(target = "statusStatistics", ignore = true)
+    DashboardResponse toDashboardBaseResponse(OrderStatisticsRangeProjection orderStats);
 
     default DashboardResponse toDashboardResponse(LocalDate fromDate,
                                                   LocalDate toDate,
                                                   OrderStatisticsRangeProjection orderStats,
                                                   List<DashboardResponse.StatusStatistic> statusStatistics) {
-        return DashboardResponse.builder()
-                .fromDate(fromDate)
-                .toDate(toDate)
-                .totalOrders(orderStats.getTotalOrders())
-                .paidOrders(orderStats.getPaidOrders())
-                .pendingOrders(orderStats.getPendingOrders())
-                .confirmedOrders(orderStats.getConfirmedOrders())
-                .shippingOrders(orderStats.getShippingOrders())
-                .deliveredOrders(orderStats.getDeliveredOrders())
-                .cancelledOrders(orderStats.getCancelledOrders())
-                .returnedOrders(orderStats.getReturnedOrders())
-                .totalRevenue(orderStats.getTotalRevenue())
-                .statusStatistics(statusStatistics)
-                .build();
+        DashboardResponse response = toDashboardBaseResponse(orderStats);
+        response.setFromDate(fromDate);
+        response.setToDate(toDate);
+        response.setStatusStatistics(statusStatistics);
+        return response;
     }
 
-    default SalesStatsResponse.Item toSalesItem(OrderRevenuePeriodProjection projection) {
-        return SalesStatsResponse.Item.builder()
-                .period(projection.getPeriod())
-                .orders(safeLong(projection.getOrders()))
-                .paidOrders(safeLong(projection.getPaidOrders()))
-                .revenue(projection.getRevenue())
-                .build();
-    }
+    @Mapping(target = "period", source = "period")
+    @Mapping(target = "orders", source = "orders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "paidOrders", source = "paidOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "revenue", source = "revenue")
+    SalesStatsResponse.Item toSalesItem(OrderRevenuePeriodProjection projection);
+
+    @Mapping(target = "groupBy", ignore = true)
+    @Mapping(target = "fromDate", ignore = true)
+    @Mapping(target = "toDate", ignore = true)
+    @Mapping(target = "totalOrders", source = "totalOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "paidOrders", source = "paidOrders", qualifiedByName = "zeroIfNull")
+    @Mapping(target = "totalRevenue", source = "totalRevenue")
+    @Mapping(target = "items", ignore = true)
+    SalesStatsResponse toSalesSummaryResponse(OrderRevenueSummaryProjection summary);
 
     default SalesStatsResponse toSalesStatsResponse(String groupBy,
                                                     LocalDate fromDate,
                                                     LocalDate toDate,
                                                     OrderRevenueSummaryProjection summary,
                                                     List<SalesStatsResponse.Item> items) {
-        return SalesStatsResponse.builder()
-                .groupBy(groupBy)
-                .fromDate(fromDate)
-                .toDate(toDate)
-                .totalOrders(summary.getTotalOrders())
-                .paidOrders(summary.getPaidOrders())
-                .totalRevenue(summary.getTotalRevenue())
-                .items(items)
-                .build();
+        SalesStatsResponse response = toSalesSummaryResponse(summary);
+        response.setGroupBy(groupBy);
+        response.setFromDate(fromDate);
+        response.setToDate(toDate);
+        response.setItems(items);
+        return response;
     }
 
-    private long safeLong(Long value) {
+    @Named("zeroIfNull")
+    default Long zeroIfNull(Long value) {
         return value == null ? 0L : value;
     }
 }

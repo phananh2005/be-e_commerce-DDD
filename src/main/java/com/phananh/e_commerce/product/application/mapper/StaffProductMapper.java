@@ -59,7 +59,7 @@ public interface StaffProductMapper {
     // Mapper for AttributeValue -> staff ProductVariantResponse.Attribute
     @Mapping(source = "attribute.id", target = "attributeId")
     @Mapping(source = "attribute.name", target = "attributeName")
-    @Mapping(source = "valueName", target = "attributeValue")
+    @Mapping(source = "value", target = "attributeValue")
     ProductVariantResponse.Attribute toStaffAttributeResponse(AttributeValue attributeValue);
 
     // Convert Set<AttributeValue> to Set<ProductVariantResponse.Attribute>

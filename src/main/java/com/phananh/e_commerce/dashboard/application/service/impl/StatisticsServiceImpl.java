@@ -35,12 +35,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 	@Override
 	public StatisticsResponse getStatistics() {
-		var orderStats = orderService.getStatisticsOverview();
-
 		return dashboardMapper.toStatisticsResponse(
 				userService.countUsers(),
-				productInternalService.countProducts(),
-				orderStats
+				productInternalService.countProducts()
 		);
 	}
 

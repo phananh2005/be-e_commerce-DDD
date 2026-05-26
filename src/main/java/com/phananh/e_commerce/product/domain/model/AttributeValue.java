@@ -25,9 +25,6 @@ public class AttributeValue {
     @JoinColumn(name = "attribute_id", nullable = false)
     private ProductAttribute attribute;
 
-//    @ManyToMany(mappedBy = "attributeValues", fetch = FetchType.LAZY)
-//    private Set<ProductVariant> variants = new HashSet<>();
-
     public static AttributeValue create(String value, ProductAttribute attribute) {
         if (StringUtils.isBlank(value)) {
             throw new IllegalArgumentException("Attribute value cannot be null or empty");

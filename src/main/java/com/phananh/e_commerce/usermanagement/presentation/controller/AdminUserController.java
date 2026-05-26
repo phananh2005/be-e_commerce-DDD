@@ -6,6 +6,7 @@ import com.phananh.e_commerce.usermanagement.application.dto.response.UserRespon
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.AdminUserQueryRequest;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.UserRoleUpdateRequest;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -30,6 +31,7 @@ public class AdminUserController {
 
     UserService userService;
 
+    @Operation(summary = "Lấy danh sách tất cả người dùng", description = "Tìm kiếm và phân trang danh sách người dùng")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(@ModelAttribute @Valid AdminUserQueryRequest adminUserQueryRequest) {
         Page<UserResponse> users = userService.getAllUsers(adminUserQueryRequest);
@@ -40,21 +42,24 @@ public class AdminUserController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping("/customer/info/{id}")
-    public ResponseEntity<ApiResponse<UserInfoResponse>> getCustomerInfo(@PathVariable Long id) {
+    @Operation(summary = "Lấy thông tin người dùng", description = "Lấy thông tin chi tiết của một người dùng theo ID")
+    @GetMapping("/info/{id}")
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@PathVariable Long id) {
         ApiResponse<UserInfoResponse> apiResponse = ApiResponse.<UserInfoResponse>builder()
                 .result(userService.getUserInfo(id))
-                .message("Get customer info successfully")
+                .message("Get user info successfully")
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(summary = "Cập nhật vai trò người dùng", description = "Cập nhật thay đổi vai trò của người dùng")
     @PatchMapping("/update-role")
     public ResponseEntity<?> updateUserRole(@RequestBody @Valid UserRoleUpdateRequest userRoleUpdateRequest) {
         userService.updateUserRole(userRoleUpdateRequest);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Cập nhật trạng thái người dùng", description = "Kích hoạt hoặc vô hiệu hóa tài khoản người dùng")
     @PatchMapping("/{id}/{status}")
     public ResponseEntity<?> updateUserStatus(@PathVariable("id") Long userId,
                                               @PathVariable String status) {

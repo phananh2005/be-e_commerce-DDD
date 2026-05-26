@@ -3,6 +3,7 @@ package com.phananh.e_commerce.productcatalog.presentation.controller;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class CustomerCategoryController {
 
     CategoryService categoryService;
 
-    // customer
+    @Operation(summary = "Lấy danh sách danh mục đang hoạt động", description = "Lấy tất cả danh mục sản phẩm đã kích hoạt")
     @GetMapping
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getEnabledCategories() {
         List<CategoryResponse> categories = categoryService.getEnabledCategories();

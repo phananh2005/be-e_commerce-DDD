@@ -27,9 +27,8 @@ public class CustomerUserController {
 
     UserService userService;
 
-    //customer
     @GetMapping("/my-info")
-    @Operation(summary = "Lấy thông tin cá nhân")
+    @Operation(summary = "Lấy thông tin cá nhân", description = "Lấy thông tin tài khoản của người dùng hiện tại")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getMyInfo() {
         ApiResponse<UserInfoResponse> apiResponse = ApiResponse.<UserInfoResponse>builder()
                 .result(userService.getMyInfo())
@@ -39,14 +38,14 @@ public class CustomerUserController {
     }
 
     @PatchMapping("/update-info")
-    @Operation(summary = "Cập nhật thông tin cá nhân")
+    @Operation(summary = "Cập nhật thông tin cá nhân", description = "Cập nhật thông tin hồ sơ cá nhân của người dùng")
     public ResponseEntity<?> updateMyInfo(@RequestBody @Valid UserInfoUpdateRequest userInfoUpdateRequest) {
         userService.updateMyInfo(userInfoUpdateRequest);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/change-password")
-    @Operation(summary = "Đổi mật khẩu")
+    @Operation(summary = "Đổi mật khẩu", description = "Thay đổi mật khẩu tài khoản của người dùng")
     public ResponseEntity<?> changePassword(@RequestBody @Valid UserChangePasswordRequest userChangePasswordRequest) {
         userService.changePassword(userChangePasswordRequest);
         return ResponseEntity.noContent().build();

@@ -5,6 +5,7 @@ import com.phananh.e_commerce.product.application.dto.response.customer.ProductD
 import com.phananh.e_commerce.product.application.dto.response.customer.ProductSummaryResponse;
 import com.phananh.e_commerce.product.application.service.CustomerProductService;
 import com.phananh.e_commerce.product.presentation.dto.request.product.customer.CustomerProductSearchRequest;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -25,7 +26,7 @@ public class CustomerProductController {
 
     CustomerProductService customerProductService;
 
-    //customer
+    @Operation(summary = "Tìm kiếm sản phẩm", description = "Tìm kiếm và phân trang danh sách sản phẩm đang bán")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<ProductSummaryResponse>>> getProductsActiveBySearch(@ModelAttribute @Valid CustomerProductSearchRequest customerProductSearchRequest) {
         Page<ProductSummaryResponse> productSummaryResponses = customerProductService.getProductsActiveBySearch(customerProductSearchRequest);
@@ -36,6 +37,7 @@ public class CustomerProductController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Lấy chi tiết sản phẩm", description = "Lấy thông tin chi tiết của một sản phẩm theo ID bao gồm các biến thể")
     @GetMapping("/product/{id}")
     public ResponseEntity<ApiResponse<ProductDetailResponse>> getProductById(@PathVariable Long id) {
         ProductDetailResponse product = customerProductService.getProductById(id);

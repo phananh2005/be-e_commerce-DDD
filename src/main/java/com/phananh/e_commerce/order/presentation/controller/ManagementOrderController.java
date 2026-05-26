@@ -4,6 +4,7 @@ import com.phananh.e_commerce.order.application.dto.response.order.*;
 import com.phananh.e_commerce.order.application.service.OrderService;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.core.util.PageUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/management")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Nhân viên - Đơn hàng", description = "API nhân viên quản lý đơn hàng")
-public class StaffOrderController {
+public class ManagementOrderController {
 
     OrderService orderService;
 
+    @Operation(summary = "Tìm kiếm đơn hàng", description = "Tìm kiếm và phân trang danh sách đơn hàng")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<StaffOrderResponse>>> getAllOrdersForStaff(
             @RequestParam(defaultValue = "1") Integer page,
@@ -43,6 +45,7 @@ public class StaffOrderController {
                 .build());
     }
 
+    @Operation(summary = "Lấy chi tiết đơn hàng", description = "Lấy thông tin chi tiết của một đơn hàng theo ID")
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetailForStaff(@PathVariable Long orderId) {
         OrderDetailResponse response = orderService.getOrderDetail(orderId);
@@ -52,6 +55,7 @@ public class StaffOrderController {
                 .build());
     }
 
+    @Operation(summary = "Cập nhật trạng thái đơn hàng", description = "Cập nhật trạng thái xử lý của đơn hàng")
     @PatchMapping("{orderId}/{status}")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @PathVariable String status) {
         orderService.updateOrderStatus(orderId, status);

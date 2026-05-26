@@ -2,6 +2,7 @@ package com.phananh.e_commerce.core.presentation.controller;
 
 import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,12 @@ import java.util.Map;
 @RequestMapping("/cloudinary")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Cloudinary", description = "Signature endpoints for direct uploads")
+@Tag(name = "Cloudinary", description = "API for generating upload signatures đi kèm với tải file trực tiếp")
 public class CloudinaryController {
 
     CloudinaryService cloudinaryService;
 
-    //admin, staff
+    @Operation(summary = "Lấy chữ ký tải file lên", description = "Tạo chữ ký để tải file trực tiếp lên Cloudinary từ phía client")
     @GetMapping("/signature")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getUploadSignature(@RequestParam String folder) {
         Map<String, Object> signature = cloudinaryService.generateUploadSignature(folder);

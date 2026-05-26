@@ -7,6 +7,7 @@ import com.phananh.e_commerce.dashboard.application.dto.response.DashboardRespon
 import com.phananh.e_commerce.dashboard.application.dto.response.SalesStatsResponse;
 import com.phananh.e_commerce.dashboard.application.dto.response.StatisticsResponse;
 import com.phananh.e_commerce.dashboard.application.service.StatisticsService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -23,12 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("admin/statistics")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Thống kê", description = "Quản lý dữ liệu tổng hợp")
+@Tag(name = "Thống kê", description = "Quản lý dữ liệu tổng hợp và báo cáo")
 public class DashboardController {
 
 	StatisticsService statisticsService;
 
-	//admin
+	@Operation(summary = "Lấy tổng quan thống kê", description = "Lấy tồng hợp các chỉ số thống kê chính của hệ thống")
 	@GetMapping("/overview")
 	public ResponseEntity<ApiResponse<StatisticsResponse>> getStatistics() {
 		StatisticsResponse response = statisticsService.getStatistics();
@@ -38,6 +39,7 @@ public class DashboardController {
 				.build());
 	}
 
+	@Operation(summary = "Lấy thống kê đơn hàng", description = "Lấy thống kê số lượng đơn hàng theo các tiêu chí lọc")
 	@PostMapping("/orders")
 	public ResponseEntity<ApiResponse<DashboardResponse>> getOrderStatistics(@RequestBody @Valid DashboardOrderStatisticRequest request) {
 		DashboardResponse response = statisticsService.getOrderStatistics(request);
@@ -47,6 +49,7 @@ public class DashboardController {
 				.build());
 	}
 
+	@Operation(summary = "Lấy báo cáo doanh thu", description = "Lấy báo cáo doanh thu theo khoảng thời gian được chỉ định")
 	@PostMapping("/revenue")
 	public ResponseEntity<ApiResponse<SalesStatsResponse>> getRevenueReport(@RequestBody @Valid DashboardRevenueReportRequest request) {
 		SalesStatsResponse response = statisticsService.getRevenueReport(request);

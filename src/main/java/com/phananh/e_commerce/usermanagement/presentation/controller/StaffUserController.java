@@ -3,6 +3,7 @@ package com.phananh.e_commerce.usermanagement.presentation.controller;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,11 @@ public class StaffUserController {
 
     UserService userService;
 
+    @Operation(summary = "Lấy thông tin khách hàng", description = "Lấy thông tin chi tiết của một khách hàng theo ID")
     @GetMapping("/customer/info/{id}")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getCustomerInfo(@PathVariable Long id) {
         ApiResponse<UserInfoResponse> apiResponse = ApiResponse.<UserInfoResponse>builder()
-                .result(userService.getUserInfo(id))
+                .result(userService.getCustomerInfo(id))
                 .message("Get customer info successfully")
                 .build();
         return ResponseEntity.ok(apiResponse);

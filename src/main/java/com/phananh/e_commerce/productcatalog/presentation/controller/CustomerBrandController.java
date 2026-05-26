@@ -3,6 +3,7 @@ package com.phananh.e_commerce.productcatalog.presentation.controller;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.productcatalog.application.dto.response.BrandResponse;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class CustomerBrandController {
 
     BrandService brandService;
 
-    //customer
+    @Operation(summary = "Lấy danh sách thương hiệu đang hoạt động", description = "Lấy tất cả thương hiệu sản phẩm đã kích hoạt")
     @GetMapping
     public ResponseEntity<ApiResponse<List<BrandResponse>>> getBrandsActive() {
         List<BrandResponse> brands = brandService.getBrandActive();

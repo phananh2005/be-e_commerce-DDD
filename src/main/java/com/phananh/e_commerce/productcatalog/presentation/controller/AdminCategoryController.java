@@ -6,6 +6,7 @@ import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.C
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryUpdateRequest;
 import com.phananh.e_commerce.productcatalog.application.dto.response.CategoryResponse;
 import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -24,6 +25,7 @@ public class AdminCategoryController {
 
     CategoryService categoryService;
 
+    @Operation(summary = "Tìm kiếm danh mục", description = "Tìm kiếm và phân trang danh sách danh mục")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<CategoryResponse>>> getAllCategoriesBySearch(@Valid @ModelAttribute CategorySearchRequest categorySearchRequest) {
         Page<CategoryResponse> categories = categoryService.getAllCategoriesBySearch(categorySearchRequest);
@@ -34,18 +36,21 @@ public class AdminCategoryController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(summary = "Tạo danh mục mới", description = "Tạo danh mục sản phẩm mới trong hệ thống")
     @PostMapping
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryCreateRequest request) {
         categoryService.createCategory(request);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Cập nhật danh mục", description = "Cập nhật thông tin danh mục sản phẩm")
     @PutMapping
     public ResponseEntity<?> updateCategory(@Valid @RequestBody CategoryUpdateRequest request) {
         categoryService.updateCategory(request);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Cập nhật trạng thái danh mục", description = "Kích hoạt hoặc vô hiệu hóa danh mục sản phẩm")
     @PatchMapping("/{categoryId}/{status}")
     public ResponseEntity<?> updateCategoryStatus(@PathVariable Long categoryId, @PathVariable String status) {
         categoryService.updateCategoryStatus(categoryId, status);

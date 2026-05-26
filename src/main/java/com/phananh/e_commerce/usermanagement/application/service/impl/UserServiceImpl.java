@@ -14,6 +14,7 @@ import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
+import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.domain.repository.UserRepository;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.*;
 import lombok.AccessLevel;
@@ -89,6 +90,22 @@ public class UserServiceImpl implements UserService {
     public UserInfoResponse getUserInfo(Long id) {
         User user = userRepository.getById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserInfoResponse(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserInfoResponse getCustomerInfo(Long id) {
+        User user = userRepository.getById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        boolean isCustomer = user.getRoles().stream()
+                .anyMatch(role -> role.getName() == RoleName.ROLE_CUSTOMER);
+
+        if (!isCustomer) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
         return userMapper.toUserInfoResponse(user);
     }
 

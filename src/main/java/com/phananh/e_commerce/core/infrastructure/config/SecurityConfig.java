@@ -43,9 +43,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/cloudinary/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/management/**").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                         .requestMatchers("/staff/**").hasAnyRole("STAFF")
-                        .anyRequest().hasAnyRole("CUSTOMER")
+                        .anyRequest().permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

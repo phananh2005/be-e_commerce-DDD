@@ -35,6 +35,12 @@ public class SecurityConfig {
 
     private final CustomJwtDecoder customJwtDecoder;
 
+    private final String[] AUTHENTICATED_ENDPOINTS = {
+            "/users/**",
+            "/cart-item/**",
+            "/orders/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -46,8 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/management/**").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                         .requestMatchers("/staff/**").hasAnyRole("STAFF")
+                        .requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated()
                         .anyRequest().permitAll()
-                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt

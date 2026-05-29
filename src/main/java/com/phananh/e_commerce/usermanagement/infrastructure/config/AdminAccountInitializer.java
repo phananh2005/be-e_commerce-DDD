@@ -8,10 +8,11 @@ import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,45 +22,45 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class AdminAccountInitializer implements ApplicationRunner {
 
     private final SpringDataUserRepository springDataUserRepository;
     private final SpringDataRoleRepository springDataRoleRepository;
-
-    @Value("${app.seed.admin.username:admin}")
-    private String username;
-
-    @Value("${app.seed.admin.password:Admin@12345}")
-    private String password;
-
-    @Value("${app.seed.admin.email:admin@ecommerce.local}")
-    private String email;
-
-    @Value("${app.seed.admin.full-name:System Administrator}")
-    private String fullName;
-
-    @Value("${app.seed.admin.phone-number:0000000000}")
-    private String phoneNumber;
-
-    @Value("${app.seed.admin.address:System}")
-    private String address;
+    private final AdminSeedProperties adminSeedProperties;
 
     @Override
     @Transactional
     public void run(@NonNull ApplicationArguments args) {
-        if (springDataUserRepository.count() > 0) {
+        seedRoles();
+
+        if (springDataUserRepository.existsByCredentialsUsername(adminSeedProperties.username())) {
             return;
         }
 
         Role adminRole = springDataRoleRepository.findByName(RoleName.ROLE_ADMIN)
-                .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.ROLE_ADMIN).build()));
+                .orElseThrow(() -> new IllegalStateException("Cannot initialize admin role"));
 
         User adminUser = new User();
-        setField(adminUser, "credentials", new UserCredentials(username, password, true));
-        setField(adminUser, "info", new UserInfo(fullName, email, address, phoneNumber));
+        setField(adminUser, "credentials", new UserCredentials(
+                adminSeedProperties.username(),
+                adminSeedProperties.password(),
+                true));
+        setField(adminUser, "info", new UserInfo(
+                adminSeedProperties.fullName(),
+                adminSeedProperties.email(),
+                adminSeedProperties.address(),
+                adminSeedProperties.phoneNumber()));
         setField(adminUser, "roles", new HashSet<>(Set.of(adminRole)));
 
         springDataUserRepository.save(adminUser);
+    }
+
+    private void seedRoles() {
+        for (RoleName roleName : RoleName.values()) {
+            springDataRoleRepository.findByName(roleName)
+                    .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(roleName).build()));
+        }
     }
 
     private void setField(Object target, String fieldName, Object value) {

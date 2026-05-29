@@ -39,9 +39,7 @@ public record UserCredentials(
             throw new AppException(ErrorCode.OLD_PASSWORD_INCORRECT);
         }
 
-        String encodedNewPassword = PasswordUtils.encode(newPassword);
-
-        return new UserCredentials(this.username, encodedNewPassword, this.isEnabled);
+        return new UserCredentials(this.username, newPassword, this.isEnabled);
     }
 
     public UserCredentials activeUser(){

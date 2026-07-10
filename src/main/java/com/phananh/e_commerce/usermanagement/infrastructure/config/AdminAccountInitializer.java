@@ -5,6 +5,7 @@ import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
+import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class AdminAccountInitializer implements ApplicationRunner {
         User adminUser = new User();
         setField(adminUser, "credentials", new UserCredentials(
                 adminSeedProperties.username(),
-                adminSeedProperties.password(),
+                PasswordUtils.encode(adminSeedProperties.password()),
                 true));
         setField(adminUser, "info", new UserInfo(
                 adminSeedProperties.fullName(),
@@ -73,5 +74,4 @@ public class AdminAccountInitializer implements ApplicationRunner {
         }
     }
 }
-
 

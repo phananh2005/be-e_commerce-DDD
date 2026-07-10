@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,46 +33,48 @@ public class AuthenticationController {
 
     @Operation(summary = "Đăng nhập")
     @PostMapping("/login")
-    public ApiResponse<AuthTokenResponse> login(@Valid @RequestBody AuthenticationRequest request) {
-        return ApiResponse.<AuthTokenResponse>builder()
+    public ResponseEntity<ApiResponse<AuthTokenResponse>> login(@Valid @RequestBody AuthenticationRequest request) {
+        ApiResponse<AuthTokenResponse> response = ApiResponse.<AuthTokenResponse>builder()
                 .message("Login successful")
                 .result(authenticationService.login(request))
                 .build();
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Đăng ký tài khoản mới")
     @PostMapping("/register")
-    public ApiResponse<AuthTokenResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ApiResponse.<AuthTokenResponse>builder()
-                .message("Register successful")
-                .result(authenticationService.register(request))
-                .build();
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+        authenticationService.register(request);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Làm mới token")
     @PostMapping("/refresh")
-    public ApiResponse<AuthTokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        return ApiResponse.<AuthTokenResponse>builder()
+    public ResponseEntity<ApiResponse<AuthTokenResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        ApiResponse<AuthTokenResponse> response = ApiResponse.<AuthTokenResponse>builder()
                 .message("Refresh token successful")
                 .result(authenticationService.refreshToken(request))
                 .build();
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Đăng xuất")
     @PostMapping("/logout")
-    public ApiResponse<LogoutResponse> logout(@Valid @RequestBody LogoutRequest request) {
-        return ApiResponse.<LogoutResponse>builder()
+    public ResponseEntity<ApiResponse<LogoutResponse>> logout(@Valid @RequestBody LogoutRequest request) {
+        ApiResponse<LogoutResponse> response = ApiResponse.<LogoutResponse>builder()
                 .message("Logout successful")
                 .result(authenticationService.logout(request))
                 .build();
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Kiểm tra token")
     @PostMapping("/introspect")
-    public ApiResponse<IntrospectResponse> introspect(@Valid @RequestBody IntrospectRequest request) {
-        return ApiResponse.<IntrospectResponse>builder()
+    public ResponseEntity<ApiResponse<IntrospectResponse>> introspect(@Valid @RequestBody IntrospectRequest request) {
+        ApiResponse<IntrospectResponse> response = ApiResponse.<IntrospectResponse>builder()
                 .message("Introspect token successful")
                 .result(authenticationService.introspect(request))
                 .build();
+        return ResponseEntity.ok(response);
     }
 }

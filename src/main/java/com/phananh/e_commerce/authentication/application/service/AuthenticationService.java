@@ -12,7 +12,7 @@ import com.phananh.e_commerce.authentication.application.dto.response.LogoutResp
 public interface AuthenticationService {
 	AuthTokenResponse login(AuthenticationRequest request);
 
-	AuthTokenResponse register(RegisterRequest request);
+	void register(RegisterRequest request);
 
 	AuthTokenResponse refreshToken(RefreshTokenRequest request);
 

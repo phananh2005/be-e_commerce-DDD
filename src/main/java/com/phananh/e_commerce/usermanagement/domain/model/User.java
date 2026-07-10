@@ -2,6 +2,8 @@ package com.phananh.e_commerce.usermanagement.domain.model;
 
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +14,8 @@ import java.util.Set;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,6 +2,7 @@ package com.phananh.e_commerce.authentication.presentation.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,8 +23,13 @@ public class RegisterRequest {
     @Email(message = "Email is invalid")
     private String email;
 
-    private String fullName;
-}
+    private String address;
 
+    @NotBlank(message = "Full name is required")
+    private String fullName;
+
+    @NotBlank(message = "Phone number is required")
+    private String phoneNumber;
+}
 
 

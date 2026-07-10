@@ -14,6 +14,7 @@ import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
+import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
@@ -84,27 +85,37 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return issueTokenPair(user);
 	}
 
-	@Override
-	public AuthTokenResponse register(RegisterRequest request) {
-		if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
-		}
+    @Override
+    public void register(RegisterRequest request) {
+        if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        }
 
-		if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
-		}
+        if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
 
-		Role customerRole = springDataRoleRepository.findByName(RoleName.ROLE_CUSTOMER)
-				.orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.ROLE_CUSTOMER).build()));
+        Role customerRole = springDataRoleRepository.findByName(RoleName.ROLE_CUSTOMER)
+                .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.ROLE_CUSTOMER).build()));
 
-		User user = new User();
-		setField(user, "credentials", new UserCredentials(request.getUsername(), request.getPassword(), true));
-		setField(user, "info", null);
-		setField(user, "roles", new HashSet<>(Set.of(customerRole)));
+        UserInfo userInfo = UserInfo.builder()
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .build();
 
-		User savedUser = springDataUserRepository.save(user);
-		return issueTokenPair(savedUser);
-	}
+        User user = User.builder()
+                .credentials(new UserCredentials(
+                        request.getUsername(),
+                        PasswordUtils.encode(request.getPassword()),
+                        true))
+                .info(userInfo)
+                .roles(new HashSet<>(Set.of(customerRole)))
+                .build();
+
+        springDataUserRepository.save(user);
+    }
 
 	@Override
 	public AuthTokenResponse refreshToken(RefreshTokenRequest request) {
@@ -300,17 +311,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
 	}
 
-	private void setField(Object target, String fieldName, Object value) {
-		try {
-			Field field = target.getClass().getDeclaredField(fieldName);
-			field.setAccessible(true);
-			field.set(target, value);
-		} catch (ReflectiveOperationException ex) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot set user field", ex);
-		}
-	}
-
-	private String extractRoleName(Role role) {
+    private String extractRoleName(Role role) {
 		try {
 			Field field = role.getClass().getDeclaredField("name");
 			field.setAccessible(true);
@@ -324,6 +325,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private record TokenClaims(String username, String tokenType, long expiresAt) {
 	}
 }
-
-
 

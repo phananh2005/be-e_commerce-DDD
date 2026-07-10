@@ -29,7 +29,7 @@ public record UserCredentials(
             throw new IllegalArgumentException("Enabled cannot be null");
         }
         this.username = username.trim();
-        this.password = PasswordUtils.encode(password.trim());
+        this.password = password.trim();
         this.isEnabled = isEnabled;
     }
 
@@ -39,7 +39,7 @@ public record UserCredentials(
             throw new AppException(ErrorCode.OLD_PASSWORD_INCORRECT);
         }
 
-        return new UserCredentials(this.username, newPassword, this.isEnabled);
+        return new UserCredentials(this.username, PasswordUtils.encode(newPassword), this.isEnabled);
     }
 
     public UserCredentials activeUser(){

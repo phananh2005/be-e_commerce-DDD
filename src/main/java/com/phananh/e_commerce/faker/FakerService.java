@@ -24,6 +24,7 @@ import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
+import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +72,10 @@ public class FakerService {
             if (userRepository.existsByInfoEmail(email)) continue;
 
             User user = new User();
-            setField(user, "credentials", new UserCredentials(username, "123456", true));
+            setField(user, "credentials", new UserCredentials(
+                    username,
+                    PasswordUtils.encode("123456"),
+                    true));
             setField(user, "info", UserInfo.builder()
                     .fullName(faker.name().fullName())
                     .email(email)

@@ -35,7 +35,7 @@ public class SecurityConfig {
 
     private final CustomJwtDecoder customJwtDecoder;
 
-    private final String[] AUTHENTICATED_ENDPOINTS = {
+    private final String[] CUSTOMER_ENDPOINTS = {
             "/users/**",
             "/cart-item/**",
             "/orders/**"
@@ -48,11 +48,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/cloudinary/**").hasAnyRole("STAFF", "ADMIN")
-                        .requestMatchers("/management/**").hasAnyRole("STAFF", "ADMIN")
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/staff/**").hasAnyRole("STAFF")
-                        .requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated()
+                        .requestMatchers("/cloudinary/**").hasAnyRole("ADMIN", "DELIVERY_STAFF")
+                        .requestMatchers("/management/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/delivery/**").hasAnyRole("DELIVERY_STAFF")
+                        .requestMatchers(CUSTOMER_ENDPOINTS).hasAnyRole("CUSTOMER")
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

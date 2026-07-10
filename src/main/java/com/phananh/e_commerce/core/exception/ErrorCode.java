@@ -16,7 +16,6 @@ public enum ErrorCode {
     INVALID_USERNAME_OR_PASSWORD(401, "Invalid username or password", HttpStatus.UNAUTHORIZED),
     TOKEN_EXPIRED(401, "Token has expired", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN(401, "Invalid token", HttpStatus.UNAUTHORIZED),
-    TOKEN_INVALIDATED(401, "Token has been invalidated", HttpStatus.UNAUTHORIZED),
     REFRESH_TOKEN_EXPIRED(401, "Refresh token has expired", HttpStatus.UNAUTHORIZED),
     FORBIDDEN(403, "Forbidden", HttpStatus.FORBIDDEN),
     ACCOUNT_DISABLED(403, "Account is disabled", HttpStatus.FORBIDDEN),
@@ -41,9 +40,10 @@ public enum ErrorCode {
 
     // Server errors (5xx)
     INTERNAL_SERVER_ERROR(500, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
-    DATABASE_ERROR(500, "Database error", HttpStatus.INTERNAL_SERVER_ERROR),
-    FILE_UPLOAD_ERROR(500, "File upload error", HttpStatus.INTERNAL_SERVER_ERROR),
-    FILE_DELETE_ERROR(500, "File delete error", HttpStatus.INTERNAL_SERVER_ERROR);
+    FILE_DELETE_ERROR(500, "File delete error", HttpStatus.INTERNAL_SERVER_ERROR),
+    TOKEN_GENERATION_ERROR(500, "Cannot generate token", HttpStatus.INTERNAL_SERVER_ERROR),
+    TOKEN_SIGNING_ERROR(500, "Cannot sign token", HttpStatus.INTERNAL_SERVER_ERROR),
+    ROLE_READ_ERROR(500, "Cannot read role name", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;

@@ -4,15 +4,16 @@ import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.core.util.SecurityUtils;
-// ...existing imports...
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserResponse;
 import com.phananh.e_commerce.usermanagement.application.mapper.UserMapper;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
+import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
+import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.domain.repository.UserRepository;
@@ -95,22 +96,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserInfoResponse getCustomerInfo(Long id) {
-        User user = userRepository.getById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-        boolean isCustomer = user.getRoles().stream()
-                .anyMatch(role -> role.getName() == RoleName.ROLE_CUSTOMER);
-
-        if (!isCustomer) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        return userMapper.toUserInfoResponse(user);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Long getIdByUserName(String userName) {
         User user = userRepository.getByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -119,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(AdminUserQueryRequest request) {
+    public Page<UserResponse> getAllUsers(ManagementUserQueryRequest request) {
         int page = PageUtils.getPageNumber(request.getPage());
         int size = PageUtils.getPageSize(request.getSize());
         String sortBy = PageUtils.getSortBy(request.getSortBy());
@@ -170,6 +155,40 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-}
+    @Override
+    @Transactional
+    public void createUser(CreateUserRequest request) {
+        RoleName role;
+        try {
+            role = RoleName.valueOf(request.getRoleName());
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
 
+        if (userRepository.getByUserName(request.getUsername()).isPresent()) {
+            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
+        }
+
+        Set<Role> roles = userRepository.getRolesByRoleNames(Set.of(role));
+
+        UserInfo userInfo = UserInfo.builder()
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .build();
+
+        User user = User.builder()
+                .credentials(new UserCredentials(
+                        request.getUsername(),
+                        PasswordUtils.encode(request.getPassword()),
+                        true))
+                .info(userInfo)
+                .roles(roles)
+                .build();
+
+        userRepository.save(user);
+    }
+
+}
 

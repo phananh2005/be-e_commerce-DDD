@@ -17,11 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("admin/categories")
+@RequestMapping("management/categories")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Quản trị - Danh mục", description = "API quản trị danh mục sản phẩm")
-public class AdminCategoryController {
+public class ManagementCategoryController {
 
     CategoryService categoryService;
 
@@ -57,4 +57,3 @@ public class AdminCategoryController {
         return ResponseEntity.noContent().build();
     }
 }
-

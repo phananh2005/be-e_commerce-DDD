@@ -68,7 +68,7 @@ Không cần auth. Không có query param.
 ### 2.1 Tìm kiếm thương hiệu (có lọc & phân trang)
 
 ```
-GET /admin/brands/search
+GET /management/brands/search
 ```
 
 **Query Parameters:**
@@ -118,7 +118,7 @@ GET /admin/brands/search
 ### 2.2 Tạo thương hiệu mới
 
 ```
-POST /admin/brands
+POST /management/brands
 Content-Type: application/json
 ```
 
@@ -144,7 +144,7 @@ Content-Type: application/json
 ### 2.3 Cập nhật thương hiệu
 
 ```
-PATCH /admin/brands/update
+PATCH /management/brands/update
 Content-Type: application/json
 ```
 
@@ -172,7 +172,7 @@ Content-Type: application/json
 ### 2.4 Cập nhật trạng thái thương hiệu
 
 ```
-PATCH /admin/brands/{brandId}/{status}
+PATCH /management/brands/{brandId}/{status}
 ```
 
 | Param      | Type   | Mô tả                                    |
@@ -226,7 +226,7 @@ Không cần auth. Không có query param.
 ### 4.1 Tìm kiếm danh mục (có lọc & phân trang)
 
 ```
-GET /admin/categories/search
+GET /management/categories/search
 ```
 
 **Query Parameters:**
@@ -276,7 +276,7 @@ GET /admin/categories/search
 ### 4.2 Tạo danh mục mới
 
 ```
-POST /admin/categories
+POST /management/categories
 Content-Type: application/json
 ```
 
@@ -302,7 +302,7 @@ Content-Type: application/json
 ### 4.3 Cập nhật danh mục
 
 ```
-PUT /admin/categories
+PUT /management/categories
 Content-Type: application/json
 ```
 
@@ -330,7 +330,7 @@ Content-Type: application/json
 ### 4.4 Cập nhật trạng thái danh mục
 
 ```
-PATCH /admin/categories/{categoryId}/{status}
+PATCH /management/categories/{categoryId}/{status}
 ```
 
 | Param        | Type   | Mô tả                              |
@@ -358,3 +358,4 @@ PATCH /admin/categories/{categoryId}/{status}
   "message": "Brand not found"
 }
 ```
+

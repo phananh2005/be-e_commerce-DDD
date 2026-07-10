@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("admin/statistics")
+@RequestMapping("management/statistics")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Thống kê", description = "Quản lý dữ liệu tổng hợp và báo cáo")

@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/cloudinary")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Cloudinary", description = "API for generating upload signatures đi kèm với tải file trực tiếp")
+@Tag(name = "Cloudinary", description = "API tạo chữ ký tải lên để client upload file trực tiếp lên Cloudinary")
 public class CloudinaryController {
 
     CloudinaryService cloudinaryService;
@@ -35,4 +35,3 @@ public class CloudinaryController {
         return ResponseEntity.ok(response);
     }
 }
-

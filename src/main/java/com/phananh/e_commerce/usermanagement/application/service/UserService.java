@@ -12,11 +12,10 @@ public interface UserService {
     void updateMyInfo(UserInfoUpdateRequest userInfoUpdateRequest);
     void changePassword(UserChangePasswordRequest userChangePasswordRequest);
     UserInfoResponse getUserInfo(Long id);
-    UserInfoResponse getCustomerInfo(Long id);
     Long getIdByUserName(String userName);
-    Page<UserResponse> getAllUsers(AdminUserQueryRequest adminUserQueryRequest);
+    Page<UserResponse> getAllUsers(ManagementUserQueryRequest managementUserQueryRequest);
     void updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest);
     void updateUserStatus(Long userId, String status);
+    void createUser(CreateUserRequest request);
 }
-
 

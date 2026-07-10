@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-public class AdminUserQueryRequest {
+public class ManagementUserQueryRequest {
     private String keyword;
     private Set<RoleName> roleNames;
     private Boolean enabled;
@@ -40,5 +40,4 @@ public class AdminUserQueryRequest {
 
     private String sortType;
 }
-
 

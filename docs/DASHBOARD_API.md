@@ -28,14 +28,14 @@ YEAR     – Nhóm theo năm
 ---
 
 > Yêu cầu: role `ROLE_ADMIN`  
-> Base path: `/admin/statistics`
+> Base path: `/management/statistics`
 
 ---
 
 ## 1. Tổng quan hệ thống
 
 ```
-GET /admin/statistics/overview
+GET /management/statistics/overview
 ```
 
 Không có request param / body.
@@ -62,7 +62,7 @@ Không có request param / body.
 ## 2. Thống kê đơn hàng theo khoảng thời gian
 
 ```
-POST /admin/statistics/orders
+POST /management/statistics/orders
 Content-Type: application/json
 ```
 
@@ -130,7 +130,7 @@ Content-Type: application/json
 ## 3. Báo cáo doanh thu theo chu kỳ
 
 ```
-POST /admin/statistics/revenue
+POST /management/statistics/revenue
 Content-Type: application/json
 ```
 
@@ -225,3 +225,4 @@ Content-Type: application/json
   "message": "Access denied"
 }
 ```
+

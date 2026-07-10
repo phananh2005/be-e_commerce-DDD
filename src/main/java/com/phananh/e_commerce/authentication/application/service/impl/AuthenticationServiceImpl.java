@@ -10,6 +10,8 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRe
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
+import com.phananh.e_commerce.core.exception.AppException;
+import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
@@ -20,9 +22,7 @@ import com.phananh.e_commerce.usermanagement.infrastructure.persistence.reposito
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -72,14 +72,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	public AuthTokenResponse login(AuthenticationRequest request) {
 		User user = springDataUserRepository.findByCredentials_Username(request.getUsername())
-				.orElseThrow(() -> unauthorized("Invalid username or password"));
+				.orElseThrow(() -> new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD));
 
 		if (user.getCredentials() == null || !Boolean.TRUE.equals(user.getCredentials().isEnabled())) {
-			throw unauthorized("Account is disabled");
+			throw new AppException(ErrorCode.ACCOUNT_DISABLED);
 		}
 
 		if (!PasswordUtils.matches(request.getPassword(), user.getCredentials().password())) {
-			throw unauthorized("Invalid username or password");
+			throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
 		}
 
 		return issueTokenPair(user);
@@ -87,16 +87,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void register(RegisterRequest request) {
+        registerWithRole(request, RoleName.ROLE_CUSTOMER);
+    }
+
+    private void registerWithRole(RegisterRequest request, RoleName roleName) {
         if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
         if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
-        Role customerRole = springDataRoleRepository.findByName(RoleName.ROLE_CUSTOMER)
-                .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.ROLE_CUSTOMER).build()));
+        Role role = springDataRoleRepository.findByName(roleName)
+                .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(roleName).build()));
 
         UserInfo userInfo = UserInfo.builder()
                 .email(request.getEmail())
@@ -111,7 +115,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         PasswordUtils.encode(request.getPassword()),
                         true))
                 .info(userInfo)
-                .roles(new HashSet<>(Set.of(customerRole)))
+                .roles(new HashSet<>(Set.of(role)))
                 .build();
 
         springDataUserRepository.save(user);
@@ -123,10 +127,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		invalidatedTokens.add(request.getRefreshToken());
 
 		User user = springDataUserRepository.findByCredentials_Username(claims.username())
-				.orElseThrow(() -> unauthorized("User not found"));
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
 		if (user.getCredentials() == null || !Boolean.TRUE.equals(user.getCredentials().isEnabled())) {
-			throw unauthorized("Account is disabled");
+			throw new AppException(ErrorCode.ACCOUNT_DISABLED);
 		}
 
 		return issueTokenPair(user);
@@ -148,7 +152,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 					.tokenType(claims.tokenType())
 					.expiresAt(claims.expiresAt())
 					.build();
-		} catch (ResponseStatusException ex) {
+		} catch (AppException ex) {
 			return IntrospectResponse.builder().active(false).build();
 		}
 	}
@@ -215,29 +219,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			String signature = encodeBase64Url(sign(signingInput));
 			return signingInput + "." + signature;
 		} catch (Exception ex) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot generate token", ex);
+			throw new AppException(ErrorCode.TOKEN_GENERATION_ERROR);
 		}
 	}
 
 	private TokenClaims parseAndValidateToken(String token, String expectedType) {
 		if (token == null || token.isBlank()) {
-			throw unauthorized("Token is required");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 
 		if (invalidatedTokens.contains(token)) {
-			throw unauthorized("Token has been invalidated");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 
 		String[] parts = token.split("\\.");
 		if (parts.length != 3) {
-			throw unauthorized("Invalid token format");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 
 		String signingInput = parts[0] + "." + parts[1];
 		byte[] actualSignature = decodeBase64Url(parts[2]);
 		byte[] expectedSignature = sign(signingInput);
 		if (!MessageDigest.isEqual(actualSignature, expectedSignature)) {
-			throw unauthorized("Invalid token signature");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 
 		try {
@@ -252,22 +256,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			long exp = asLong(payload.get("exp"));
 
 			if (expectedType != null && !expectedType.equals(tokenType)) {
-				throw unauthorized("Invalid token type");
+				throw new AppException(ErrorCode.INVALID_TOKEN);
 			}
 
 			if (Instant.now().getEpochSecond() >= exp) {
-				throw unauthorized("Token has expired");
+				throw new AppException(ErrorCode.TOKEN_EXPIRED);
 			}
 
 			if (username.isBlank()) {
-				throw unauthorized("Token subject is missing");
+				throw new AppException(ErrorCode.INVALID_TOKEN);
 			}
 
 			return new TokenClaims(username, tokenType, exp);
-		} catch (ResponseStatusException ex) {
+		} catch (AppException ex) {
 			throw ex;
 		} catch (Exception ex) {
-			throw unauthorized("Invalid token payload");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -277,7 +281,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			mac.init(new SecretKeySpec(jwtSecret, "HmacSHA256"));
 			return mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
 		} catch (Exception ex) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot sign token", ex);
+			throw new AppException(ErrorCode.TOKEN_SIGNING_ERROR);
 		}
 	}
 
@@ -289,7 +293,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		try {
 			return Base64.getUrlDecoder().decode(value);
 		} catch (IllegalArgumentException ex) {
-			throw unauthorized("Invalid base64 token data");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -298,17 +302,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return number.longValue();
 		}
 		if (value == null) {
-			throw unauthorized("Token expiration is missing");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 		try {
 			return Long.parseLong(value.toString());
 		} catch (NumberFormatException ex) {
-			throw unauthorized("Token expiration is invalid");
+			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
-	}
-
-	private ResponseStatusException unauthorized(String message) {
-		return new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
 	}
 
     private String extractRoleName(Role role) {
@@ -318,7 +318,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			Object value = field.get(role);
 			return value == null ? "" : value.toString();
 		} catch (ReflectiveOperationException ex) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot read role name", ex);
+			throw new AppException(ErrorCode.ROLE_READ_ERROR);
 		}
 	}
 

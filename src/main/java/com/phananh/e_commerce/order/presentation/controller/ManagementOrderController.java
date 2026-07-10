@@ -17,10 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/management")
+@RequestMapping("/management/order")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Nhân viên - Đơn hàng", description = "API nhân viên quản lý đơn hàng")
+@Tag(name = "Quản trị - Đơn hàng", description = "API quản trị đơn hàng")
 public class ManagementOrderController {
 
     OrderService orderService;
@@ -41,7 +41,7 @@ public class ManagementOrderController {
         Page<StaffOrderResponse> response = orderService.getAllOrders(pageable);
         return ResponseEntity.ok(ApiResponse.<Page<StaffOrderResponse>>builder()
                 .result(response)
-                .message("Get staff orders successfully")
+                .message("Get orders successfully")
                 .build());
     }
 
@@ -51,7 +51,7 @@ public class ManagementOrderController {
         OrderDetailResponse response = orderService.getOrderDetail(orderId);
         return ResponseEntity.ok(ApiResponse.<OrderDetailResponse>builder()
                 .result(response)
-                .message("Get staff order detail successfully")
+                .message("Get order detail successfully")
                 .build());
     }
 
@@ -62,5 +62,3 @@ public class ManagementOrderController {
         return ResponseEntity.noContent().build();
     }
 }
-
-

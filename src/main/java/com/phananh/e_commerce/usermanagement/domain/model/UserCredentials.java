@@ -6,6 +6,7 @@ import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Builder;
 
 @Embeddable
 public record UserCredentials(
@@ -18,6 +19,7 @@ public record UserCredentials(
         @Column(nullable = false)
         Boolean isEnabled) {
 
+    @Builder
     public UserCredentials(String username, String password, Boolean isEnabled) {
         if (StringUtils.isBlank(username)) {
             throw new IllegalArgumentException("Username cannot be null or blank");

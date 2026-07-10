@@ -17,11 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("admin/brands")
+@RequestMapping("management/brands")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Quản trị - Thương hiệu", description = "API quản trị thương hiệu sản phẩm")
-public class AdminBrandController {
+public class ManagementBrandController {
 
     BrandService brandService;
 
@@ -57,4 +57,3 @@ public class AdminBrandController {
         return ResponseEntity.noContent().build();
     }
 }
-

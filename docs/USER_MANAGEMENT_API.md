@@ -25,7 +25,7 @@ Tất cả response đều bọc trong `ApiResponse<T>`:
 
 ```
 ROLE_ADMIN
-ROLE_STAFF
+ROLE_DELIVERY_STAFF
 ROLE_CUSTOMER
 ```
 
@@ -113,48 +113,14 @@ Content-Type: application/json
 
 ---
 
-## 2. Staff – Quản lý khách hàng
-
-> Yêu cầu: role `ROLE_STAFF` hoặc `ROLE_ADMIN`
-
-### 2.1 Lấy thông tin khách hàng theo ID
-
-```
-GET /staff/users/customer/info/{id}
-```
-
-| Param | Type | Mô tả       |
-|-------|------|-------------|
-| `id`  | Long | ID người dùng |
-
-**Response 200:**
-```json
-{
-  "code": 1000,
-  "message": "Get customer info successfully",
-  "result": {
-    "id": 5,
-    "username": "customer01",
-    "email": "customer01@example.com",
-    "fullName": "Nguyễn Văn A",
-    "phoneNumber": "0912345678",
-    "address": "456 Đường XYZ, Hà Nội",
-    "roles": ["ROLE_CUSTOMER"],
-    "isEnabled": true
-  }
-}
-```
-
----
-
-## 3. Admin – Quản trị người dùng
+## 2. Admin – Quản trị người dùng
 
 > Yêu cầu: role `ROLE_ADMIN`
 
 ### 3.1 Lấy danh sách người dùng (có lọc & phân trang)
 
 ```
-GET /admin/users
+GET /management/users
 ```
 
 **Query Parameters:**
@@ -162,7 +128,7 @@ GET /admin/users
 | Param              | Type            | Bắt buộc | Mô tả                                      |
 |--------------------|-----------------|----------|--------------------------------------------|
 | `keyword`          | string          | ❌        | Tìm theo username / email / fullName       |
-| `roleNames`        | RoleName[]      | ❌        | Lọc theo role, VD: `roleNames=ROLE_CUSTOMER&roleNames=ROLE_STAFF` |
+| `roleNames`        | RoleName[]      | ❌        | Lọc theo role, VD: `roleNames=ROLE_CUSTOMER&roleNames=ROLE_DELIVERY_STAFF` |
 | `enabled`          | boolean         | ❌        | `true` / `false`                           |
 | `createdDateFrom`  | ISO datetime    | ❌        | VD: `2024-01-01T00:00:00`                  |
 | `createdDateTo`    | ISO datetime    | ❌        |                                            |
@@ -212,7 +178,7 @@ GET /admin/users
 ### 3.2 Lấy thông tin chi tiết người dùng theo ID
 
 ```
-GET /admin/users/info/{id}
+GET /management/users/info/{id}
 ```
 
 | Param | Type | Mô tả         |
@@ -242,7 +208,7 @@ GET /admin/users/info/{id}
 ### 3.3 Cập nhật vai trò người dùng
 
 ```
-PATCH /admin/users/update-role
+PATCH /management/users/update-role
 Content-Type: application/json
 ```
 
@@ -250,7 +216,7 @@ Content-Type: application/json
 ```json
 {
   "userId": 5,
-  "roleNames": ["ROLE_STAFF"]
+  "roleNames": ["ROLE_DELIVERY_STAFF"]
 }
 ```
 
@@ -266,7 +232,7 @@ Content-Type: application/json
 ### 3.4 Cập nhật trạng thái người dùng
 
 ```
-PATCH /admin/users/{id}/{status}
+PATCH /management/users/{id}/{status}
 ```
 
 | Param    | Type   | Mô tả                                  |
@@ -294,3 +260,4 @@ PATCH /admin/users/{id}/{status}
   "message": "User not found"
 }
 ```
+

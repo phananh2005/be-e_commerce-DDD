@@ -14,21 +14,18 @@ Hoàn thành cập nhật tài liệu Swagger cho tất cả 15 controllers tron
 - **PATCH /update-info** - Cập nhật thông tin cá nhân
 - **PATCH /change-password** - Đổi mật khẩu
 
-#### ✅ AdminUserController (admin/users)
+#### ✅ ManagementUserController (management/users)
 - **GET** - Lấy danh sách tất cả người dùng (có phân trang và tìm kiếm)
 - **GET /info/{id}** - Lấy thông tin chi tiết người dùng
 - **PATCH /update-role** - Cập nhật vai trò người dùng
 - **PATCH /{id}/{status}** - Cập nhật trạng thái tài khoản (ACTIVE/INACTIVE)
-
-#### ✅ StaffUserController (staff/users)
-- **GET /customer/info/{id}** - Lấy thông tin khách hàng (chỉ role ROLE_CUSTOMER)
 
 ### 2. **Product Catalog Controllers** (4 controllers)
 
 #### ✅ CustomerCategoryController (/categories)
 - **GET** - Lấy danh sách danh mục đang hoạt động
 
-#### ✅ AdminCategoryController (admin/categories)
+#### ✅ ManagementCategoryController (management/categories)
 - **GET /search** - Tìm kiếm và phân trang danh mục
 - **POST** - Tạo danh mục mới
 - **PUT** - Cập nhật danh mục
@@ -37,7 +34,7 @@ Hoàn thành cập nhật tài liệu Swagger cho tất cả 15 controllers tron
 #### ✅ CustomerBrandController (/brands)
 - **GET** - Lấy danh sách thương hiệu đang hoạt động
 
-#### ✅ AdminBrandController (admin/brands)
+#### ✅ ManagementBrandController (management/brands)
 - **GET /search** - Tìm kiếm và phân trang thương hiệu
 - **POST** - Tạo thương hiệu mới
 - **PATCH /update** - Cập nhật thương hiệu
@@ -87,7 +84,7 @@ Hoàn thành cập nhật tài liệu Swagger cho tất cả 15 controllers tron
 - **POST /logout** - Đăng xuất
 - **POST /introspect** - Kiểm tra token
 
-#### ✅ DashboardController (admin/statistics)
+#### ✅ DashboardController (management/statistics)
 - **GET /overview** - Lấy tồng quan thống kê
 - **POST /orders** - Lấy thống kê đơn hàng
 - **POST /revenue** - Lấy báo cáo doanh thu
@@ -119,20 +116,19 @@ Hoàn thành cập nhật tài liệu Swagger cho tất cả 15 controllers tron
 ```
 14 files updated:
 1. CustomerUserController.java
-2. AdminUserController.java
+2. ManagementUserController.java
 3. StaffUserController.java
 4. DashboardController.java
 5. CustomerCategoryController.java
-6. AdminCategoryController.java
+6. ManagementCategoryController.java
 7. CustomerBrandController.java
-8. AdminBrandController.java
+8. ManagementBrandController.java
 9. CloudinaryController.java
 10. OrderController.java
 11. CartController.java
 12. ManagementOrderController.java
 13. CustomerProductController.java
 14. ManagementProductController.java
-+ 1 service method added: getCustomerInfo() in UserService
 ```
 
 ## Next Steps

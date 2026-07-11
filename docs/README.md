@@ -11,6 +11,7 @@ Tài liệu dùng hiện tại cho dự án e-commerce backend.
 - `FRONTEND_WORK.md` — mô tả phạm vi và cấu trúc công việc frontend
 - `FRONTEND_AI_PROMPT.md` — bản brief/prompt copy-paste để AI bắt đầu code frontend
 - `FRONTEND_BACKEND_REFERENCE.md` — base URL, endpoint thực tế, response JSON, auth/token
+- `HELP.md` — mẹo hỗ trợ nhanh và vận hành
 
 ## Tài liệu đã lưu trữ
 - `docs/archived/` — các báo cáo session, quick cards, bản migration cũ và tài liệu nháp

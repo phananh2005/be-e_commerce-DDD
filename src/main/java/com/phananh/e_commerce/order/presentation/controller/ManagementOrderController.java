@@ -28,13 +28,13 @@ public class ManagementOrderController {
     @Operation(summary = "Tìm kiếm đơn hàng", description = "Tìm kiếm và phân trang danh sách đơn hàng")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<StaffOrderResponse>>> getAllOrdersForStaff(
-            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortType) {
 
         Pageable pageable = PageRequest.of(
-                Math.max(PageUtils.getPageNumber(page), 1) - 1,
+                PageUtils.getPageNumber(page),
                 PageUtils.getPageSize(size),
                 Sort.by(Sort.Direction.fromString(PageUtils.getSortType(sortType)), PageUtils.getSortBy(sortBy)));
 

@@ -13,7 +13,7 @@ public interface UserService {
     void changePassword(UserChangePasswordRequest userChangePasswordRequest);
     UserInfoResponse getUserInfo(Long id);
     Long getIdByUserName(String userName);
-    Page<UserResponse> getAllUsers(ManagementUserQueryRequest managementUserQueryRequest);
+    Page<UserResponse> getAllUsers(UserQueryRequest userQueryRequest);
     void updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest);
     void updateUserStatus(Long userId, String status);
     void createUser(CreateUserRequest request);

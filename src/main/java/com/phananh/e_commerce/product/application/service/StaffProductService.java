@@ -2,7 +2,7 @@ package com.phananh.e_commerce.product.application.service;
 
 import com.phananh.e_commerce.product.application.dto.response.staff.ProductResponse;
 import com.phananh.e_commerce.product.application.dto.response.staff.ProductVariantResponse;
-import com.phananh.e_commerce.product.presentation.dto.request.product.staff.*;
+import com.phananh.e_commerce.product.presentation.dto.request.product.management.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface StaffProductService {
 	List<ProductVariantResponse> getStaffProductVariantsByProductId(Long productId);
 
 	// Staff - search all products (including inactive)
-	Page<ProductResponse> getAllProductsBySearch(StaffProductSearchRequest staffProductSearchRequest);
+	Page<ProductResponse> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest);
 
 	// Staff - create/update operations
 	void createProduct(ProductCreateRequest productCreateRequest);

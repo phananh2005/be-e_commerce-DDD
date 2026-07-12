@@ -41,7 +41,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         int size = PageUtils.getPageSize(request.getSize());
         String sortBy = PageUtils.getSortBy(request.getSortBy());
         String sortType = PageUtils.getSortType(request.getSortType());
-        Pageable pageable = PageRequest.of(page - 1, size,
+        Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         ProductSearchQuery query = ProductSearchQuery.builder()

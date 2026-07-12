@@ -1,9 +1,5 @@
 package com.phananh.e_commerce.usermanagement.presentation.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
@@ -13,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-public class ManagementUserQueryRequest {
+public class UserQueryRequest {
     private String keyword;
     private Set<RoleName> roleNames;
     private Boolean enabled;

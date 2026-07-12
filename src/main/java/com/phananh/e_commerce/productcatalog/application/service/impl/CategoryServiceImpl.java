@@ -53,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
         int size = PageUtils.getPageSize(request.getSize());
         String sortBy = PageUtils.getSortBy(request.getSortBy());
         String sortType = PageUtils.getSortType(request.getSortType());
-        Pageable pageable = PageRequest.of(page - 1, size,
+        Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         CategorySearchQuery query = CategorySearchQuery.builder()

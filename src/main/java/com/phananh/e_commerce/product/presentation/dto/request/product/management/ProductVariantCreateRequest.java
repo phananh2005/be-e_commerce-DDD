@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.product.presentation.dto.request.product.staff;
+package com.phananh.e_commerce.product.presentation.dto.request.product.management;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

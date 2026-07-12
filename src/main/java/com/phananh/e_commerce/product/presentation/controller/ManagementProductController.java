@@ -4,7 +4,7 @@ import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.product.application.dto.response.staff.ProductResponse;
 import com.phananh.e_commerce.product.application.dto.response.staff.ProductVariantResponse;
 import com.phananh.e_commerce.product.application.service.StaffProductService;
-import com.phananh.e_commerce.product.presentation.dto.request.product.staff.*;
+import com.phananh.e_commerce.product.presentation.dto.request.product.management.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,8 +28,8 @@ public class ManagementProductController {
 
     @Operation(summary = "Tìm kiếm sản phẩm", description = "Tìm kiếm và phân trang danh sách sản phẩm")
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProductsBySearch(@ModelAttribute @Valid StaffProductSearchRequest staffProductSearchRequest) {
-        Page<ProductResponse> products = staffProductService.getAllProductsBySearch(staffProductSearchRequest);
+    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProductsBySearch(@ModelAttribute @Valid ManagementProductSearchRequest managementProductSearchRequest) {
+        Page<ProductResponse> products = staffProductService.getAllProductsBySearch(managementProductSearchRequest);
         ApiResponse<Page<ProductResponse>> response = ApiResponse.<Page<ProductResponse>>builder()
                 .message("Get product successfully")
                 .result(products)

@@ -104,12 +104,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(ManagementUserQueryRequest request) {
+    public Page<UserResponse> getAllUsers(UserQueryRequest request) {
         int page = PageUtils.getPageNumber(request.getPage());
         int size = PageUtils.getPageSize(request.getSize());
         String sortBy = PageUtils.getSortBy(request.getSortBy());
         String sortType = PageUtils.getSortType(request.getSortType());
-        Pageable pageable = PageRequest.of(page - 1, size,
+        Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         UserSearchQuery userSearchQuery = UserSearchQuery.builder()

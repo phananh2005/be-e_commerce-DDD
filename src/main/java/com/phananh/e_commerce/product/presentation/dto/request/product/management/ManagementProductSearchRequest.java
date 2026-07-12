@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.product.presentation.dto.request.product.staff;
+package com.phananh.e_commerce.product.presentation.dto.request.product.management;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data
-public class StaffProductSearchRequest {
+public class ManagementProductSearchRequest {
 
     private String keyword;
 

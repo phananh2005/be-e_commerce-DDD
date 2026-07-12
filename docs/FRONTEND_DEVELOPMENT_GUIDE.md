@@ -987,7 +987,7 @@ RETURNED   – Trả hàng / hoàn tiền
 > Yêu cầu: `ROLE_ADMIN`  
 > Base path: `/management/order`
 
-> ⚠️ `page` bắt đầu từ **1** (khác các API khác bắt đầu từ 0).
+> ⚠️ `page` bắt đầu từ **0**.
 
 #### GET /management/order/search
 
@@ -995,7 +995,7 @@ RETURNED   – Trả hàng / hoàn tiền
 
 | Param | Type | Mặc định |
 |-------|------|----------|
-| `page` | int | 1 |
+| `page` | int | 0 |
 | `size` | int | 10 |
 | `sortBy` | string | `createdAt` |
 | `sortType` | string | `desc` |
@@ -1221,7 +1221,7 @@ POST /management/statistics/revenue
 
 ### Phân trang
 
-Một số API `page` bắt đầu từ **0** (products, users, brands, categories), một số bắt đầu từ **1** (management orders). Cần xử lý đúng theo từng API.
+Tất cả các API phân trang đều sử dụng `page` bắt đầu từ **0** (zero-based paging).
 
 ### Format tiền tệ
 

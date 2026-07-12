@@ -16,7 +16,7 @@ import com.phananh.e_commerce.product.application.service.StaffProductService;
 import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
-import com.phananh.e_commerce.product.presentation.dto.request.product.staff.*;
+import com.phananh.e_commerce.product.presentation.dto.request.product.management.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,21 +47,21 @@ public class StaffProductServiceImpl implements StaffProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getAllProductsBySearch(StaffProductSearchRequest staffProductSearchRequest) {
-        int page = PageUtils.getPageNumber(staffProductSearchRequest.getPage());
-        int size = PageUtils.getPageSize(staffProductSearchRequest.getSize());
-        String sortBy = PageUtils.getSortBy(staffProductSearchRequest.getSortBy());
-        String sortType = PageUtils.getSortType(staffProductSearchRequest.getSortType());
-        Pageable pageable = PageRequest.of(page - 1, size,
+    public Page<ProductResponse> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest) {
+        int page = PageUtils.getPageNumber(managementProductSearchRequest.getPage());
+        int size = PageUtils.getPageSize(managementProductSearchRequest.getSize());
+        String sortBy = PageUtils.getSortBy(managementProductSearchRequest.getSortBy());
+        String sortType = PageUtils.getSortType(managementProductSearchRequest.getSortType());
+        Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         StaffProductSearchQuery query = StaffProductSearchQuery.builder()
-                .keyword(staffProductSearchRequest.getKeyword() == null || staffProductSearchRequest.getKeyword().isBlank() ? null : staffProductSearchRequest.getKeyword().trim())
-                .categoryId(staffProductSearchRequest.getCategoryId())
-                .brandId(staffProductSearchRequest.getBrandId())
-                .minPrice(staffProductSearchRequest.getMinPrice())
-                .maxPrice(staffProductSearchRequest.getMaxPrice())
-                .minRating(staffProductSearchRequest.getMinRating())
+                .keyword(managementProductSearchRequest.getKeyword() == null || managementProductSearchRequest.getKeyword().isBlank() ? null : managementProductSearchRequest.getKeyword().trim())
+                .categoryId(managementProductSearchRequest.getCategoryId())
+                .brandId(managementProductSearchRequest.getBrandId())
+                .minPrice(managementProductSearchRequest.getMinPrice())
+                .maxPrice(managementProductSearchRequest.getMaxPrice())
+                .minRating(managementProductSearchRequest.getMinRating())
                 .pageable(pageable)
                 .build();
 

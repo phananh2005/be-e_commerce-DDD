@@ -5,7 +5,7 @@ import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoRe
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserResponse;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.CreateUserRequest;
-import com.phananh.e_commerce.usermanagement.presentation.dto.request.ManagementUserQueryRequest;
+import com.phananh.e_commerce.usermanagement.presentation.dto.request.UserQueryRequest;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.UserRoleUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +35,8 @@ public class ManagementUserController {
 
     @Operation(summary = "Lấy danh sách tất cả người dùng", description = "Tìm kiếm và phân trang danh sách người dùng")
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(@ModelAttribute @Valid ManagementUserQueryRequest managementUserQueryRequest) {
-        Page<UserResponse> users = userService.getAllUsers(managementUserQueryRequest);
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(@ModelAttribute @Valid UserQueryRequest userQueryRequest) {
+        Page<UserResponse> users = userService.getAllUsers(userQueryRequest);
         ApiResponse<Page<UserResponse>> apiResponse = ApiResponse.<Page<UserResponse>>builder()
                 .result(users)
                 .message("Get all users successfully")

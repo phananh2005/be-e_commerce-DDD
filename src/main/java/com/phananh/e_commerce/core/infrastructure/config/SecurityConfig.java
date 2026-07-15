@@ -36,9 +36,12 @@ public class SecurityConfig {
     private final CustomJwtDecoder customJwtDecoder;
 
     private final String[] CUSTOMER_ENDPOINTS = {
-            "/users/**",
             "/cart-item/**",
             "/orders/**"
+    };
+
+    private final String[] PUBLIC_ENDPOINTS = {
+            "/users/**",
     };
 
     @Bean
@@ -51,8 +54,8 @@ public class SecurityConfig {
                         .requestMatchers("/cloudinary/**").hasAnyRole("ADMIN", "DELIVERY_STAFF")
                         .requestMatchers("/management/**").hasAnyRole("ADMIN")
                         .requestMatchers("/delivery/**").hasAnyRole("DELIVERY_STAFF")
-                        .requestMatchers("/users/my-info").authenticated()
                         .requestMatchers(CUSTOMER_ENDPOINTS).hasAnyRole("CUSTOMER")
+                        .requestMatchers(PUBLIC_ENDPOINTS).authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

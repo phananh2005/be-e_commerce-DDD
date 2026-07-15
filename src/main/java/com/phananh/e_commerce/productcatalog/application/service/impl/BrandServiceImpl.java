@@ -1,17 +1,19 @@
 package com.phananh.e_commerce.productcatalog.application.service.impl;
 
+import com.phananh.e_commerce.core.exception.AppException;
+import com.phananh.e_commerce.core.exception.ErrorCode;
+import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
 import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.productcatalog.application.dto.query.BrandSearchQuery;
-import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
-import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.*;
 import com.phananh.e_commerce.productcatalog.application.dto.response.BrandResponse;
-import com.phananh.e_commerce.core.exception.AppException;
-import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.productcatalog.application.mapper.BrandMapper;
-import com.phananh.e_commerce.productcatalog.domain.model.Brand;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
-import com.phananh.e_commerce.core.infrastructure.service.CloudinaryService;
+import com.phananh.e_commerce.productcatalog.domain.model.Brand;
+import com.phananh.e_commerce.productcatalog.domain.repository.BrandRepository;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
+import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandUpdateRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +25,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service

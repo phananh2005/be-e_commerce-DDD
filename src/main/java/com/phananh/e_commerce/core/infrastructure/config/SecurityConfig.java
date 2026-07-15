@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/cloudinary/**").hasAnyRole("ADMIN", "DELIVERY_STAFF")
                         .requestMatchers("/management/**").hasAnyRole("ADMIN")
                         .requestMatchers("/delivery/**").hasAnyRole("DELIVERY_STAFF")
+                        .requestMatchers("/users/my-info").authenticated()
                         .requestMatchers(CUSTOMER_ENDPOINTS).hasAnyRole("CUSTOMER")
                         .anyRequest().permitAll()
                 )

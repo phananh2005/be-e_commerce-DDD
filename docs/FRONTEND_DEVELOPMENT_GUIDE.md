@@ -237,7 +237,17 @@ POST /auth/login
 | `username` | string | ✅ |
 | `password` | string | ✅ |
 
-**Response 200:** _(cấu trúc giống 5.1)_
+**Response 200:**
+```json
+{
+  "code": 1000,
+  "message": "Login successful",
+  "result": {
+    "accessToken": "...",
+    "refreshToken": "..."
+  }
+}
+```
 
 ### 5.3 Refresh Token
 
@@ -654,7 +664,7 @@ Ví dụ: `GET /management/product/search?categoryIds=1&categoryIds=2&brandIds=3
 
 **Response:** Phân trang, mỗi item chứa `id, name, description, avatarUrl, status, categoryName, brandName, createdAt, ...`
 
-> ⚠️ Lưu ý: `categoryName` và `brandName` trong `ProductResponse` có thể là Long (ID), cần xác nhận lại.
+> ⚠️ Lưu ý: `categoryName` và `brandName` trong `ProductResponse` là `Long` (chứa ID).
 
 #### GET /management/product/{id}
 
@@ -1011,7 +1021,7 @@ RETURNED   – Trả hàng / hoàn tiền
 | `sortBy` | string | `createdAt` |
 | `sortType` | string | `desc` |
 
-**Response 200:** Phân trang, mỗi item chứa Order object (giống 10.4).
+**Response 200:** Phân trang, mỗi item chứa các thông tin đơn hàng (orderId, status, totalPrice, ...), **không** bao gồm danh sách sản phẩm (`items`).
 
 #### GET /management/order/{orderId}
 

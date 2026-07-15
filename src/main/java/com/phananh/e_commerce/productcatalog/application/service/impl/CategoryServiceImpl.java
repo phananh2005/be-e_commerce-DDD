@@ -58,10 +58,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategorySearchQuery query = CategorySearchQuery.builder()
                 .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
-                .createdDateFrom(request.getCreatedDateFrom())
-                .createdDateTo(request.getCreatedDateTo())
-                .modifiedDateFrom(request.getModifiedDateFrom())
-                .modifiedDateTo(request.getModifiedDateTo())
                 .pageable(pageable)
                 .build();
 

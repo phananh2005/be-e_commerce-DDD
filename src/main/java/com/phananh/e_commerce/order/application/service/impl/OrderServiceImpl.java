@@ -21,7 +21,7 @@ import com.phananh.e_commerce.order.application.dto.response.order.StaffOrderRes
 import com.phananh.e_commerce.order.domain.repository.OrderRepository;
 import com.phananh.e_commerce.order.domain.repository.OrderItemRepository;
 import com.phananh.e_commerce.product.application.service.ProductInternalService;
-import com.phananh.e_commerce.product.application.service.StaffProductService;
+import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.application.dto.response.internal.ProductInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.core.exception.AppException;
@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
     OrderItemRepository orderItemRepository;
 
     ProductInternalService productService;
-    StaffProductService staffProductService;
+    ManagementProductService managementProductService;
     UserService userService;
     OrderMapper orderMapper;
 
@@ -168,7 +168,7 @@ public class OrderServiceImpl implements OrderService {
             orderItemRepository.save(orderItem);
 
             int newStock = currentStock - item.getQuantity();
-            staffProductService.updateVariantStock(item.getVariantId(), Math.max(newStock, 0));
+            managementProductService.updateVariantStock(item.getVariantId(), Math.max(newStock, 0));
             itemsToSave.add(orderItem);
         }
         order.updateTotalPrice(total);

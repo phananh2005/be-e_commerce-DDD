@@ -4,6 +4,8 @@ import com.phananh.e_commerce.product.domain.model.Product;
 import com.phananh.e_commerce.product.domain.model.ProductVariant;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
+
 public class ProductSearchSpecification {
 
     public static Specification<Product> hasNameLike(String name) {
@@ -27,9 +29,19 @@ public class ProductSearchSpecification {
                 brandId == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("brand").get("id"), brandId);
     }
 
+    public static Specification<Product> hasBrandIds(List<Long> brandIds) {
+        return (root, query, criteriaBuilder) ->
+                brandIds == null || brandIds.isEmpty() ? criteriaBuilder.conjunction() : root.get("brand").get("id").in(brandIds);
+    }
+
     public static Specification<Product> hasCategoryId(Long categoryId) {
         return (root, query, criteriaBuilder) ->
                 categoryId == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("category").get("id"), categoryId);
+    }
+
+    public static Specification<Product> hasCategoryIds(List<Long> categoryIds) {
+        return (root, query, criteriaBuilder) ->
+                categoryIds == null || categoryIds.isEmpty() ? criteriaBuilder.conjunction() : root.get("category").get("id").in(categoryIds);
     }
 
     public static Specification<Product> hasPriceBetween(Double minPrice, Double maxPrice) {

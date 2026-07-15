@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface StaffProductMapper {
+public interface ManagementProductMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")

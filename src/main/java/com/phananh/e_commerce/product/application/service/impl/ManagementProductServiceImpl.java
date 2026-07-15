@@ -8,11 +8,11 @@ import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.product.application.dto.command.ProductCreateCommand;
 import com.phananh.e_commerce.product.application.dto.command.ProductVariantCreateCommand;
-import com.phananh.e_commerce.product.application.dto.query.StaffProductSearchQuery;
+import com.phananh.e_commerce.product.application.dto.query.ManagementProductSearchQuery;
 import com.phananh.e_commerce.product.application.dto.response.staff.ProductResponse;
 import com.phananh.e_commerce.product.application.dto.response.staff.ProductVariantResponse;
-import com.phananh.e_commerce.product.application.mapper.StaffProductMapper;
-import com.phananh.e_commerce.product.application.service.StaffProductService;
+import com.phananh.e_commerce.product.application.mapper.ManagementProductMapper;
+import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
@@ -38,10 +38,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-public class StaffProductServiceImpl implements StaffProductService {
+public class ManagementProductServiceImpl implements ManagementProductService {
 
     ProductRepository productRepository;
-    StaffProductMapper staffProductMapper;
+    ManagementProductMapper staffProductMapper;
     CloudinaryService cloudinaryService;
 
 
@@ -55,10 +55,10 @@ public class StaffProductServiceImpl implements StaffProductService {
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
-        StaffProductSearchQuery query = StaffProductSearchQuery.builder()
+        ManagementProductSearchQuery query = ManagementProductSearchQuery.builder()
                 .keyword(managementProductSearchRequest.getKeyword() == null || managementProductSearchRequest.getKeyword().isBlank() ? null : managementProductSearchRequest.getKeyword().trim())
-                .categoryId(managementProductSearchRequest.getCategoryId())
-                .brandId(managementProductSearchRequest.getBrandId())
+                .categoryIds(managementProductSearchRequest.getCategoryIds())
+                .brandIds(managementProductSearchRequest.getBrandIds())
                 .minPrice(managementProductSearchRequest.getMinPrice())
                 .maxPrice(managementProductSearchRequest.getMaxPrice())
                 .minRating(managementProductSearchRequest.getMinRating())
@@ -71,7 +71,7 @@ public class StaffProductServiceImpl implements StaffProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductResponse getStaffProductById(Long id) {
+    public ProductResponse getManagementProductById(Long id) {
         Product product = productRepository.getProductById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
@@ -80,7 +80,7 @@ public class StaffProductServiceImpl implements StaffProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductVariantResponse> getStaffProductVariantsByProductId(Long productId) {
+    public List<ProductVariantResponse> getManagementProductVariantsByProductId(Long productId) {
         if (productRepository.getProductById(productId).isEmpty()) {
             throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
         }

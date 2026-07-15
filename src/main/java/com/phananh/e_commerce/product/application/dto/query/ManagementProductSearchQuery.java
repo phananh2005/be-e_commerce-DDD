@@ -4,12 +4,14 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @Data
 @Builder
-public class StaffProductSearchQuery {
+public class ManagementProductSearchQuery {
     private String keyword;
-    private Long categoryId;
-    private Long brandId;
+    private List<Long> categoryIds;
+    private List<Long> brandIds;
     private Double minPrice;
     private Double maxPrice;
     private Integer minRating;

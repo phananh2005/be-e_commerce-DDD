@@ -7,19 +7,19 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public interface StaffProductService {
+public interface ManagementProductService {
 
 
-	// Staff - product detail
-	ProductResponse getStaffProductById(Long id);
+	// Management - product detail
+	ProductResponse getManagementProductById(Long id);
 
-	// Staff - list variants by product
-	List<ProductVariantResponse> getStaffProductVariantsByProductId(Long productId);
+	// Management - list variants by product
+	List<ProductVariantResponse> getManagementProductVariantsByProductId(Long productId);
 
-	// Staff - search all products (including inactive)
+	// Management - search all products (including inactive)
 	Page<ProductResponse> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest);
 
-	// Staff - create/update operations
+	// Management - create/update operations
 	void createProduct(ProductCreateRequest productCreateRequest);
 
 	void createProductVariant(Long productId, ProductVariantCreateRequest productVariantCreateRequest);

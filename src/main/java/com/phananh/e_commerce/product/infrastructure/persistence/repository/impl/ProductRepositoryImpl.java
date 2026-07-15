@@ -1,7 +1,7 @@
 package com.phananh.e_commerce.product.infrastructure.persistence.repository.impl;
 
 import com.phananh.e_commerce.product.application.dto.query.ProductSearchQuery;
-import com.phananh.e_commerce.product.application.dto.query.StaffProductSearchQuery;
+import com.phananh.e_commerce.product.application.dto.query.ManagementProductSearchQuery;
 import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataAttributeValueRepository;
@@ -51,13 +51,13 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public Page<Product> getAllProductsBySearch(StaffProductSearchQuery productSearchQuery) {
+    public Page<Product> getAllProductsBySearch(ManagementProductSearchQuery productSearchQuery) {
         Pageable pageable = productSearchQuery.getPageable();
 
         Specification<Product> specification = Specification
                 .where(ProductSearchSpecification.hasNameLike(productSearchQuery.getKeyword()))
-                .and(ProductSearchSpecification.hasCategoryId(productSearchQuery.getCategoryId()))
-                .and(ProductSearchSpecification.hasBrandId(productSearchQuery.getBrandId()))
+                .and(ProductSearchSpecification.hasCategoryIds(productSearchQuery.getCategoryIds()))
+                .and(ProductSearchSpecification.hasBrandIds(productSearchQuery.getBrandIds()))
                 .and(ProductSearchSpecification.hasPriceBetween(productSearchQuery.getMinPrice(), productSearchQuery.getMaxPrice()));
 
         return springDataProductRepository.findAll(specification, pageable);

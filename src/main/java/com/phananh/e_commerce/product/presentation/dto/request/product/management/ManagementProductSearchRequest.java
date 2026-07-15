@@ -5,14 +5,16 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ManagementProductSearchRequest {
 
     private String keyword;
 
-    private Long categoryId;
+    private List<Long> categoryIds;
 
-    private Long brandId;
+    private List<Long> brandIds;
 
     @DecimalMin(value = "0.0", message = "Min price must be >= 0")
     private Double minPrice;

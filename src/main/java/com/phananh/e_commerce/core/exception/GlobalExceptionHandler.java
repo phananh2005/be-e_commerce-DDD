@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,6 +37,18 @@ public class GlobalExceptionHandler {
                 errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
         return new ResponseEntity<>(
                 ApiResponse.builder().code(ErrorCode.VALIDATION_ERROR.getCode()).message("Validation failed").result(errors).build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidRequest(HttpMessageNotReadableException ex) {
+        log.error("Invalid request body: ", ex);
+        return new ResponseEntity<>(
+                ApiResponse.builder()
+                        .code(ErrorCode.INVALID_REQUEST.getCode())
+                        .message("Malformed JSON or invalid input provided")
+                        .build(),
                 HttpStatus.BAD_REQUEST
         );
     }

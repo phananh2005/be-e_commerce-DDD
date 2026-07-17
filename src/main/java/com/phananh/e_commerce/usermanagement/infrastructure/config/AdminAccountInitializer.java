@@ -39,8 +39,8 @@ public class AdminAccountInitializer implements ApplicationRunner {
             return;
         }
 
-        Role adminRole = springDataRoleRepository.findByName(RoleName.ROLE_ADMIN)
-                .orElseThrow(() -> new IllegalStateException("Cannot initialize admin role"));
+        Role superAdminRole = springDataRoleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
+                .orElseThrow(() -> new IllegalStateException("Cannot initialize super admin role"));
 
         User adminUser = new User();
         setField(adminUser, "credentials", new UserCredentials(
@@ -52,7 +52,7 @@ public class AdminAccountInitializer implements ApplicationRunner {
                 adminSeedProperties.email(),
                 adminSeedProperties.address(),
                 adminSeedProperties.phoneNumber()));
-        setField(adminUser, "roles", new HashSet<>(Set.of(adminRole)));
+        setField(adminUser, "roles", new HashSet<>(Set.of(superAdminRole)));
 
         springDataUserRepository.save(adminUser);
     }

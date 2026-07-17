@@ -408,7 +408,7 @@ Tạo user bởi admin. Thay cho API cũ `registerAdminOrStaff` / `/register/{ro
 
 #### GET /management/users/info/{id}
 
-**Response 200:** User object.
+**Response 200:** UserResponse object (bao gồm cả createdAt, createdBy, modifiedAt, modifiedBy).
 
 #### PATCH /management/users/update-role
 

@@ -46,8 +46,8 @@ public class ManagementUserController {
 
     @Operation(summary = "Lấy thông tin người dùng", description = "Lấy thông tin chi tiết của một người dùng theo ID")
     @GetMapping("/info/{id}")
-    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@PathVariable Long id) {
-        ApiResponse<UserInfoResponse> apiResponse = ApiResponse.<UserInfoResponse>builder()
+    public ResponseEntity<ApiResponse<UserResponse>> getUserInfo(@PathVariable Long id) {
+        ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
                 .result(userService.getUserInfo(id))
                 .message("Get user info successfully")
                 .build();

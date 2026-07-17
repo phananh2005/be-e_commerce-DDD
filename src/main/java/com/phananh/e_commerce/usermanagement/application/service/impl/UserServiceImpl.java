@@ -3,6 +3,7 @@ package com.phananh.e_commerce.usermanagement.application.service.impl;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.PageUtils;
+import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.core.util.SecurityUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
@@ -10,7 +11,6 @@ import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoRe
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserResponse;
 import com.phananh.e_commerce.usermanagement.application.mapper.UserMapper;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
-import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
@@ -88,10 +88,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserInfoResponse getUserInfo(Long id) {
+    public UserResponse getUserInfo(Long id) {
         User user = userRepository.getById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return userMapper.toUserInfoResponse(user);
+        return userMapper.toResponse(user);
     }
 
     @Override
@@ -133,9 +133,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getById(userRoleUpdateRequest.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        Set<Role> roles = userRepository.getRolesByRoleNames(userRoleUpdateRequest.getRoleNames());
+        validateManagementPermission(user);
+        validateRoleAssignment(userRoleUpdateRequest.getRoleNames());
 
-        user.updateRoles(roles);
+        user.updateRoles(userRepository.getRolesByRoleNames(userRoleUpdateRequest.getRoleNames()));
         userRepository.save(user);
     }
 
@@ -144,6 +145,8 @@ public class UserServiceImpl implements UserService {
     public void updateUserStatus(Long userId, String status) {
         User user = userRepository.getById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        validateManagementPermission(user);
 
         if (StringUtils.isBlank(status)) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
@@ -158,18 +161,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void createUser(CreateUserRequest request) {
-        RoleName role;
-        try {
-            role = RoleName.valueOf(request.getRoleName());
-        } catch (IllegalArgumentException e) {
-            throw new AppException(ErrorCode.INVALID_REQUEST);
-        }
+        validateRoleAssignment(request.getRoleNames());
 
         if (userRepository.getByUserName(request.getUsername()).isPresent()) {
             throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
-        Set<Role> roles = userRepository.getRolesByRoleNames(Set.of(role));
+        Set<Role> roles = userRepository.getRolesByRoleNames(request.getRoleNames());
 
         UserInfo userInfo = UserInfo.builder()
                 .email(request.getEmail())
@@ -190,5 +188,47 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    private void validateRoleAssignment(Set<RoleName> roleNames) {
+        User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        for (RoleName roleName : roleNames) {
+            if (!canAssign(currentUser, roleName)) {
+                throw new AppException(ErrorCode.FORBIDDEN);
+            }
+        }
+    }
+
+    private boolean hasRole(User user, RoleName roleName) {
+        return user.getRoles().stream()
+                .map(Role::getName)
+                .anyMatch(roleName::equals);
+    }
+
+    private void validateManagementPermission(User targetUser) {
+        User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        if (!canManage(currentUser, targetUser)) {
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+    }
+
+    private boolean canManage(User currentUser, User targetUser) {
+        if (hasRole(targetUser, RoleName.ROLE_SUPER_ADMIN)) return false;
+
+        return targetUser.getRoles().stream()
+                .map(Role::getName)
+                .allMatch(role -> canAssign(currentUser, role));
+    }
+
+    private boolean canAssign(User currentUser, RoleName targetRole) {
+        if (targetRole == RoleName.ROLE_SUPER_ADMIN) return false;
+
+        if (hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN)) return true;
+
+        return hasRole(currentUser, RoleName.ROLE_STORE_ADMIN)
+                && (targetRole == RoleName.ROLE_DELIVERY_STAFF || targetRole == RoleName.ROLE_CUSTOMER);
+    }
 }
 

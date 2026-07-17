@@ -1,11 +1,15 @@
 package com.phananh.e_commerce.usermanagement.presentation.dto.request;
 
+import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Data
 @Builder
@@ -30,6 +34,6 @@ public class CreateUserRequest {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
-    @NotBlank(message = "Role name is required")
-    private String roleName;
+    @NotEmpty(message = "Role names are required")
+    private Set<RoleName> roleNames;
 }

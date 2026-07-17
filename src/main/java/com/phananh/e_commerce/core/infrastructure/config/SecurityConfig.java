@@ -51,8 +51,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/cloudinary/**").hasAnyRole("ADMIN", "DELIVERY_STAFF")
-                        .requestMatchers("/management/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/cloudinary/**").hasAnyRole("SUPER_ADMIN", "STORE_ADMIN", "DELIVERY_STAFF")
+                        .requestMatchers("/management/**").hasAnyRole("SUPER_ADMIN", "STORE_ADMIN")
                         .requestMatchers("/delivery/**").hasAnyRole("DELIVERY_STAFF")
                         .requestMatchers(CUSTOMER_ENDPOINTS).hasAnyRole("CUSTOMER")
                         .requestMatchers(PUBLIC_ENDPOINTS).authenticated()

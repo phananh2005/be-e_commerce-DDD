@@ -198,7 +198,11 @@ GET /management/users/info/{id}
     "phoneNumber": "0912345678",
     "address": "456 Đường XYZ, Hà Nội",
     "roles": ["ROLE_CUSTOMER"],
-    "isEnabled": true
+    "isEnabled": true,
+    "createdAt": "2024-01-15T10:30:00",
+    "createdBy": "admin",
+    "modifiedAt": "2024-01-20T14:25:30",
+    "modifiedBy": "admin"
   }
 }
 ```

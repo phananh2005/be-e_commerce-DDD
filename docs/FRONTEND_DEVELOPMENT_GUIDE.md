@@ -360,7 +360,7 @@ POST /auth/introspect
 
 ### 6.2 Admin — Quản trị người dùng
 
-> Yêu cầu: `ROLE_ADMIN`
+> Yêu cầu: `ROLE_SUPER_ADMIN` hoặc `ROLE_STORE_ADMIN`
 
 #### POST /management/users
 
@@ -386,7 +386,7 @@ Tạo user bởi admin. Thay cho API cũ `registerAdminOrStaff` / `/register/{ro
 | `address` | string | ❌ | |
 | `fullName` | string | ✅ | |
 | `phoneNumber` | string | ✅ | |
-| `roleName` | RoleName | ✅ | `ROLE_CUSTOMER`, `ROLE_DELIVERY_STAFF`, `ROLE_ADMIN` |
+| `roleName` | RoleName | ✅ | `ROLE_CUSTOMER`, `ROLE_DELIVERY_STAFF`, `ROLE_STORE_ADMIN`, `ROLE_SUPER_ADMIN` |
 
 **Response:** 204 No Content
 
@@ -488,7 +488,7 @@ Không cần auth. Không query param.
 
 ### 7.2 Admin — Quản lý Brand
 
-> Yêu cầu: `ROLE_ADMIN`
+> Yêu cầu: `ROLE_SUPER_ADMIN` hoặc `ROLE_STORE_ADMIN`
 
 #### GET /management/brands/search
 
@@ -535,7 +535,7 @@ Không cần auth. Không query param.
 
 ### 7.3 Admin — Quản lý Category
 
-> Yêu cầu: `ROLE_ADMIN`
+> Yêu cầu: `ROLE_SUPER_ADMIN` hoặc `ROLE_STORE_ADMIN`
 
 #### GET /management/categories/search
 
@@ -659,7 +659,7 @@ GET /product/{id}
 
 ### 8.3 Admin — Quản lý sản phẩm
 
-> Yêu cầu: `ROLE_ADMIN`  
+> Yêu cầu: `ROLE_SUPER_ADMIN` hoặc `ROLE_STORE_ADMIN`  
 > Base path: `/management/product`
 
 **Enum `ProductStatus`:**
@@ -1033,7 +1033,7 @@ RETURNED   – Trả hàng / hoàn tiền
 
 ### 10.5 Admin — Quản lý đơn hàng
 
-> Yêu cầu: `ROLE_ADMIN`  
+> Yêu cầu: `ROLE_SUPER_ADMIN` hoặc `ROLE_STORE_ADMIN`  
 > Base path: `/management/order`
 
 > ⚠️ `page` bắt đầu từ **0**.
@@ -1071,7 +1071,7 @@ RETURNED   – Trả hàng / hoàn tiền
 
 ## 11. API Reference — Dashboard (Admin)
 
-> Yêu cầu: `ROLE_ADMIN`  
+> Yêu cầu: `ROLE_SUPER_ADMIN` hoặc `ROLE_STORE_ADMIN`  
 > Base path: `/management/statistics`
 
 ### 11.1 Tổng quan hệ thống
@@ -1179,12 +1179,12 @@ POST /management/statistics/revenue
 | Xem sản phẩm | ❌ (public) | ❌ (public) | ❌ (public) | ❌ (public) |
 | Giỏ hàng | ✅ | ❌ | ❌ | ❌ |
 | Đặt hàng / Lịch sử đơn | ✅ | ❌ | ❌ | ❌ |
-| Quản lý đơn hàng | ❌ | ❌ | ❌ | ✅ |
-| Xem thông tin khách hàng | ❌ | ❌ | ❌ | ✅ |
-| Quản lý Brand/Category | ❌ | ❌ | ❌ | ✅ |
-| CRUD Sản phẩm & Variant | ❌ | ❌ | ❌ | ✅ |
-| Quản lý người dùng | ❌ | ❌ | ❌ | ✅ |
-| Dashboard / Thống kê | ❌ | ❌ | ❌ | ✅ |
+| Quản lý đơn hàng | ❌ | ❌ | ✅ | ✅ |
+| Xem thông tin khách hàng | ❌ | ❌ | ✅ | ✅ |
+| Quản lý Brand/Category | ❌ | ❌ | ✅ | ✅ |
+| CRUD Sản phẩm & Variant | ❌ | ❌ | ✅ | ✅ |
+| Quản lý người dùng | ❌ | ❌ | ✅ | ✅ |
+| Dashboard / Thống kê | ❌ | ❌ | ✅ | ✅ |
 | Upload ảnh (Cloudinary) | ❌ | ✅ | ✅ | ✅ |
 | Tạo user staff/customer | ❌ | ❌ | ✅ | ✅ |
 | Gán role staff/customer | ❌ | ❌ | ✅ | ✅ |

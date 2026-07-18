@@ -1,8 +1,8 @@
 package com.phananh.e_commerce.usermanagement.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserResponse;
+import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryResponse;
+import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponseForManagement;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.CreateUserRequest;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.UserQueryRequest;
@@ -35,9 +35,9 @@ public class ManagementUserController {
 
     @Operation(summary = "Lấy danh sách tất cả người dùng", description = "Tìm kiếm và phân trang danh sách người dùng")
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(@ModelAttribute @Valid UserQueryRequest userQueryRequest) {
-        Page<UserResponse> users = userService.getAllUsers(userQueryRequest);
-        ApiResponse<Page<UserResponse>> apiResponse = ApiResponse.<Page<UserResponse>>builder()
+    public ResponseEntity<ApiResponse<Page<UserSummaryResponse>>> getAllUsers(@ModelAttribute @Valid UserQueryRequest userQueryRequest) {
+        Page<UserSummaryResponse> users = userService.getAllUsers(userQueryRequest);
+        ApiResponse<Page<UserSummaryResponse>> apiResponse = ApiResponse.<Page<UserSummaryResponse>>builder()
                 .result(users)
                 .message("Get all users successfully")
                 .build();
@@ -46,8 +46,8 @@ public class ManagementUserController {
 
     @Operation(summary = "Lấy thông tin người dùng", description = "Lấy thông tin chi tiết của một người dùng theo ID")
     @GetMapping("/info/{id}")
-    public ResponseEntity<ApiResponse<UserResponse>> getUserInfo(@PathVariable Long id) {
-        ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
+    public ResponseEntity<ApiResponse<UserInfoResponseForManagement>> getUserInfo(@PathVariable Long id) {
+        ApiResponse<UserInfoResponseForManagement> apiResponse = ApiResponse.<UserInfoResponseForManagement>builder()
                 .result(userService.getUserInfo(id))
                 .message("Get user info successfully")
                 .build();

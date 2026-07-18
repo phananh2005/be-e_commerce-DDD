@@ -8,7 +8,8 @@ import com.phananh.e_commerce.core.util.SecurityUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserResponse;
+import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponseForManagement;
+import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryResponse;
 import com.phananh.e_commerce.usermanagement.application.mapper.UserMapper;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
@@ -88,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponse getUserInfo(Long id) {
+    public UserInfoResponseForManagement getUserInfo(Long id) {
         User user = userRepository.getById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toResponse(user);
@@ -104,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(UserQueryRequest request) {
+    public Page<UserSummaryResponse> getAllUsers(UserQueryRequest request) {
         int page = PageUtils.getPageNumber(request.getPage());
         int size = PageUtils.getPageSize(request.getSize());
         String sortBy = PageUtils.getSortBy(request.getSortBy());
@@ -124,7 +125,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         return userRepository.getListUsersBySearch(userSearchQuery)
-                .map(userMapper::toResponse);
+                .map(userMapper::toSummary);
     }
 
     @Override

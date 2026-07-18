@@ -404,7 +404,7 @@ Tạo user bởi admin. Thay cho API cũ `registerAdminOrStaff` / `/register/{ro
 | `sortBy` | string | createdAt | |
 | `sortType` | string | desc | |
 
-**Response 200:** Phân trang, cấu trúc `content[]` chứa User objects.
+**Response 200:** Phân trang, cấu trúc `content[]` chứa UserSummary objects.
 
 #### GET /management/users/info/{id}
 

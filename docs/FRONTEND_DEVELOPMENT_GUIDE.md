@@ -392,12 +392,16 @@ Tạo user bởi admin. Thay cho API cũ `registerAdminOrStaff` / `/register/{ro
 
 #### GET /management/users
 
+Lấy danh sách người dùng với phân quyền:
+- SUPER_ADMIN: xem tất cả người dùng với mọi role
+- STORE_ADMIN: chỉ xem được các user có role DELIVERY_STAFF hoặc CUSTOMER, bất kể query param roleNames có gì
+
 **Query Parameters:**
 
 | Param | Type | Mặc định | Ghi chú |
 |-------|------|----------|---------|
 | `keyword` | string | | Tìm username/email/fullName |
-| `roleNames` | RoleName[] | | `ROLE_CUSTOMER`, `ROLE_DELIVERY_STAFF`, `ROLE_ADMIN` |
+| `roleNames` | RoleName[] | | `ROLE_CUSTOMER`, `ROLE_DELIVERY_STAFF`, `ROLE_SUPER_ADMIN` (SUPER_ADMIN), `ROLE_CUSTOMER`, `ROLE_DELIVERY_STAFF` (STORE_ADMIN) |
 | `enabled` | boolean | | true/false |
 | `page` | int | 0 | |
 | `size` | int | 10 | |
@@ -427,6 +431,30 @@ Tạo user bởi admin. Thay cho API cũ `registerAdminOrStaff` / `/register/{ro
 | `status` | `active` hoặc `inactive` |
 
 **Response:** 204 No Content
+
+#### GET /management/users/roles
+
+Lấy danh sách role (id + roleName) cho việc hiển thị role (bộ lọc, dropdown chọn role, ...).
+
+**Response 200:**
+```json
+{
+  "code": 1000,
+  "message": "Get role filter options successfully",
+  "result": [
+    { "id": 1, "roleName": "ROLE_SUPER_ADMIN" },
+    { "id": 2, "roleName": "ROLE_STORE_ADMIN" },
+    { "id": 3, "roleName": "ROLE_DELIVERY_STAFF" },
+    { "id": 4, "roleName": "ROLE_CUSTOMER" }
+  ]
+}
+```
+
+| Role hiện tại | Role trả về |
+|-------------|------------|
+| `ROLE_SUPER_ADMIN` | Tất cả các role |
+| `ROLE_STORE_ADMIN` | Chỉ `ROLE_DELIVERY_STAFF`, `ROLE_CUSTOMER` |
+| Các role khác | 403 FORBIDDEN |
 
 ---
 

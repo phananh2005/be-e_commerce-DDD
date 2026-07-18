@@ -1,6 +1,7 @@
 package com.phananh.e_commerce.usermanagement.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
+import com.phananh.e_commerce.usermanagement.application.dto.response.RoleResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponseForManagement;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
@@ -40,6 +41,16 @@ public class ManagementUserController {
         ApiResponse<Page<UserSummaryResponse>> apiResponse = ApiResponse.<Page<UserSummaryResponse>>builder()
                 .result(users)
                 .message("Get all users successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @Operation(summary = "Lấy danh sách role")
+    @GetMapping("/roles")
+    public ResponseEntity<ApiResponse<java.util.List<RoleResponse>>> getRoles() {
+        ApiResponse<java.util.List<RoleResponse>> apiResponse = ApiResponse.<java.util.List<RoleResponse>>builder()
+                .result(userService.getRoles())
+                .message("Get roles successfully")
                 .build();
         return ResponseEntity.ok(apiResponse);
     }

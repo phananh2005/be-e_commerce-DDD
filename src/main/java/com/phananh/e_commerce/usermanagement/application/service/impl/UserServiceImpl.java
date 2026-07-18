@@ -7,6 +7,7 @@ import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.core.util.SecurityUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
+import com.phananh.e_commerce.usermanagement.application.dto.response.RoleResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponseForManagement;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryResponse;
@@ -19,6 +20,8 @@ import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.domain.repository.UserRepository;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.*;
+
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -106,6 +109,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Page<UserSummaryResponse> getAllUsers(UserQueryRequest request) {
+        User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
         int page = PageUtils.getPageNumber(request.getPage());
         int size = PageUtils.getPageSize(request.getSize());
         String sortBy = PageUtils.getSortBy(request.getSortBy());
@@ -113,9 +119,20 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
+        Set<RoleName> roleNames = request.getRoleNames();
+        if (!hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN)
+                && hasRole(currentUser, RoleName.ROLE_STORE_ADMIN)) {
+            Set<RoleName> allowedRoles = Set.of(RoleName.ROLE_DELIVERY_STAFF, RoleName.ROLE_CUSTOMER);
+            if (roleNames == null) {
+                roleNames = allowedRoles;
+            } else {
+                roleNames.retainAll(allowedRoles);
+            }
+        }
+
         UserSearchQuery userSearchQuery = UserSearchQuery.builder()
                 .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
-                .roleNames(request.getRoleNames())
+                .roleNames(roleNames)
                 .enabled(request.getEnabled())
                 .createdDateFrom(request.getCreatedDateFrom())
                 .createdDateTo(request.getCreatedDateTo())
@@ -230,6 +247,34 @@ public class UserServiceImpl implements UserService {
 
         return hasRole(currentUser, RoleName.ROLE_STORE_ADMIN)
                 && (targetRole == RoleName.ROLE_DELIVERY_STAFF || targetRole == RoleName.ROLE_CUSTOMER);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoleResponse> getRoles() {
+        User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        if (hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN)) {
+            Set<Role> allRoles = userRepository.getRolesByRoleNames(Set.of(RoleName.values()));
+            return allRoles.stream()
+                    .map(role -> RoleResponse.builder()
+                            .id(role.getId())
+                            .roleName(role.getName())
+                            .build())
+                    .toList();
+        } else if (hasRole(currentUser, RoleName.ROLE_STORE_ADMIN)) {
+            Set<RoleName> allowedRoles = Set.of(RoleName.ROLE_DELIVERY_STAFF, RoleName.ROLE_CUSTOMER);
+            Set<Role> roles = userRepository.getRolesByRoleNames(allowedRoles);
+            return roles.stream()
+                    .map(role -> RoleResponse.builder()
+                            .id(role.getId())
+                            .roleName(role.getName())
+                            .build())
+                    .toList();
+        } else {
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
     }
 }
 

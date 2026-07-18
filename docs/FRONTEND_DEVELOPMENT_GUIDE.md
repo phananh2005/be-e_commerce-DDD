@@ -1145,19 +1145,22 @@ POST /management/statistics/revenue
 
 ## 12. Role & Permission Matrix
 
-| Chức năng | `ROLE_CUSTOMER` | `ROLE_DELIVERY_STAFF` | `ROLE_ADMIN` |
-|-----------|:---------------:|:---------------------:|:------------:|
-| Đăng nhập / Đăng ký | ❌ (public) | ❌ (public) | ❌ (public) |
-| Xem sản phẩm | ❌ (public) | ❌ (public) | ❌ (public) |
-| Giỏ hàng | ✅ | ❌ | ❌ |
-| Đặt hàng / Lịch sử đơn | ✅ | ❌ | ❌ |
-| Quản lý đơn hàng | ❌ | ❌ | ✅ |
-| Xem thông tin khách hàng | ❌ | ❌ | ✅ |
-| Quản lý Brand/Category | ❌ | ❌ | ✅ |
-| CRUD Sản phẩm & Variant | ❌ | ❌ | ✅ |
-| Quản lý người dùng | ❌ | ❌ | ✅ |
-| Dashboard / Thống kê | ❌ | ❌ | ✅ |
-| Upload ảnh (Cloudinary) | ❌ | ✅ | ✅ |
+| Chức năng | `ROLE_CUSTOMER` | `ROLE_DELIVERY_STAFF` | `ROLE_STORE_ADMIN` | `ROLE_SUPER_ADMIN` |
+|-----------|:---------------:|:---------------------:|:------------------:|:------------------:|
+| Đăng nhập / Đăng ký | ❌ (public) | ❌ (public) | ❌ (public) | ❌ (public) |
+| Xem sản phẩm | ❌ (public) | ❌ (public) | ❌ (public) | ❌ (public) |
+| Giỏ hàng | ✅ | ❌ | ❌ | ❌ |
+| Đặt hàng / Lịch sử đơn | ✅ | ❌ | ❌ | ❌ |
+| Quản lý đơn hàng | ❌ | ❌ | ❌ | ✅ |
+| Xem thông tin khách hàng | ❌ | ❌ | ❌ | ✅ |
+| Quản lý Brand/Category | ❌ | ❌ | ❌ | ✅ |
+| CRUD Sản phẩm & Variant | ❌ | ❌ | ❌ | ✅ |
+| Quản lý người dùng | ❌ | ❌ | ❌ | ✅ |
+| Dashboard / Thống kê | ❌ | ❌ | ❌ | ✅ |
+| Upload ảnh (Cloudinary) | ❌ | ✅ | ✅ | ✅ |
+| Tạo user staff/customer | ❌ | ❌ | ✅ | ✅ |
+| Gán role staff/customer | ❌ | ❌ | ✅ | ✅ |
+| Gán role super admin | ❌ | ❌ | ❌ | ❌ |
 
 ---
 

@@ -98,6 +98,8 @@ public class OrderServiceImpl implements OrderService {
                 .phoneNumber(orderFilterRequest.getPhoneNumber())
                 .shippingAddress(orderFilterRequest.getShippingAddress())
                 .status(orderFilterRequest.getStatus())
+                .createdFromDate(orderFilterRequest.getCreatedFromDate())
+                .createdToDate(orderFilterRequest.getCreatedToDate())
                 .pageable(pageable)
                 .build();
 

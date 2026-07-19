@@ -4,6 +4,7 @@ import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +17,8 @@ public class OrderFilterRequest {
     private String phoneNumber;
     private String shippingAddress;
     private OrderStatus status;
+    private LocalDateTime createdFromDate;
+    private LocalDateTime createdToDate;
 
     @Min(value = 0, message = "Page must be >= 0")
     private Integer page;

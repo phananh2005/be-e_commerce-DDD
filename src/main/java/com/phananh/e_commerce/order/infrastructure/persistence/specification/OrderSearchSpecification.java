@@ -3,6 +3,7 @@ package com.phananh.e_commerce.order.infrastructure.persistence.specification;
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
 import org.springframework.data.jpa.domain.Specification;
+import java.time.LocalDateTime;
 
 public class OrderSearchSpecification {
 
@@ -42,6 +43,20 @@ public class OrderSearchSpecification {
         return (root, query, cb) -> {
             if (status == null) return cb.conjunction();
             return cb.equal(root.get("status"), status);
+        };
+    }
+
+    public static Specification<Order> hasCreatedFromDate(LocalDateTime createdFromDate) {
+        return (root, query, cb) -> {
+            if (createdFromDate == null) return cb.conjunction();
+            return cb.greaterThanOrEqualTo(root.get("createdAt"), createdFromDate);
+        };
+    }
+
+    public static Specification<Order> hasCreatedToDate(LocalDateTime createdToDate) {
+        return (root, query, cb) -> {
+            if (createdToDate == null) return cb.conjunction();
+            return cb.lessThanOrEqualTo(root.get("createdAt"), createdToDate);
         };
     }
 }

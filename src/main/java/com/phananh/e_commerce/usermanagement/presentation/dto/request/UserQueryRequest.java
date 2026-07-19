@@ -2,13 +2,19 @@ package com.phananh.e_commerce.usermanagement.presentation.dto.request;
 
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserQueryRequest {
     private String keyword;
     private Set<RoleName> roleNames;

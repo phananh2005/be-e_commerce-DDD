@@ -17,7 +17,7 @@ import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewR
 import com.phananh.e_commerce.order.application.dto.response.order.OrderDetailResponse;
 import com.phananh.e_commerce.order.application.dto.response.order.OrderPreviewDetailResponse;
 import com.phananh.e_commerce.order.application.dto.response.order.OrderSummaryResponse;
-import com.phananh.e_commerce.order.application.dto.response.order.StaffOrderResponse;
+import com.phananh.e_commerce.order.application.dto.response.order.ManagementOrderResponse;
 import com.phananh.e_commerce.order.domain.repository.OrderRepository;
 import com.phananh.e_commerce.order.domain.repository.OrderItemRepository;
 import com.phananh.e_commerce.product.application.service.ProductInternalService;
@@ -80,9 +80,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<StaffOrderResponse> getAllOrders(Pageable pageable) {
+    public Page<ManagementOrderResponse> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable)
-                .map(orderMapper::toStaffOrderResponse);
+                .map(orderMapper::toManagementOrderResponse);
     }
 
     @Override

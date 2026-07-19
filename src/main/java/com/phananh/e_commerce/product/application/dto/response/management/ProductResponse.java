@@ -1,4 +1,4 @@
-package com.phananh.e_commerce.product.application.dto.response.staff;
+package com.phananh.e_commerce.product.application.dto.response.management;
 
 import lombok.Data;
 

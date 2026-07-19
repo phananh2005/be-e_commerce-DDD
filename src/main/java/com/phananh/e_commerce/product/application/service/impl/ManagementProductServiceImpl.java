@@ -9,8 +9,8 @@ import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.product.application.dto.command.ProductCreateCommand;
 import com.phananh.e_commerce.product.application.dto.command.ProductVariantCreateCommand;
 import com.phananh.e_commerce.product.application.dto.query.ManagementProductSearchQuery;
-import com.phananh.e_commerce.product.application.dto.response.staff.ProductResponse;
-import com.phananh.e_commerce.product.application.dto.response.staff.ProductVariantResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponse;
 import com.phananh.e_commerce.product.application.mapper.ManagementProductMapper;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.domain.model.*;
@@ -41,7 +41,7 @@ import java.util.Set;
 public class ManagementProductServiceImpl implements ManagementProductService {
 
     ProductRepository productRepository;
-    ManagementProductMapper staffProductMapper;
+    ManagementProductMapper managementProductMapper;
     CloudinaryService cloudinaryService;
 
 
@@ -66,7 +66,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                 .build();
 
         return productRepository.getAllProductsBySearch(query)
-                .map(staffProductMapper::toStaffProductResponse);
+                .map(managementProductMapper::toManagementProductResponse);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         Product product = productRepository.getProductById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        return staffProductMapper.toStaffProductResponse(product);
+        return managementProductMapper.toManagementProductResponse(product);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         }
 
         return productRepository.getVariantsByProductId(productId).stream()
-                .map(staffProductMapper::toStaffProductVariantResponse)
+                .map(managementProductMapper::toManagementProductVariantResponse)
                 .toList();
     }
 

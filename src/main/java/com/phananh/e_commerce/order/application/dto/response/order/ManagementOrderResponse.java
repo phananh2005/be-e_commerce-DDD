@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class StaffOrderResponse {
+public class ManagementOrderResponse {
     private Long orderId;
     private Long userId;
     private String fullName;

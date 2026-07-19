@@ -1,8 +1,8 @@
 package com.phananh.e_commerce.product.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.product.application.dto.response.staff.ProductResponse;
-import com.phananh.e_commerce.product.application.dto.response.staff.ProductVariantResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponse;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.presentation.dto.request.product.management.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ public class ManagementProductController {
 
     @Operation(summary = "Lấy chi tiết sản phẩm", description = "Lấy thông tin chi tiết của một sản phẩm theo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductResponse>> getStaffProductById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ProductResponse>> getManagementProductById(@PathVariable Long id) {
         ProductResponse product = managementProductService.getManagementProductById(id);
         ApiResponse<ProductResponse> response = ApiResponse.<ProductResponse>builder()
                 .message("Get product successfully")
@@ -50,7 +50,7 @@ public class ManagementProductController {
 
     @Operation(summary = "Lấy biến thể sản phẩm", description = "Lấy danh sách các biến thể của một sản phẩm")
     @GetMapping("/{productId}/variants")
-    public ResponseEntity<ApiResponse<List<ProductVariantResponse>>> getStaffProductVariantsByProductId(@PathVariable Long productId) {
+    public ResponseEntity<ApiResponse<List<ProductVariantResponse>>> getManagementProductVariantsByProductId(@PathVariable Long productId) {
         List<ProductVariantResponse> variants = managementProductService.getManagementProductVariantsByProductId(productId);
         ApiResponse<List<ProductVariantResponse>> response = ApiResponse.<List<ProductVariantResponse>>builder()
                 .message("Get product variants successfully")

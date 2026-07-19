@@ -27,7 +27,7 @@ public class ManagementOrderController {
 
     @Operation(summary = "Tìm kiếm đơn hàng", description = "Tìm kiếm và phân trang danh sách đơn hàng")
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<StaffOrderResponse>>> getAllOrdersForStaff(
+    public ResponseEntity<ApiResponse<Page<ManagementOrderResponse>>> getAllOrdersForManagement(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -38,8 +38,8 @@ public class ManagementOrderController {
                 PageUtils.getPageSize(size),
                 Sort.by(Sort.Direction.fromString(PageUtils.getSortType(sortType)), PageUtils.getSortBy(sortBy)));
 
-        Page<StaffOrderResponse> response = orderService.getAllOrders(pageable);
-        return ResponseEntity.ok(ApiResponse.<Page<StaffOrderResponse>>builder()
+        Page<ManagementOrderResponse> response = orderService.getAllOrders(pageable);
+        return ResponseEntity.ok(ApiResponse.<Page<ManagementOrderResponse>>builder()
                 .result(response)
                 .message("Get orders successfully")
                 .build());
@@ -47,7 +47,7 @@ public class ManagementOrderController {
 
     @Operation(summary = "Lấy chi tiết đơn hàng", description = "Lấy thông tin chi tiết của một đơn hàng theo ID")
     @GetMapping("/{orderId}")
-    public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetailForStaff(@PathVariable Long orderId) {
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetailForManagement(@PathVariable Long orderId) {
         OrderDetailResponse response = orderService.getOrderDetail(orderId);
         return ResponseEntity.ok(ApiResponse.<OrderDetailResponse>builder()
                 .result(response)

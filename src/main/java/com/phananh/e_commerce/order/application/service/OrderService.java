@@ -19,7 +19,7 @@ public interface OrderService {
     OrderStatisticsRangeProjection getStatisticsByDateRange(LocalDateTime fromDate, LocalDateTime toDate);
     OrderRevenueSummaryProjection getRevenueSummary(LocalDateTime fromDate, LocalDateTime toDate);
     List<OrderRevenuePeriodProjection> getRevenueReport(LocalDateTime fromDate, LocalDateTime toDate, String groupBy);
-    Page<StaffOrderResponse> getAllOrders(Pageable pageable);
+    Page<ManagementOrderResponse> getAllOrders(Pageable pageable);
 
     OrderPreviewDetailResponse previewOrder(List<OrderPreviewRequest> orderPreviewRequest);
 

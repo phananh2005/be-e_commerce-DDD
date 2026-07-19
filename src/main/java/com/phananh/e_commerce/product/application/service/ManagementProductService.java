@@ -1,7 +1,7 @@
 package com.phananh.e_commerce.product.application.service;
 
-import com.phananh.e_commerce.product.application.dto.response.staff.ProductResponse;
-import com.phananh.e_commerce.product.application.dto.response.staff.ProductVariantResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponse;
 import com.phananh.e_commerce.product.presentation.dto.request.product.management.*;
 import org.springframework.data.domain.Page;
 

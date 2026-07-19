@@ -23,7 +23,7 @@ public interface OrderMapper {
     @Mapping(target = "orderId", source = "id")
     @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
     @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod() != null ? order.getPaymentMethod().toString() : null)")
-    StaffOrderResponse toStaffOrderResponse(Order order);
+    ManagementOrderResponse toManagementOrderResponse(Order order);
 
     default OrderSummaryResponse.Item toOrderSummaryItem(OrderItem orderItem, ProductInfoResponse productInfo) {
         return OrderSummaryResponse.Item.builder()

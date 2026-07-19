@@ -2,17 +2,14 @@ package com.phananh.e_commerce.order.presentation.controller;
 
 import com.phananh.e_commerce.order.application.dto.response.order.*;
 import com.phananh.e_commerce.order.application.service.OrderService;
+import com.phananh.e_commerce.order.presentation.dto.request.order.OrderFilterRequest;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.core.util.PageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,20 +22,11 @@ public class ManagementOrderController {
 
     OrderService orderService;
 
-    @Operation(summary = "Tìm kiếm đơn hàng", description = "Tìm kiếm và phân trang danh sách đơn hàng")
+    @Operation(summary = "Tìm kiếm đơn hàng", description = "Tìm kiếm và phân trang danh sách đơn hàng theo mã, họ tên, SĐT, địa chỉ, trạng thái")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<ManagementOrderResponse>>> getAllOrdersForManagement(
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortType) {
-
-        Pageable pageable = PageRequest.of(
-                PageUtils.getPageNumber(page),
-                PageUtils.getPageSize(size),
-                Sort.by(Sort.Direction.fromString(PageUtils.getSortType(sortType)), PageUtils.getSortBy(sortBy)));
-
-        Page<ManagementOrderResponse> response = orderService.getAllOrders(pageable);
+            @ModelAttribute OrderFilterRequest filter) {
+        Page<ManagementOrderResponse> response = orderService.getAllOrders(filter);
         return ResponseEntity.ok(ApiResponse.<Page<ManagementOrderResponse>>builder()
                 .result(response)
                 .message("Get orders successfully")

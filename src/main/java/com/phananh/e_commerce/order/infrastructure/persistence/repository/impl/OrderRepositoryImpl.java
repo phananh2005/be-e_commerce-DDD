@@ -4,13 +4,16 @@ import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenu
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenueSummaryProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsOverviewProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsRangeProjection;
+import com.phananh.e_commerce.order.application.dto.query.OrderSearchQuery;
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.repository.OrderRepository;
 import com.phananh.e_commerce.order.infrastructure.persistence.repository.springdata.SpringDataOrderRepository;
+import com.phananh.e_commerce.order.infrastructure.persistence.specification.OrderSearchSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -42,6 +45,17 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Page<Order> findAll(Pageable pageable) {
         return springDataOrderRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Order> getListOrdersBySearch(OrderSearchQuery orderSearchQuery) {
+        Specification<Order> specification = Specification
+                .where(OrderSearchSpecification.hasOrderCode(orderSearchQuery.getOrderCode()))
+                .and(OrderSearchSpecification.hasFullName(orderSearchQuery.getFullName()))
+                .and(OrderSearchSpecification.hasPhoneNumber(orderSearchQuery.getPhoneNumber()))
+                .and(OrderSearchSpecification.hasShippingAddress(orderSearchQuery.getShippingAddress()))
+                .and(OrderSearchSpecification.hasStatus(orderSearchQuery.getStatus()));
+        return springDataOrderRepository.findAll(specification, orderSearchQuery.getPageable());
     }
 
     @Override

@@ -5,14 +5,15 @@ import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenu
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenueSummaryProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsOverviewProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsRangeProjection;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface SpringDataOrderRepository extends JpaRepository<Order, Long> {
+public interface SpringDataOrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     List<Order> findByUserId(Long userId);
 
     @Query(value = """

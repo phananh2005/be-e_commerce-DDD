@@ -2,6 +2,7 @@ package com.phananh.e_commerce.order.application.service;
 
 import com.phananh.e_commerce.order.application.dto.response.order.*;
 import com.phananh.e_commerce.order.presentation.dto.request.order.CheckoutRequest;
+import com.phananh.e_commerce.order.presentation.dto.request.order.OrderFilterRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewRequest;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenuePeriodProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenueSummaryProjection;
@@ -19,7 +20,7 @@ public interface OrderService {
     OrderStatisticsRangeProjection getStatisticsByDateRange(LocalDateTime fromDate, LocalDateTime toDate);
     OrderRevenueSummaryProjection getRevenueSummary(LocalDateTime fromDate, LocalDateTime toDate);
     List<OrderRevenuePeriodProjection> getRevenueReport(LocalDateTime fromDate, LocalDateTime toDate, String groupBy);
-    Page<ManagementOrderResponse> getAllOrders(Pageable pageable);
+    Page<ManagementOrderResponse> getAllOrders(OrderFilterRequest orderFilterRequest);
 
     OrderPreviewDetailResponse previewOrder(List<OrderPreviewRequest> orderPreviewRequest);
 

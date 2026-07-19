@@ -4,6 +4,7 @@ import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenu
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenueSummaryProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsOverviewProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsRangeProjection;
+import com.phananh.e_commerce.order.application.dto.query.OrderSearchQuery;
 import com.phananh.e_commerce.order.domain.model.Order;
 
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ public interface OrderRepository {
     Optional<Order> findById(Long id);
     List<Order> findByUserId(Long userId);
     Page<Order> findAll(Pageable pageable);
+    Page<Order> getListOrdersBySearch(OrderSearchQuery orderSearchQuery);
 
     OrderStatisticsOverviewProjection getStatisticsOverview();
     OrderStatisticsRangeProjection getStatisticsByDateRange(LocalDateTime fromDate, LocalDateTime toDate);

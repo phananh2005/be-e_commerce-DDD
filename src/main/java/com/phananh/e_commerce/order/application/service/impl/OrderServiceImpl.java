@@ -5,9 +5,11 @@ import com.phananh.e_commerce.order.application.dto.command.OrderItemCreateComma
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.model.OrderItem;
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
+import com.phananh.e_commerce.order.presentation.dto.request.order.OrderFilterRequest;
 import com.phananh.e_commerce.order.domain.model.enums.PaymentMethod;
 import com.phananh.e_commerce.order.application.service.OrderService;
 import com.phananh.e_commerce.order.application.dto.command.OrderCreateCommand;
+import com.phananh.e_commerce.order.application.dto.query.OrderSearchQuery;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenuePeriodProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderRevenueSummaryProjection;
 import com.phananh.e_commerce.order.application.dto.projection.order.OrderStatisticsOverviewProjection;
@@ -27,6 +29,7 @@ import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.SecurityUtils;
+import com.phananh.e_commerce.core.util.PageUtils;
 import com.phananh.e_commerce.order.application.mapper.OrderMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -80,8 +85,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ManagementOrderResponse> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable)
+    public Page<ManagementOrderResponse> getAllOrders(OrderFilterRequest orderFilterRequest) {
+        int page = PageUtils.getPageNumber(orderFilterRequest.getPage());
+        int size = PageUtils.getPageSize(orderFilterRequest.getSize());
+        String sortBy = PageUtils.getSortBy(orderFilterRequest.getSortBy());
+        String sortType = PageUtils.getSortType(orderFilterRequest.getSortType());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortType), sortBy));
+
+        OrderSearchQuery orderSearchQuery = OrderSearchQuery.builder()
+                .orderCode(orderFilterRequest.getOrderCode())
+                .fullName(orderFilterRequest.getFullName())
+                .phoneNumber(orderFilterRequest.getPhoneNumber())
+                .shippingAddress(orderFilterRequest.getShippingAddress())
+                .status(orderFilterRequest.getStatus())
+                .pageable(pageable)
+                .build();
+
+        return orderRepository.getListOrdersBySearch(orderSearchQuery)
                 .map(orderMapper::toManagementOrderResponse);
     }
 

@@ -9,17 +9,30 @@ import java.util.Set;
 
 public class UserSearchSpecification {
 
+    public static Specification<User> hasUserIdentifier(String userIdentifier) {
+        return (root, query, criteriaBuilder) -> {
+            if (userIdentifier == null || userIdentifier.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            try {
+                Long userId = Long.parseLong(userIdentifier);
+                return criteriaBuilder.equal(root.get("id"), userId);
+            } catch (NumberFormatException e) {
+                return criteriaBuilder.equal(root.get("credentials").get("username"), userIdentifier);
+            }
+        };
+    }
+
     public static Specification<User> hasKeyword(String keyword) {
         return (root, query, criteriaBuilder) -> {
             if (keyword == null || keyword.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
             String likePattern = "%" + keyword.toLowerCase() + "%";
-            // navigate into embedded value objects: credentials.username and info.email/fullName
             return criteriaBuilder.or(
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("info").get("fullName")), likePattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("info").get("email")), likePattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("info").get("fullName")), likePattern)
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("info").get("phoneNumber")), likePattern)
             );
         };
     }
@@ -27,9 +40,7 @@ public class UserSearchSpecification {
     public static Specification<User> hasRoleName(Set<RoleName> roleNames) {
         return (root, query, criteriaBuilder) -> {
             if (roleNames == null || roleNames.isEmpty()) return criteriaBuilder.conjunction();
-            // avoid duplicate results when joining collection
             query.distinct(true);
-            // join roles and check if role.name is in the given set of RoleName enums
             return root.join("roles").get("name").in(roleNames);
         };
     }
@@ -52,20 +63,6 @@ public class UserSearchSpecification {
         return (root, query, criteriaBuilder) -> {
             if (createdDateTo == null) return criteriaBuilder.conjunction();
             return criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), createdDateTo);
-        };
-    }
-
-    public static Specification<User> modifiedAtFrom(LocalDateTime modifiedDateFrom) {
-        return (root, query, criteriaBuilder) -> {
-            if (modifiedDateFrom == null) return criteriaBuilder.conjunction();
-            return criteriaBuilder.greaterThanOrEqualTo(root.get("modifiedAt"), modifiedDateFrom);
-        };
-    }
-
-    public static Specification<User> modifiedAtTo(LocalDateTime modifiedDateTo) {
-        return (root, query, criteriaBuilder) -> {
-            if (modifiedDateTo == null) return criteriaBuilder.conjunction();
-            return criteriaBuilder.lessThanOrEqualTo(root.get("modifiedAt"), modifiedDateTo);
         };
     }
 }

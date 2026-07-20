@@ -16,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserQueryRequest {
+    private String userIdentifier;
     private String keyword;
     private Set<RoleName> roleNames;
     private Boolean enabled;
@@ -25,12 +26,6 @@ public class UserQueryRequest {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateTo;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime modifiedDateFrom;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime modifiedDateTo;
 
     @Min(value = 0, message = "Page must be >= 0")
     private Integer page;

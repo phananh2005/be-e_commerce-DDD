@@ -11,12 +11,11 @@ import java.util.Set;
 @Data
 @Builder
 public class UserSearchQuery {
+    private String userIdentifier;
     private String keyword;
     private Set<RoleName> roleNames;
     private Boolean enabled;
     private LocalDateTime createdDateFrom;
     private LocalDateTime createdDateTo;
-    private LocalDateTime modifiedDateFrom;
-    private LocalDateTime modifiedDateTo;
     private Pageable pageable;
 }

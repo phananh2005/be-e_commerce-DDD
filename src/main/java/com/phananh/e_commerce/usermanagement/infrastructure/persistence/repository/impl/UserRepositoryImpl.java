@@ -48,13 +48,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Page<User> getListUsersBySearch(UserSearchQuery userSearchQuery) {
         Specification<User> specification = Specification
-                .where(UserSearchSpecification.hasKeyword(userSearchQuery.getKeyword()))
+                .where(UserSearchSpecification.hasUserIdentifier(userSearchQuery.getUserIdentifier()))
+                .and(UserSearchSpecification.hasKeyword(userSearchQuery.getKeyword()))
                 .and(UserSearchSpecification.hasRoleName(userSearchQuery.getRoleNames()))
                 .and(UserSearchSpecification.isEnabled(userSearchQuery.getEnabled()))
                 .and(UserSearchSpecification.createdAtFrom(userSearchQuery.getCreatedDateFrom()))
-                .and(UserSearchSpecification.createdAtTo(userSearchQuery.getCreatedDateTo()))
-                .and(UserSearchSpecification.modifiedAtFrom(userSearchQuery.getModifiedDateFrom()))
-                .and(UserSearchSpecification.modifiedAtTo(userSearchQuery.getModifiedDateTo()));
+                .and(UserSearchSpecification.createdAtTo(userSearchQuery.getCreatedDateTo()));
         return springDataUserRepository.findAll(specification, userSearchQuery.getPageable());
     }
 

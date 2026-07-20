@@ -154,13 +154,12 @@ public class UserServiceImpl implements UserService {
         }
 
         UserSearchQuery userSearchQuery = UserSearchQuery.builder()
+                .userIdentifier(request.getUserIdentifier() == null ? null : request.getUserIdentifier().trim())
                 .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
                 .roleNames(roleNames)
                 .enabled(request.getEnabled())
                 .createdDateFrom(request.getCreatedDateFrom())
                 .createdDateTo(request.getCreatedDateTo())
-                .modifiedDateFrom(request.getModifiedDateFrom())
-                .modifiedDateTo(request.getModifiedDateTo())
                 .pageable(pageable)
                 .build();
 

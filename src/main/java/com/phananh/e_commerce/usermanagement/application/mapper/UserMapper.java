@@ -41,10 +41,12 @@ public interface UserMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "username", source = "credentials.username")
+    @Mapping(target = "email", source = "info.email")
     @Mapping(target = "fullName", source = "info.fullName")
     @Mapping(target = "phoneNumber", source = "info.phoneNumber")
     @Mapping(target = "roles", expression = "java(mapRoles(user.getRoles()))")
     @Mapping(target = "isEnabled", source = "credentials.isEnabled")
+    @Mapping(target = "createdAt", source = "createdAt")
     UserSummaryForManagementResponse toSummary(User user);
 
     // helper method used in mapping expressions

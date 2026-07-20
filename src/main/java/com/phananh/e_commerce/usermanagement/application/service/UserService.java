@@ -16,6 +16,7 @@ public interface UserService {
     void updateMyInfo(UserInfoUpdateRequest userInfoUpdateRequest);
     void changePassword(UserChangePasswordRequest userChangePasswordRequest);
     UserInfoResponseForManagement getUserInfo(Long id);
+    String getUsernameByUserId(Long userId);
     Long getIdByUserName(String userName);
     Page<UserSummaryResponse> getAllUsers(UserQueryRequest userQueryRequest);
     List<RoleResponse> getRoles();

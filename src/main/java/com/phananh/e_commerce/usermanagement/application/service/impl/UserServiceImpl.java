@@ -105,6 +105,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return user.getId();
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public String getUsernameByUserId(Long userId) {
+        User user = userRepository.getById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return user.getCredentials().username();
+    }
 
     @Override
     @Transactional(readOnly = true)

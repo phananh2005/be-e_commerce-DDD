@@ -30,7 +30,7 @@ public interface OrderService {
 
     OrderDetailResponse getOrderDetail(Long orderId);
 
-    void updateOrderStatus(Long orderId, String status);
+    void updateOrderStatus(Long orderId, String status, String cancellationReason);
 }
 
 

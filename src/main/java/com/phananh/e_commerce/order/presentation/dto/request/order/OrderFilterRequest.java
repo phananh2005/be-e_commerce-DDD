@@ -13,12 +13,9 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderFilterRequest {
     private String orderCode;
-    private String fullName;
-    private String phoneNumber;
-    private String shippingAddress;
-    private OrderStatus status;
     private LocalDateTime createdFromDate;
     private LocalDateTime createdToDate;
+    private OrderStatus status;
 
     @Min(value = 0, message = "Page must be >= 0")
     private Integer page;

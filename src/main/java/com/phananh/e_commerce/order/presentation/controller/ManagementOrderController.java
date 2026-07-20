@@ -3,6 +3,7 @@ package com.phananh.e_commerce.order.presentation.controller;
 import com.phananh.e_commerce.order.application.dto.response.order.*;
 import com.phananh.e_commerce.order.application.service.OrderService;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderFilterRequest;
+import com.phananh.e_commerce.order.presentation.dto.request.order.OrderStatusUpdateRequest;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,10 +44,10 @@ public class ManagementOrderController {
                 .build());
     }
 
-    @Operation(summary = "Cập nhật trạng thái đơn hàng", description = "Cập nhật trạng thái xử lý của đơn hàng")
-    @PatchMapping("{orderId}/{status}")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @PathVariable String status) {
-        orderService.updateOrderStatus(orderId, status);
+@Operation(summary = "Cập nhật trạng thái đơn hàng", description = "Cập nhật trạng thái xử lý của đơn hàng. Khi status là CANCELLED hoặc RETURNED thì phải nhập cancellationReason.")
+    @PatchMapping("{orderId}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusUpdateRequest request) {
+        orderService.updateOrderStatus(orderId, request.getStatus(), request.getCancellationReason());
         return ResponseEntity.noContent().build();
     }
 }

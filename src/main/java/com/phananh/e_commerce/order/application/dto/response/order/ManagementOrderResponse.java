@@ -1,28 +1,37 @@
 package com.phananh.e_commerce.order.application.dto.response.order;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ManagementOrderResponse {
     private Long orderId;
     private Long userId;
-    private String fullName;
-    private String phoneNumber;
-    private String shippingAddress;
-    private BigDecimal shippingFee;
+    private String username;
     private BigDecimal totalPrice;
-    private String status;
-    private Boolean isPaid;
-    private String paymentMethod;
-    private LocalDateTime paymentDate;
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
-    private String createdBy;
-    private String modifiedBy;
+    private List<Item> items;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Item {
+        private Long productId;
+        private String productName;
+        private String skuCode;
+        private Integer quantity;
+        private BigDecimal price;
+        private String variantImageUrl;
+    }
 }
 

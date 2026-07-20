@@ -1,13 +1,16 @@
 package com.phananh.e_commerce.order.domain.model;
 
+import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import com.phananh.e_commerce.core.util.NumberUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
+import com.phananh.e_commerce.order.application.dto.command.OrderCreateCommand;
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
 import com.phananh.e_commerce.order.domain.model.enums.PaymentMethod;
-import com.phananh.e_commerce.order.application.dto.command.OrderCreateCommand;
-import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -60,6 +63,9 @@ public class Order extends BaseEntity{
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<OrderItem> orderItems = new HashSet<>();
 
+    @Column(name = "cancellation_reason", columnDefinition = "TEXT")
+    private String cancellationReason;
+
     public static Order createFirst(OrderCreateCommand command) {
         if(command == null) throw new IllegalArgumentException("Command must not be null");
         if(NumberUtils.isNullOrNegative(command.getUserId())) throw new IllegalArgumentException("User id must be a positive number");
@@ -90,9 +96,15 @@ public class Order extends BaseEntity{
         this.shippingFee = shippingFee;
     }
 
-    public void updateStatus(OrderStatus status) {
+    public void updateStatusWithReason(OrderStatus status, String cancellationReason) {
         if (status == null) throw new IllegalArgumentException("Status must not be null");
         this.status = status;
+        if ((status == OrderStatus.CANCELLED || status == OrderStatus.RETURNED) && StringUtils.isBlank(cancellationReason)) {
+            throw new IllegalArgumentException("Cancellation reason must not be null or empty for CANCELLED or RETURNED status");
+        }
+        if (status == OrderStatus.CANCELLED || status == OrderStatus.RETURNED) {
+            this.cancellationReason = cancellationReason;
+        }
     }
 
     public void addOrderItems(Set<OrderItem> items) {

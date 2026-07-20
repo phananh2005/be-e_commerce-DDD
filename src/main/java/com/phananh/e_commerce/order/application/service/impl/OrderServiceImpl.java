@@ -94,17 +94,33 @@ public class OrderServiceImpl implements OrderService {
 
         OrderSearchQuery orderSearchQuery = OrderSearchQuery.builder()
                 .orderCode(orderFilterRequest.getOrderCode())
-                .fullName(orderFilterRequest.getFullName())
-                .phoneNumber(orderFilterRequest.getPhoneNumber())
-                .shippingAddress(orderFilterRequest.getShippingAddress())
-                .status(orderFilterRequest.getStatus())
                 .createdFromDate(orderFilterRequest.getCreatedFromDate())
                 .createdToDate(orderFilterRequest.getCreatedToDate())
+                .status(orderFilterRequest.getStatus())
                 .pageable(pageable)
                 .build();
 
-        return orderRepository.getListOrdersBySearch(orderSearchQuery)
-                .map(orderMapper::toManagementOrderResponse);
+        Page<Order> orderPage = orderRepository.getListOrdersBySearch(orderSearchQuery);
+
+        return orderPage.map(order -> {
+            List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(order.getId());
+            List<ManagementOrderResponse.Item> items = orderItems.stream()
+                    .map(oi -> orderMapper.toManagementOrderItem(oi, productService.getProductInfoByVariantId(oi.getVariantId())))
+                    .collect(Collectors.toList());
+
+            String username = null;
+            if (order.getUserId() != null) {
+                try {
+                    username = userService.getUserInfo(order.getUserId()).getUsername();
+                } catch (Exception e) {
+                    username = null;
+                }
+            }
+
+            ManagementOrderResponse response = orderMapper.toManagementOrderResponse(order, username);
+            response.setItems(items);
+            return response;
+        });
     }
 
     @Override
@@ -122,7 +138,8 @@ public class OrderServiceImpl implements OrderService {
         for (OrderPreviewRequest req : orderPreviewRequest) {
             ProductInfoResponse productInfo = productService.getProductInfoByVariantId(req.getVariantId());
             if (req.getQuantity() == null || req.getQuantity() <= 0) throw new AppException(ErrorCode.INVALID_REQUEST);
-            if (req.getQuantity() > productInfo.getStockQuantity()) throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+            if (req.getQuantity() > productInfo.getStockQuantity())
+                throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
 
             BigDecimal line = productInfo.getVariantPrice().multiply(BigDecimal.valueOf(req.getQuantity()));
             total = total.add(line);
@@ -172,7 +189,8 @@ public class OrderServiceImpl implements OrderService {
 
         for (CheckoutRequest.Item item : checkoutRequest.getItems()) {
             ProductInfoResponse productInfo = productService.getProductInfoByVariantId(item.getVariantId());
-            if (item.getQuantity() == null || item.getQuantity() <= 0) throw new AppException(ErrorCode.INVALID_REQUEST);
+            if (item.getQuantity() == null || item.getQuantity() <= 0)
+                throw new AppException(ErrorCode.INVALID_REQUEST);
             Integer currentStock = productInfo.getStockQuantity();
             if (item.getQuantity() > currentStock) throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
 
@@ -240,12 +258,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void updateOrderStatus(Long orderId, String status) {
+    public void updateOrderStatus(Long orderId, String status, String cancellationReason) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         try {
-            order.updateStatus(OrderStatus.valueOf(status));
+            order.updateStatusWithReason(OrderStatus.valueOf(status), cancellationReason);
         } catch (IllegalArgumentException e) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }

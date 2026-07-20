@@ -10,11 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 public class OrderSearchQuery {
     private String orderCode;
-    private String fullName;
-    private String phoneNumber;
-    private String shippingAddress;
-    private OrderStatus status;
     private LocalDateTime createdFromDate;
     private LocalDateTime createdToDate;
+    private OrderStatus status;
     private Pageable pageable;
 }

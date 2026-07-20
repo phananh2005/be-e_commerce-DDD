@@ -90,8 +90,26 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserInfoResponseForManagement getUserInfo(Long id) {
+        User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+        
         User user = userRepository.getById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        
+        if (!hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN)) {
+            if (hasRole(currentUser, RoleName.ROLE_STORE_ADMIN)) {
+                Set<RoleName> allowedRoles = Set.of(RoleName.ROLE_DELIVERY_STAFF, RoleName.ROLE_CUSTOMER);
+                boolean isAllowed = user.getRoles().stream()
+                        .map(Role::getName)
+                        .allMatch(allowedRoles::contains);
+                if (!isAllowed) {
+                    throw new AppException(ErrorCode.FORBIDDEN);
+                }
+            } else {
+                throw new AppException(ErrorCode.FORBIDDEN);
+            }
+        }
+        
         return userMapper.toResponse(user);
     }
 

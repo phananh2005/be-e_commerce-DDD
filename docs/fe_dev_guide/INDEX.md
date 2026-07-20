@@ -2,6 +2,7 @@
 
 | Version | Date | Changed Files | Summary |
 |---------|------|---------------|---------|
+| V1.0.5 | 2026-07-20 | `GET /management/users/info/{id}` | Thêm xác thực quyền dựa trên role: SUPER_ADMIN xem tất cả, STORE_ADMIN chỉ xem DELIVERY_STAFF/CUSTOMER |
 | V1.0.4 | 2026-07-20 | `GET /management/order/search` | Thêm trường `status` và `updatedAt` vào response |
 | V1.0.3 | 2026-07-19 | `GET /management/order/search` | Loại bỏ bộ lọc fullName, phoneNumber, shippingAddress, status; loại bỏ các trường response không cần; thêm danh sách sản phẩm trong response |
 | V1.0.2 | 2026-07-19 | `GET /management/order/search` | Bổ sung lọc khoảng thời gian tạo đơn hàng: createdFromDate, createdToDate |

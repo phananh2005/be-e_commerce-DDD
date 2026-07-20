@@ -2,7 +2,7 @@ package com.phananh.e_commerce.usermanagement.application.mapper;
 
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponseForManagement;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryResponse;
+import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryForManagementResponse;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
 import org.mapstruct.Mapper;
@@ -45,7 +45,7 @@ public interface UserMapper {
     @Mapping(target = "phoneNumber", source = "info.phoneNumber")
     @Mapping(target = "roles", expression = "java(mapRoles(user.getRoles()))")
     @Mapping(target = "isEnabled", source = "credentials.isEnabled")
-    UserSummaryResponse toSummary(User user);
+    UserSummaryForManagementResponse toSummary(User user);
 
     // helper method used in mapping expressions
     @SuppressWarnings("unused")

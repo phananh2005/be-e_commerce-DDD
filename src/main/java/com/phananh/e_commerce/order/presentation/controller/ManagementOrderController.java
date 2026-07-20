@@ -23,7 +23,7 @@ public class ManagementOrderController {
 
     OrderService orderService;
 
-    @Operation(summary = "Tìm kiếm đơn hàng", description = "Tìm kiếm và phân trang danh sách đơn hàng theo mã, họ tên, SĐT, địa chỉ, trạng thái")
+    @Operation(summary = "Tìm kiếm đơn hàng", description = "Tìm kiếm và phân trang danh sách đơn hàng theo mã, trạng thái")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<ManagementOrderResponse>>> getAllOrdersForManagement(
             @ModelAttribute OrderFilterRequest filter) {

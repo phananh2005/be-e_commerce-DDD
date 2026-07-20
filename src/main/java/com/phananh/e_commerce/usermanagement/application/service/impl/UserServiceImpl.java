@@ -7,10 +7,7 @@ import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.core.util.SecurityUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
-import com.phananh.e_commerce.usermanagement.application.dto.response.RoleResponse;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponse;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponseForManagement;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryResponse;
+import com.phananh.e_commerce.usermanagement.application.dto.response.*;
 import com.phananh.e_commerce.usermanagement.application.mapper.UserMapper;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
@@ -116,7 +113,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserSummaryResponse> getAllUsers(UserQueryRequest request) {
+    public Page<UserSummaryForManagementResponse> getAllUsers(UserQueryRequest request) {
         User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
 

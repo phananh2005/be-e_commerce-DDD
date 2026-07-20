@@ -2,7 +2,7 @@ package com.phananh.e_commerce.usermanagement.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.RoleResponse;
-import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryResponse;
+import com.phananh.e_commerce.usermanagement.application.dto.response.UserSummaryForManagementResponse;
 import com.phananh.e_commerce.usermanagement.application.dto.response.UserInfoResponseForManagement;
 import com.phananh.e_commerce.usermanagement.application.service.UserService;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.CreateUserRequest;
@@ -36,9 +36,9 @@ public class ManagementUserController {
 
     @Operation(summary = "Lấy danh sách tất cả người dùng", description = "Tìm kiếm và phân trang danh sách người dùng")
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<UserSummaryResponse>>> getAllUsers(@ModelAttribute @Valid UserQueryRequest userQueryRequest) {
-        Page<UserSummaryResponse> users = userService.getAllUsers(userQueryRequest);
-        ApiResponse<Page<UserSummaryResponse>> apiResponse = ApiResponse.<Page<UserSummaryResponse>>builder()
+    public ResponseEntity<ApiResponse<Page<UserSummaryForManagementResponse>>> getAllUsers(@ModelAttribute @Valid UserQueryRequest userQueryRequest) {
+        Page<UserSummaryForManagementResponse> users = userService.getAllUsers(userQueryRequest);
+        ApiResponse<Page<UserSummaryForManagementResponse>> apiResponse = ApiResponse.<Page<UserSummaryForManagementResponse>>builder()
                 .result(users)
                 .message("Get all users successfully")
                 .build();

@@ -85,7 +85,9 @@ public interface OrderMapper {
     @Mapping(target = "userId", source = "order.userId")
     @Mapping(target = "username", source = "username")
     @Mapping(target = "totalPrice", source = "order.totalPrice")
+    @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
     @Mapping(target = "createdAt", source = "order.createdAt")
+    @Mapping(target = "modifiedAt", source = "order.modifiedAt")
     @Mapping(target = "items", ignore = true)
     ManagementOrderResponse toManagementOrderResponse(Order order, String username);
 

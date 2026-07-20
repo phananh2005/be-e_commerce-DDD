@@ -18,7 +18,9 @@ public class ManagementOrderResponse {
     private Long userId;
     private String username;
     private BigDecimal totalPrice;
+    private String status;
     private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private List<Item> items;
 
     @Data

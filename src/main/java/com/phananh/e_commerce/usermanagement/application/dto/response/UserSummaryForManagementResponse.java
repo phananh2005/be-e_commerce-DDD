@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Data
 @Builder
-public class UserSummaryResponse {
+public class UserSummaryForManagementResponse {
     private Long id;
     private String username;
     private String fullName;

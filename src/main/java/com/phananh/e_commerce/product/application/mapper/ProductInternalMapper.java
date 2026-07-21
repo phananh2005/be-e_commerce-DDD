@@ -13,6 +13,7 @@ import java.util.Set;
 public interface ProductInternalMapper {
 
 	@Mapping(target = "productId", expression = "java(product.getId())")
+	@Mapping(target = "productUuid", expression = "java(product.getUuid())")
 	@Mapping(target = "productName", expression = "java(product.getName())")
 	@Mapping(target = "productStatus", expression = "java(product.getStatus() == null ? null : product.getStatus().name())")
 	@Mapping(target = "variantSkuCode", expression = "java(resolveVariant(product, variantId).getSkuCode())")

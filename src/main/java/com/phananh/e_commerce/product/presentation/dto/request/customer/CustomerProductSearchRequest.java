@@ -1,9 +1,5 @@
-package com.phananh.e_commerce.product.presentation.dto.request.product.customer;
+package com.phananh.e_commerce.product.presentation.dto.request.customer;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

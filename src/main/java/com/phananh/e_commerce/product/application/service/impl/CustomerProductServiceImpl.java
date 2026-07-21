@@ -11,7 +11,7 @@ import com.phananh.e_commerce.product.application.mapper.CustomerProductMapper;
 import com.phananh.e_commerce.product.application.service.CustomerProductService;
 import com.phananh.e_commerce.product.domain.model.Product;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
-import com.phananh.e_commerce.product.presentation.dto.request.product.customer.CustomerProductSearchRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.customer.CustomerProductSearchRequest;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
 import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
 import lombok.AccessLevel;

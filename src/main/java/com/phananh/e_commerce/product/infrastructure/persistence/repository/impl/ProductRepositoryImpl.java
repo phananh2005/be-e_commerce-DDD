@@ -55,10 +55,9 @@ public class ProductRepositoryImpl implements ProductRepository {
         Pageable pageable = productSearchQuery.getPageable();
 
         Specification<Product> specification = Specification
-                .where(ProductSearchSpecification.hasNameLike(productSearchQuery.getKeyword()))
+                .where(ProductSearchSpecification.hasProductSearch(productSearchQuery.getProductSearch()))
                 .and(ProductSearchSpecification.hasCategoryIds(productSearchQuery.getCategoryIds()))
-                .and(ProductSearchSpecification.hasBrandIds(productSearchQuery.getBrandIds()))
-                .and(ProductSearchSpecification.hasPriceBetween(productSearchQuery.getMinPrice(), productSearchQuery.getMaxPrice()));
+                .and(ProductSearchSpecification.hasBrandIds(productSearchQuery.getBrandIds()));
 
         return springDataProductRepository.findAll(specification, pageable);
     }

@@ -14,8 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManagementOrderResponse {
-    private Long orderId;
-    private Long userId;
+    private String orderUuid;
+    private String userUuid;
     private String username;
     private BigDecimal totalPrice;
     private String status;
@@ -28,7 +28,7 @@ public class ManagementOrderResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Item {
-        private Long productId;
+        private String productUuid;
         private String productName;
         private String skuCode;
         private Integer quantity;

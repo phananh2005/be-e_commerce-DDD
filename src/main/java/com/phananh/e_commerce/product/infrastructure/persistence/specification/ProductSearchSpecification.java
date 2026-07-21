@@ -1,7 +1,6 @@
 package com.phananh.e_commerce.product.infrastructure.persistence.specification;
 
 import com.phananh.e_commerce.product.domain.model.Product;
-import com.phananh.e_commerce.product.domain.model.ProductVariant;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -15,13 +14,6 @@ public class ProductSearchSpecification {
             }
             return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
         };
-    }
-
-    public static Specification<Product> hasDescriptionLike(String keyword) {
-        return (root, query, criteriaBuilder) ->
-                keyword == null || keyword.isBlank()
-                        ? criteriaBuilder.conjunction()
-                        : criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + keyword.toLowerCase() + "%");
     }
 
     public static Specification<Product> hasBrandId(Long brandId) {
@@ -45,21 +37,23 @@ public class ProductSearchSpecification {
     }
 
     public static Specification<Product> hasPriceBetween(Double minPrice, Double maxPrice) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+    }
+
+    public static Specification<Product> hasProductSearch(String productSearch) {
         return (root, query, criteriaBuilder) -> {
-            if (minPrice == null && maxPrice == null) return criteriaBuilder.conjunction();
-
-            var subquery = query.subquery(Double.class);
-            var variantRoot = subquery.from(ProductVariant.class);
-
-            subquery.select(criteriaBuilder.min(variantRoot.get("price")));
-            subquery.where(criteriaBuilder.equal(variantRoot.get("product"), root));
-
-            if (minPrice != null && maxPrice != null) {
-                return criteriaBuilder.between(subquery, minPrice, maxPrice);
-            } else if (minPrice != null) {
-                return criteriaBuilder.greaterThanOrEqualTo(subquery, minPrice);
-            } else {
-                return criteriaBuilder.lessThanOrEqualTo(subquery, maxPrice);
+            if (productSearch == null || productSearch.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            String likePattern = "%" + productSearch.toLowerCase() + "%";
+            try {
+                Long productId = Long.parseLong(productSearch);
+                return criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("id"), productId),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern)
+                );
+            } catch (NumberFormatException e) {
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern);
             }
         };
     }

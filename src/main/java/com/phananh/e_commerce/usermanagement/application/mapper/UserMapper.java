@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "id", source = "id")
+    @Mapping(target = "uuid", source = "uuid")
     @Mapping(target = "username", source = "credentials.username")
     @Mapping(target = "email", source = "info.email")
     @Mapping(target = "fullName", source = "info.fullName")
@@ -25,7 +25,7 @@ public interface UserMapper {
     @Mapping(target = "isEnabled", source = "credentials.isEnabled")
     UserInfoResponse toUserInfoResponse(User user);
 
-    @Mapping(target = "id", source = "id")
+    @Mapping(target = "uuid", source = "uuid")
     @Mapping(target = "username", source = "credentials.username")
     @Mapping(target = "email", source = "info.email")
     @Mapping(target = "fullName", source = "info.fullName")
@@ -39,7 +39,7 @@ public interface UserMapper {
     @Mapping(target = "modifiedBy", source = "modifiedBy")
     UserInfoResponseForManagement toResponse(User user);
 
-    @Mapping(target = "id", source = "id")
+    @Mapping(target = "uuid", source = "uuid")
     @Mapping(target = "username", source = "credentials.username")
     @Mapping(target = "email", source = "info.email")
     @Mapping(target = "fullName", source = "info.fullName")

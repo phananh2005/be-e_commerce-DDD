@@ -1,10 +1,7 @@
 package com.phananh.e_commerce.product.application.dto.response.customer;
 
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,7 +10,7 @@ import java.util.Set;
 @Data
 public class ProductDetailResponse{
 
-    private Long productId;
+    private String productUuid;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String createdBy;

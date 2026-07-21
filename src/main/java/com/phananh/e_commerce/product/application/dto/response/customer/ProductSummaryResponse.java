@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 public class ProductSummaryResponse {
-    private Long productId;
+    private String productUuid;
     private String productName;
     private BigDecimal minPrice;
     private String avatarUrl;

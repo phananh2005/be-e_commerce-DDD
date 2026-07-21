@@ -15,17 +15,11 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ManagementProductMapper {
 
-    @Mapping(target = "id", source = "id")
+    @Mapping(target = "uuid", source = "uuid")
     @Mapping(target = "name", source = "name")
-    @Mapping(target = "description", source = "description")
     @Mapping(target = "avatarUrl", source = "avatarUrl")
     @Mapping(target = "status", expression = "java(product.getStatus() == null ? null : product.getStatus().name())")
-    @Mapping(target = "categoryName", source = "categoryId")
-    @Mapping(target = "brandName", source = "brandId")
-    @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "modifiedAt", source = "modifiedAt")
-    @Mapping(target = "createdBy", source = "createdBy")
-    @Mapping(target = "modifiedBy", source = "modifiedBy")
     ProductResponse toManagementProductResponse(Product product);
 
     @Mapping(target = "id", source = "id")

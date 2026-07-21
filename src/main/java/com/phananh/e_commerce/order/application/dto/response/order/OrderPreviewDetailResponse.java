@@ -21,7 +21,7 @@ public class OrderPreviewDetailResponse {
     @Data
     @Builder
     public static class Item {
-        private Long productId;
+        private String productUuid;
         private String productName;
         private String skuCode;
         private Integer quantity;

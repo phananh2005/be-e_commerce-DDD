@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -20,6 +21,9 @@ public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", columnDefinition = "VARCHAR(36)", unique = true, nullable = false)
+    private String uuid;
 
     @Embedded
     private UserCredentials credentials;
@@ -52,6 +56,13 @@ public class User extends BaseEntity{
     public void active(){this.credentials = this.credentials.activeUser();}
 
     public void inactive(){this.credentials = this.credentials.inactiveUser();}
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
 }
 
 

@@ -16,7 +16,10 @@ import com.phananh.e_commerce.product.application.service.ManagementProductServi
 import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
-import com.phananh.e_commerce.product.presentation.dto.request.product.management.*;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ManagementProductSearchRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ProductCreateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ProductUpdateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ProductVariantCreateRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -56,12 +59,9 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         ManagementProductSearchQuery query = ManagementProductSearchQuery.builder()
-                .keyword(managementProductSearchRequest.getKeyword() == null || managementProductSearchRequest.getKeyword().isBlank() ? null : managementProductSearchRequest.getKeyword().trim())
+                .productSearch(managementProductSearchRequest.getProductSearch() == null || managementProductSearchRequest.getProductSearch().isBlank() ? null : managementProductSearchRequest.getProductSearch().trim())
                 .categoryIds(managementProductSearchRequest.getCategoryIds())
                 .brandIds(managementProductSearchRequest.getBrandIds())
-                .minPrice(managementProductSearchRequest.getMinPrice())
-                .maxPrice(managementProductSearchRequest.getMaxPrice())
-                .minRating(managementProductSearchRequest.getMinRating())
                 .pageable(pageable)
                 .build();
 

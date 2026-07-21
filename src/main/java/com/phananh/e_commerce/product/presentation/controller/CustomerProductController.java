@@ -4,7 +4,7 @@ import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.product.application.dto.response.customer.ProductDetailResponse;
 import com.phananh.e_commerce.product.application.dto.response.customer.ProductSummaryResponse;
 import com.phananh.e_commerce.product.application.service.CustomerProductService;
-import com.phananh.e_commerce.product.presentation.dto.request.product.customer.CustomerProductSearchRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.customer.CustomerProductSearchRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

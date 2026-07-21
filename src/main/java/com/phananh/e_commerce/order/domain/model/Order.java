@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -27,6 +28,9 @@ public class Order extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", columnDefinition = "VARCHAR(36)", unique = true, nullable = false)
+    private String uuid;
 
     @Column(nullable = false)
     private Long userId;
@@ -115,6 +119,13 @@ public class Order extends BaseEntity{
         if(items == null || items.isEmpty()) throw new IllegalArgumentException("Order items must not be null or empty");
         orderItems.clear();
         orderItems.addAll(items);
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 }
 

@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 @Builder
 public class UserInfoResponse {
-    private Long id;
+    private String uuid;
     private String username;
     private String email;
     private String fullName;

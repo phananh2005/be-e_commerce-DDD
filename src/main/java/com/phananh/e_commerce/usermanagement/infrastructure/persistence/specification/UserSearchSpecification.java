@@ -14,16 +14,21 @@ public class UserSearchSpecification {
             if (userIdentifier == null || userIdentifier.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
+            String likePattern = "%" + userIdentifier.toLowerCase() + "%";
             try {
                 Long userId = Long.parseLong(userIdentifier);
-                return criteriaBuilder.equal(root.get("id"), userId);
+                return criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("id"), userId),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern)
+                );
             } catch (NumberFormatException e) {
-                return criteriaBuilder.equal(root.get("credentials").get("username"), userIdentifier);
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern);
             }
         };
     }
 
     public static Specification<User> hasKeyword(String keyword) {
+
         return (root, query, criteriaBuilder) -> {
             if (keyword == null || keyword.isEmpty()) {
                 return criteriaBuilder.conjunction();

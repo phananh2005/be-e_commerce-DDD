@@ -2,7 +2,10 @@ package com.phananh.e_commerce.product.application.service;
 
 import com.phananh.e_commerce.product.application.dto.response.management.ProductResponse;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponse;
-import com.phananh.e_commerce.product.presentation.dto.request.product.management.*;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ManagementProductSearchRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ProductCreateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ProductUpdateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.management.ProductVariantCreateRequest;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

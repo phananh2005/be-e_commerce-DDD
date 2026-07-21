@@ -18,26 +18,26 @@ public class OrderSearchSpecification {
         };
     }
 
-    public static Specification<Order> hasFullName(String fullName) {
-        return (root, query, cb) -> {
-            if (fullName == null || fullName.isBlank()) return cb.conjunction();
-            return cb.like(cb.lower(root.get("fullName")), "%" + fullName.trim().toLowerCase() + "%");
-        };
-    }
-
-    public static Specification<Order> hasPhoneNumber(String phoneNumber) {
-        return (root, query, cb) -> {
-            if (phoneNumber == null || phoneNumber.isBlank()) return cb.conjunction();
-            return cb.like(root.get("phoneNumber"), "%" + phoneNumber.trim() + "%");
-        };
-    }
-
-    public static Specification<Order> hasShippingAddress(String shippingAddress) {
-        return (root, query, cb) -> {
-            if (shippingAddress == null || shippingAddress.isBlank()) return cb.conjunction();
-            return cb.like(cb.lower(root.get("shippingAddress")), "%" + shippingAddress.trim().toLowerCase() + "%");
-        };
-    }
+//    public static Specification<Order> hasFullName(String fullName) {
+//        return (root, query, cb) -> {
+//            if (fullName == null || fullName.isBlank()) return cb.conjunction();
+//            return cb.like(cb.lower(root.get("fullName")), "%" + fullName.trim().toLowerCase() + "%");
+//        };
+//    }
+//
+//    public static Specification<Order> hasPhoneNumber(String phoneNumber) {
+//        return (root, query, cb) -> {
+//            if (phoneNumber == null || phoneNumber.isBlank()) return cb.conjunction();
+//            return cb.like(root.get("phoneNumber"), "%" + phoneNumber.trim() + "%");
+//        };
+//    }
+//
+//    public static Specification<Order> hasShippingAddress(String shippingAddress) {
+//        return (root, query, cb) -> {
+//            if (shippingAddress == null || shippingAddress.isBlank()) return cb.conjunction();
+//            return cb.like(cb.lower(root.get("shippingAddress")), "%" + shippingAddress.trim().toLowerCase() + "%");
+//        };
+//    }
 
     public static Specification<Order> hasStatus(OrderStatus status) {
         return (root, query, cb) -> {

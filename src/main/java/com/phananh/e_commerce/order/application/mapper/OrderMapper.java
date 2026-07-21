@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
 
-    @Mapping(target = "orderId", source = "id")
+    @Mapping(target = "orderUuid", source = "uuid")
     @Mapping(target = "totalPrice", source = "totalPrice")
     @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
     @Mapping(target = "items", ignore = true)
@@ -37,7 +37,7 @@ public interface OrderMapper {
 
     default OrderDetailResponse.Item toCustomerOrderDetailItem(OrderItem orderItem, ProductInfoResponse productInfo) {
         return OrderDetailResponse.Item.builder()
-                .productId(productInfo.getProductId())
+                .productUuid(productInfo.getProductUuid())
                 .productName(productInfo.getProductName())
                 .skuCode(productInfo.getVariantSkuCode())
                 .quantity(orderItem.getQuantity())
@@ -46,7 +46,8 @@ public interface OrderMapper {
                 .build();
     }
 
-    @Mapping(target = "orderId", source = "id")
+    @Mapping(target = "orderUuid", source = "uuid")
+    @Mapping(target = "userUuid", ignore = true)
     @Mapping(target = "totalPrice", source = "totalPrice")
     @Mapping(target = "shippingFee", source = "shippingFee")
     @Mapping(target = "addressInfo.fullName", source = "fullName")
@@ -73,7 +74,7 @@ public interface OrderMapper {
     default OrderPreviewDetailResponse.Item toOrderPreviewItem(ProductInfoResponse productInfo) {
         return OrderPreviewDetailResponse.Item.builder()
                 .skuCode(productInfo.getVariantSkuCode())
-                .productId(productInfo.getProductId())
+                .productUuid(productInfo.getProductUuid())
                 .productName(productInfo.getProductName())
                 .variantImageUrl(productInfo.getVariantImageUrl())
                 .build();
@@ -88,8 +89,8 @@ public interface OrderMapper {
     @Mapping(target = "items", ignore = true)
     OrderPreviewDetailResponse toOrderPreviewDetailResponse(UserInfoResponse userInfo);
 
-    @Mapping(target = "orderId", source = "order.id")
-    @Mapping(target = "userId", source = "order.userId")
+    @Mapping(target = "orderUuid", source = "order.uuid")
+    @Mapping(target = "userUuid", ignore = true)
     @Mapping(target = "username", source = "username")
     @Mapping(target = "totalPrice", source = "order.totalPrice")
     @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
@@ -100,7 +101,7 @@ public interface OrderMapper {
 
     default ManagementOrderResponse.Item toManagementOrderItem(OrderItem orderItem, ProductInfoResponse productInfo) {
         return ManagementOrderResponse.Item.builder()
-                .productId(productInfo.getProductId())
+                .productUuid(productInfo.getProductUuid())
                 .productName(productInfo.getProductName())
                 .skuCode(productInfo.getVariantSkuCode())
                 .quantity(orderItem.getQuantity())

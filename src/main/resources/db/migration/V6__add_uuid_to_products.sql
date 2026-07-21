@@ -1,0 +1,7 @@
+ALTER TABLE products ADD COLUMN uuid VARCHAR(36) UNIQUE;
+
+UPDATE products SET uuid = UUID() WHERE uuid IS NULL;
+
+ALTER TABLE products MODIFY COLUMN uuid VARCHAR(36) UNIQUE NOT NULL;
+
+CREATE UNIQUE INDEX idx_products_uuid ON products(uuid);

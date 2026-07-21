@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "products")
@@ -23,6 +24,9 @@ public class Product extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", columnDefinition = "VARCHAR(36)", unique = true, nullable = false)
+    private String uuid;
 
     @Column(nullable = false)
     private String name;
@@ -94,6 +98,13 @@ public class Product extends BaseEntity{
 
     public void addVariant(ProductVariant variant) {
         this.variants.add(variant);
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 }
 

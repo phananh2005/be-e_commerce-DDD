@@ -109,14 +109,16 @@ public class OrderServiceImpl implements OrderService {
                     .map(oi -> orderMapper.toManagementOrderItem(oi, productService.getProductInfoByVariantId(oi.getVariantId())))
                     .collect(Collectors.toList());
 
-            String username = null;
-            if (order.getUserId() != null) {
-                try {
-                    username = userService.getUserInfo(order.getUserId()).getUsername();
-                } catch (Exception e) {
-                    username = null;
-                }
-            }
+            String username;
+             if (order.getUserId() != null) {
+                 try {
+                     username = userService.getUserInfo(order.getUserId()).getUsername();
+                 } catch (Exception e) {
+                     username = null;
+                 }
+             } else {
+                 username = null;
+             }
 
             ManagementOrderResponse response = orderMapper.toManagementOrderResponse(order, username);
             response.setItems(items);

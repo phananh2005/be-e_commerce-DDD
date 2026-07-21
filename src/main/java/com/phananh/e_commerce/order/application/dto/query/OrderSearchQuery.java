@@ -13,5 +13,6 @@ public class OrderSearchQuery {
     private LocalDateTime createdFromDate;
     private LocalDateTime createdToDate;
     private OrderStatus status;
+    private Long userId;
     private Pageable pageable;
 }

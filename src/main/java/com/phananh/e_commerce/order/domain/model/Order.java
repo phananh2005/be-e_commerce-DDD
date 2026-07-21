@@ -35,10 +35,12 @@ public class Order extends BaseEntity{
     private BigDecimal totalPrice;
 
     @Column(name = "shipping_fee", precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal shippingFee = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 50)
+    @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
     @Column(name = "full_name")
@@ -55,12 +57,14 @@ public class Order extends BaseEntity{
     private PaymentMethod paymentMethod;
 
     @Column(name = "is_paid", nullable = false)
+    @Builder.Default
     private Boolean isPaid = false;
 
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @Builder.Default
     private Set<OrderItem> orderItems = new HashSet<>();
 
     @Column(name = "cancellation_reason", columnDefinition = "TEXT")

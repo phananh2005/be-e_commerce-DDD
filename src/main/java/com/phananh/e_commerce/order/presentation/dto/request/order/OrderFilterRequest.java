@@ -16,6 +16,7 @@ public class OrderFilterRequest {
     private LocalDateTime createdFromDate;
     private LocalDateTime createdToDate;
     private OrderStatus status;
+    private Long userId;
 
     @Min(value = 0, message = "Page must be >= 0")
     private Integer page;

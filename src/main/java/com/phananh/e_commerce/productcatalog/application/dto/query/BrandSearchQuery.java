@@ -7,6 +7,6 @@ import org.springframework.data.domain.Pageable;
 @Data
 @Builder
 public class BrandSearchQuery {
-    private String keyword;
+    private String name;
     private Pageable pageable;
 }

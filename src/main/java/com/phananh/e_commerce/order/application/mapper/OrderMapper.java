@@ -49,19 +49,26 @@ public interface OrderMapper {
     @Mapping(target = "orderId", source = "id")
     @Mapping(target = "totalPrice", source = "totalPrice")
     @Mapping(target = "shippingFee", source = "shippingFee")
-    @Mapping(target = "fullName", source = "fullName")
-    @Mapping(target = "phoneNumber", source = "phoneNumber")
-    @Mapping(target = "shippingAddress", source = "shippingAddress")
+    @Mapping(target = "addressInfo.fullName", source = "fullName")
+    @Mapping(target = "addressInfo.phoneNumber", source = "phoneNumber")
+    @Mapping(target = "addressInfo.shippingAddress", source = "shippingAddress")
     @Mapping(target = "isPaid", source = "isPaid")
     @Mapping(target = "paymentDate", source = "paymentDate")
     @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod() != null ? order.getPaymentMethod().toString() : null)")
     @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
+    @Mapping(target = "cancellationReason", expression = "java(isCancelledOrReturned(order) ? order.getCancellationReason() : null)")
     @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "createdBy", source = "createdBy")
     @Mapping(target = "modifiedAt", source = "modifiedAt")
     @Mapping(target = "modifiedBy", source = "modifiedBy")
     @Mapping(target = "items", ignore = true)
     OrderDetailResponse toCustomerOrderDetailResponse(Order order);
+
+    default boolean isCancelledOrReturned(Order order) {
+        return order.getStatus() != null && 
+               (order.getStatus().toString().equals("CANCELLED") || 
+                order.getStatus().toString().equals("RETURNED"));
+    }
 
     default OrderPreviewDetailResponse.Item toOrderPreviewItem(ProductInfoResponse productInfo) {
         return OrderPreviewDetailResponse.Item.builder()

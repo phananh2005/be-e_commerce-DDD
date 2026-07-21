@@ -48,9 +48,11 @@ public class ProductVariant extends BaseEntity{
             joinColumns = @JoinColumn(name = "variant_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "attribute_value_id", nullable = false)
     )
+    @Builder.Default
     private Set<AttributeValue> attributeValues = new HashSet<>();
 
     @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Builder.Default
     private Set<VariantImage> images = new HashSet<>();
 
     public static ProductVariant create(ProductVariantCreateCommand command) {

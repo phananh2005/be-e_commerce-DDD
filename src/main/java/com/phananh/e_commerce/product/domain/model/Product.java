@@ -44,6 +44,7 @@ public class Product extends BaseEntity{
     private Long brandId;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE} )
+    @Builder.Default
     private Set<ProductVariant> variants = new HashSet<>();
 
     public static Product create(ProductCreateCommand command) {

@@ -59,4 +59,11 @@ public class OrderSearchSpecification {
             return cb.lessThanOrEqualTo(root.get("createdAt"), createdToDate);
         };
     }
+
+    public static Specification<Order> hasUserId(Long userId) {
+        return (root, query, cb) -> {
+            if (userId == null) return cb.conjunction();
+            return cb.equal(root.get("userId"), userId);
+        };
+    }
 }

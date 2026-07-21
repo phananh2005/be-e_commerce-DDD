@@ -33,6 +33,7 @@ public class User extends BaseEntity{
             joinColumns = @JoinColumn(name = "user_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false)
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     public void updateInfo (UserInfo userInfo){

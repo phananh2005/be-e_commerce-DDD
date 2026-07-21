@@ -37,7 +37,7 @@ public class ManagementOrderController {
     @Operation(summary = "Lấy chi tiết đơn hàng", description = "Lấy thông tin chi tiết của một đơn hàng theo ID")
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetailForManagement(@PathVariable Long orderId) {
-        OrderDetailResponse response = orderService.getOrderDetail(orderId);
+        OrderDetailResponse response = orderService.getOrderDetailForManagement(orderId);
         return ResponseEntity.ok(ApiResponse.<OrderDetailResponse>builder()
                 .result(response)
                 .message("Get order detail successfully")

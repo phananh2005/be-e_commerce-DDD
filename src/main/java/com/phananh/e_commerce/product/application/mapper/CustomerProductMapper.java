@@ -48,6 +48,8 @@ public interface CustomerProductMapper {
     @Mapping(target = "avatarUrl", source = "avatarUrl")
     @Mapping(target = "categoryId", source = "categoryId")
     @Mapping(target = "brandId", source = "brandId")
+    @Mapping(target = "brandName", ignore = true)
+    @Mapping(target = "categoryName", ignore = true)
     @Mapping(target = "minPrice", expression = "java(getMinPrice(product))")
     @Mapping(target = "maxPrice", expression = "java(getMaxPrice(product))")
     @Mapping(target = "status", source = "status")

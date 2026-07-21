@@ -55,7 +55,7 @@ public class BrandServiceImpl implements BrandService {
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         BrandSearchQuery query = BrandSearchQuery.builder()
-                .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
+                .name(request.getName() == null ? null : request.getName().trim())
                 .pageable(pageable)
                 .build();
 
@@ -96,11 +96,14 @@ public class BrandServiceImpl implements BrandService {
                 brand.updateImage(imageUrl);
             } else {
                 // empty string => remove existing image and delete from Cloudinary
-                try {
-                    cloudinaryService.deleteFileByUrl(imageUrl);
-                } catch (Exception e) {
-                    log.error("Error deleting brand image", e);
-                    throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+                String existingImageUrl = brand.getImageUrl();
+                if (existingImageUrl != null && !existingImageUrl.isBlank()) {
+                    try {
+                        cloudinaryService.deleteFileByUrl(existingImageUrl);
+                    } catch (Exception e) {
+                        log.error("Error deleting brand image", e);
+                        throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+                    }
                 }
                 brand.removeImage();
             }

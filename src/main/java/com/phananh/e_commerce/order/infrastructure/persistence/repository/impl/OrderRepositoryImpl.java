@@ -53,7 +53,8 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .where(OrderSearchSpecification.hasOrderCode(orderSearchQuery.getOrderCode()))
                 .and(OrderSearchSpecification.hasCreatedFromDate(orderSearchQuery.getCreatedFromDate()))
                 .and(OrderSearchSpecification.hasCreatedToDate(orderSearchQuery.getCreatedToDate()))
-                .and(OrderSearchSpecification.hasStatus(orderSearchQuery.getStatus()));
+                .and(OrderSearchSpecification.hasStatus(orderSearchQuery.getStatus()))
+                .and(OrderSearchSpecification.hasUserId(orderSearchQuery.getUserId()));
         return springDataOrderRepository.findAll(specification, orderSearchQuery.getPageable());
     }
 

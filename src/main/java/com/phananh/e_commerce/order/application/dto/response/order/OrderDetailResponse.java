@@ -16,16 +16,23 @@ public class OrderDetailResponse {
     private LocalDateTime modifiedAt;
     private String createdBy;
     private String modifiedBy;
-    private String fullName;
+    private AddressInfo addressInfo;
     private Boolean isPaid;
     private LocalDateTime paymentDate;
     private String paymentMethod;
-    private String phoneNumber;
-    private String shippingAddress;
     private BigDecimal shippingFee;
     private String status;
     private BigDecimal totalPrice;
+    private String cancellationReason;
     private List<Item> items;
+
+    @Data
+    @Builder
+    public static class AddressInfo {
+        private String fullName;
+        private String phoneNumber;
+        private String shippingAddress;
+    }
 
     @Data
     @Builder

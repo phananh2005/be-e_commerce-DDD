@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
         CategorySearchQuery query = CategorySearchQuery.builder()
-                .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
+                .name(request.getName() == null ? null : request.getName().trim())
                 .pageable(pageable)
                 .build();
 
@@ -94,15 +94,17 @@ public class CategoryServiceImpl implements CategoryService {
         String imageUrl = request.getImageUrl();
         if (imageUrl != null) {
             if (!imageUrl.isBlank()) {
-                // Set provided URL directly
                 category.updateImage(imageUrl);
             } else {
                 // empty string => remove existing image and delete from Cloudinary
-                try {
-                    cloudinaryService.deleteFileByUrl(imageUrl);
-                } catch (Exception e) {
-                    log.error("Error deleting category image", e);
-                    throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+                String existingImageUrl = category.getImageUrl();
+                if (existingImageUrl != null && !existingImageUrl.isBlank()) {
+                    try {
+                        cloudinaryService.deleteFileByUrl(existingImageUrl);
+                    } catch (Exception e) {
+                        log.error("Error deleting category image", e);
+                        throw new AppException(ErrorCode.FILE_DELETE_ERROR);
+                    }
                 }
                 category.removeImage();
             }

@@ -24,6 +24,7 @@ public class VariantImage {
     private String imageUrl;
 
     @Column(name = "is_avatar", nullable = false)
+    @Builder.Default
     private boolean isAvatar = false;
 
     public static VariantImage create(ProductVariant variant, String imageUrl, boolean isAvatar) {

@@ -32,7 +32,7 @@ public class ManagementUserController {
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest request) {
         userService.createUser(request);
         return ResponseEntity.noContent().build();
-    }
+        }
 
     @Operation(summary = "Lấy danh sách tất cả người dùng", description = "Tìm kiếm và phân trang danh sách người dùng")
     @GetMapping

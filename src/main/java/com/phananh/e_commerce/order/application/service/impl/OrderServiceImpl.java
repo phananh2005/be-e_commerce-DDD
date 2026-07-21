@@ -97,6 +97,7 @@ public class OrderServiceImpl implements OrderService {
                 .createdFromDate(orderFilterRequest.getCreatedFromDate())
                 .createdToDate(orderFilterRequest.getCreatedToDate())
                 .status(orderFilterRequest.getStatus())
+                .userId(orderFilterRequest.getUserId())
                 .pageable(pageable)
                 .build();
 
@@ -241,6 +242,29 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        Long currentUserId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
+        if (!order.getUserId().equals(currentUserId)) {
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+
+        List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(order.getId());
+
+        List<OrderDetailResponse.Item> items = orderItems.stream().map(oi -> {
+            ProductInfoResponse p = productService.getProductInfoByVariantId(oi.getVariantId());
+            return orderMapper.toCustomerOrderDetailItem(oi, p);
+        }).collect(Collectors.toList());
+
+        OrderDetailResponse response = orderMapper.toCustomerOrderDetailResponse(order);
+        response.setItems(items);
+        return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderDetailForManagement(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 

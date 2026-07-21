@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class CategorySearchRequest {
 
-    private String keyword;
+    private String name;
 
     @Min(value = 0, message = "Page must be >= 0")
     private Integer page;

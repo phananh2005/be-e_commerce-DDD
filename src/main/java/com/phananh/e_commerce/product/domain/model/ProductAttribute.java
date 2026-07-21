@@ -21,6 +21,7 @@ public class ProductAttribute{
     private String name;
 
     @OneToMany(mappedBy = "attribute", fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<AttributeValue> attributeValues = new HashSet<>();
 }
 

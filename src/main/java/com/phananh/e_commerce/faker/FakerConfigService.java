@@ -1,13 +1,10 @@
 package com.phananh.e_commerce.faker;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * Runtime configuration for faker. This bean holds the values used by `DataSeeder`.
- * You can modify these values programmatically (e.g. in code or tests) by injecting
- * this bean and calling the setters.
- */
 @Component
+@ConfigurationProperties(prefix = "app.faker")
 public class FakerConfigService {
 
     private boolean enabled = false;

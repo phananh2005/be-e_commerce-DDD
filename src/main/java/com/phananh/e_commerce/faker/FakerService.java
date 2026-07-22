@@ -71,18 +71,20 @@ public class FakerService {
             if (userRepository.existsByCredentialsUsername(username)) continue;
             if (userRepository.existsByInfoEmail(email)) continue;
 
-            User user = new User();
-            setField(user, "credentials", new UserCredentials(
-                    username,
-                    PasswordUtils.encode("123456"),
-                    true));
-            setField(user, "info", UserInfo.builder()
-                    .fullName(faker.name().fullName())
-                    .email(email)
-                    .address(faker.address().fullAddress())
-                    .phoneNumber(phone)
-                    .build());
-            setField(user, "roles", new HashSet<>(Set.of(customerRole)));
+            User user = User.builder()
+                    .credentials(UserCredentials.builder()
+                            .username(username)
+                            .password(PasswordUtils.encode("123456"))
+                            .isEnabled(true)
+                            .build())
+                    .info(UserInfo.builder()
+                            .fullName(faker.name().fullName())
+                            .email(email)
+                            .address(faker.address().fullAddress())
+                            .phoneNumber(phone)
+                            .build())
+                    .roles(new HashSet<>(Set.of(customerRole)))
+                    .build();
             users.add(userRepository.save(user));
         }
         return users;
@@ -256,15 +258,5 @@ public class FakerService {
         return orders.size();
     }
 
-    // ── HELPER ─────────────────────────────────────────────────────────────────
 
-    private void setField(Object target, String fieldName, Object value) {
-        try {
-            var field = target.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(target, value);
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot set field: " + fieldName, e);
-        }
-    }
 }

@@ -67,6 +67,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                 .productSearch(managementProductSearchRequest.getProductSearch() == null || managementProductSearchRequest.getProductSearch().isBlank() ? null : managementProductSearchRequest.getProductSearch().trim())
                 .categoryIds(managementProductSearchRequest.getCategoryIds())
                 .brandIds(managementProductSearchRequest.getBrandIds())
+                .status(managementProductSearchRequest.getStatus())
                 .pageable(pageable)
                 .build();
 

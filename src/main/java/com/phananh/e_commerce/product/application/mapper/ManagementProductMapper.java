@@ -21,6 +21,9 @@ public interface ManagementProductMapper {
     @Mapping(target = "name", source = "name")
     @Mapping(target = "avatarUrl", source = "avatarUrl")
     @Mapping(target = "status", expression = "java(product.getStatus() == null ? null : product.getStatus().name())")
+    @Mapping(target = "createdBy", source = "createdBy")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "modifiedBy", source = "modifiedBy")
     @Mapping(target = "modifiedAt", source = "modifiedAt")
     ProductSummaryResponseForManagement toManagementProductResponse(Product product);
 

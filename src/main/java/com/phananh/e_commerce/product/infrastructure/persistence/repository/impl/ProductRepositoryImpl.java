@@ -9,6 +9,7 @@ import com.phananh.e_commerce.product.infrastructure.persistence.repository.spri
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductAttributeRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataProductVariantRepository;
 import com.phananh.e_commerce.product.infrastructure.persistence.repository.springdata.SpringDataVariantImageRepository;
+import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.infrastructure.persistence.specification.ProductSearchSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -40,7 +41,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .and(ProductSearchSpecification.hasCategoryId(productSearchQuery.getCategoryId()))
                 .and(ProductSearchSpecification.hasBrandId(productSearchQuery.getBrandId()))
                 .and(ProductSearchSpecification.hasPriceBetween(productSearchQuery.getMinPrice(), productSearchQuery.getMaxPrice()))
-                .and(ProductSearchSpecification.hasStatus("ACTIVE"));
+                .and(ProductSearchSpecification.hasStatus(ProductStatus.ACTIVE));
 
         return springDataProductRepository.findAll(specification, pageable);
     }
@@ -57,7 +58,8 @@ public class ProductRepositoryImpl implements ProductRepository {
         Specification<Product> specification = Specification
                 .where(ProductSearchSpecification.hasProductSearch(productSearchQuery.getProductSearch()))
                 .and(ProductSearchSpecification.hasCategoryIds(productSearchQuery.getCategoryIds()))
-                .and(ProductSearchSpecification.hasBrandIds(productSearchQuery.getBrandIds()));
+                .and(ProductSearchSpecification.hasBrandIds(productSearchQuery.getBrandIds()))
+                .and(ProductSearchSpecification.hasStatus(productSearchQuery.getStatus()));
 
         return springDataProductRepository.findAll(specification, pageable);
     }

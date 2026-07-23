@@ -1,6 +1,7 @@
 package com.phananh.e_commerce.product.infrastructure.persistence.specification;
 
 import com.phananh.e_commerce.product.domain.model.Product;
+import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public class ProductSearchSpecification {
         };
     }
 
-    public static Specification<Product> hasStatus(String status) {
+    public static Specification<Product> hasStatus(ProductStatus status) {
         return (root, query, criteriaBuilder) -> status == null ? criteriaBuilder.conjunction()
                 : criteriaBuilder.equal(root.get("status"), status);
     }

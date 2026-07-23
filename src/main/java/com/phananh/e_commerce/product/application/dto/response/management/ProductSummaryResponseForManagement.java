@@ -11,5 +11,8 @@ public class ProductSummaryResponseForManagement {
     private String avatarUrl;
     private String name;
     private String status;
+    private String createdBy;
+    private LocalDateTime createdAt;
+    private String modifiedBy;
     private LocalDateTime modifiedAt;
 }

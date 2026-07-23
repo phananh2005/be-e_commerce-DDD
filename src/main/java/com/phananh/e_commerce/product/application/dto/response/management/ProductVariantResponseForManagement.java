@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-public class ProductVariantResponse {
+public class ProductVariantResponseForManagement {
     private Long id;
     private String skuCode;
     private Double price;

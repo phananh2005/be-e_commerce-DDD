@@ -10,6 +10,7 @@ import java.util.Set;
 @Data
 @Builder
 public class UserInfoResponseForManagement {
+    private Long id;
     private String uuid;
     private String username;
     private String email;

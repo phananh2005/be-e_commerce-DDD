@@ -36,12 +36,14 @@ public interface CustomerProductMapper {
                 .orElse(BigDecimal.ZERO);
     }
 
+    @Mapping(source = "id", target = "productId")
     @Mapping(target = "productUuid", source = "uuid")
     @Mapping(target = "productName", source = "name")
     @Mapping(target = "minPrice", expression = "java(getMinPrice(product))")
     @Mapping(source = "avatarUrl", target = "avatarUrl")
     ProductSummaryResponse toProductSummaryResponse(Product product);
 
+    @Mapping(source = "id", target = "productId")
     @Mapping(target = "productUuid", source = "uuid")
     @Mapping(target = "productName", source = "name")
     @Mapping(target = "productDescription", source = "description")

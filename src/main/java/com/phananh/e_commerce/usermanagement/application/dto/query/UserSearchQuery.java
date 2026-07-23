@@ -12,7 +12,7 @@ import java.util.Set;
 @Builder
 public class UserSearchQuery {
     private String userIdentifier;
-    private String keyword;
+    private String userInfo;
     private Set<RoleName> roleNames;
     private Boolean enabled;
     private LocalDateTime createdDateFrom;

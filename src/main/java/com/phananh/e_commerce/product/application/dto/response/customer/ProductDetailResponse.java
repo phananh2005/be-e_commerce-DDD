@@ -10,6 +10,7 @@ import java.util.Set;
 @Data
 public class ProductDetailResponse{
 
+    private Long productId;
     private String productUuid;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

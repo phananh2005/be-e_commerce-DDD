@@ -17,6 +17,8 @@ public class BrandSearchRequest {
     private String sortBy;
 
     private String sortType;
+
+    private Boolean enabled;
 }
 
 

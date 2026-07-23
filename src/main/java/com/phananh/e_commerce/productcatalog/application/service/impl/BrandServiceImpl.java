@@ -56,6 +56,7 @@ public class BrandServiceImpl implements BrandService {
 
         BrandSearchQuery query = BrandSearchQuery.builder()
                 .name(request.getName() == null ? null : request.getName().trim())
+                .enabled(request.getEnabled())
                 .pageable(pageable)
                 .build();
 

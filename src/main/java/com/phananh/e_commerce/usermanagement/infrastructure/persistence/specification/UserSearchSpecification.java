@@ -15,25 +15,20 @@ public class UserSearchSpecification {
                 return criteriaBuilder.conjunction();
             }
             String likePattern = "%" + userIdentifier.toLowerCase() + "%";
-            try {
-                Long userId = Long.parseLong(userIdentifier);
-                return criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("id"), userId),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern)
-                );
-            } catch (NumberFormatException e) {
-                return criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern);
-            }
+            return criteriaBuilder.or(
+                    criteriaBuilder.equal(criteriaBuilder.lower(root.get("uuid")), userIdentifier.toLowerCase()),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern)
+            );
         };
     }
 
-    public static Specification<User> hasKeyword(String keyword) {
+    public static Specification<User> hasUserInfo(String userInfo) {
 
         return (root, query, criteriaBuilder) -> {
-            if (keyword == null || keyword.isEmpty()) {
+            if (userInfo == null || userInfo.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            String likePattern = "%" + keyword.toLowerCase() + "%";
+            String likePattern = "%" + userInfo.toLowerCase() + "%";
             return criteriaBuilder.or(
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("info").get("fullName")), likePattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("info").get("email")), likePattern),

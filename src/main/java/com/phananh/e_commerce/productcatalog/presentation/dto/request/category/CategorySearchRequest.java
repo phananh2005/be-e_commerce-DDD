@@ -17,6 +17,8 @@ public class CategorySearchRequest {
     private String sortBy;
 
     private String sortType;
+
+    private Boolean enabled;
 }
 
 

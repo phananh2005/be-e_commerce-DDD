@@ -81,8 +81,7 @@ public class UserServiceImpl implements UserService {
 
         user.changePassword(
                 userChangePasswordRequest.getOldPassword(),
-                userChangePasswordRequest.getNewPassword()
-        );
+                userChangePasswordRequest.getNewPassword());
 
         userRepository.save(user);
     }
@@ -92,10 +91,10 @@ public class UserServiceImpl implements UserService {
     public UserInfoResponseForManagement getUserInfo(Long id) {
         User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
-        
+
         User user = userRepository.getById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        
+
         if (!hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN)) {
             if (hasRole(currentUser, RoleName.ROLE_STORE_ADMIN)) {
                 Set<RoleName> allowedRoles = Set.of(RoleName.ROLE_DELIVERY_STAFF, RoleName.ROLE_CUSTOMER);
@@ -109,7 +108,7 @@ public class UserServiceImpl implements UserService {
                 throw new AppException(ErrorCode.FORBIDDEN);
             }
         }
-        
+
         return userMapper.toResponse(user);
     }
 
@@ -120,13 +119,29 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return user.getId();
     }
-    
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long getIdByUserUuid(String userUuid) {
+        User user = userRepository.getByUuid(userUuid)
+                .orElse(null);
+        return user != null ? user.getId() : null;
+    }
+
     @Override
     @Transactional(readOnly = true)
     public String getUsernameByUserId(Long userId) {
         User user = userRepository.getById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return user.getCredentials().username();
+                .orElse(null);
+        return user != null ? user.getCredentials().username() : null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getUuidByUserId(Long userId) {
+        User user = userRepository.getById(userId)
+                .orElse(null);
+        return user != null ? user.getUuid() : null;
     }
 
     @Override
@@ -137,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
         int page = PageUtils.getPageNumber(request.getPage());
         int size = PageUtils.getPageSize(request.getSize());
-        String sortBy = PageUtils.getSortBy(request.getSortBy());
+        String sortBy = UserSortFieldMapper.map(PageUtils.getSortBy(request.getSortBy()));
         String sortType = PageUtils.getSortType(request.getSortType());
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
@@ -155,7 +170,7 @@ public class UserServiceImpl implements UserService {
 
         UserSearchQuery userSearchQuery = UserSearchQuery.builder()
                 .userIdentifier(request.getUserIdentifier() == null ? null : request.getUserIdentifier().trim())
-                .keyword(request.getKeyword() == null ? null : request.getKeyword().trim())
+                .userInfo(request.getUserInfo() == null ? null : request.getUserInfo().trim())
                 .roleNames(roleNames)
                 .enabled(request.getEnabled())
                 .createdDateFrom(request.getCreatedDateFrom())
@@ -192,8 +207,10 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        if ("ACTIVE".equalsIgnoreCase(status)) user.active();
-        else if ("INACTIVE".equalsIgnoreCase(status)) user.inactive();
+        if ("ACTIVE".equalsIgnoreCase(status))
+            user.active();
+        else if ("INACTIVE".equalsIgnoreCase(status))
+            user.inactive();
 
         userRepository.save(user);
     }
@@ -255,7 +272,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean canManage(User currentUser, User targetUser) {
-        if (hasRole(targetUser, RoleName.ROLE_SUPER_ADMIN)) return false;
+        if (hasRole(targetUser, RoleName.ROLE_SUPER_ADMIN))
+            return false;
 
         return targetUser.getRoles().stream()
                 .map(Role::getName)
@@ -263,9 +281,11 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean canAssign(User currentUser, RoleName targetRole) {
-        if (targetRole == RoleName.ROLE_SUPER_ADMIN) return false;
+        if (targetRole == RoleName.ROLE_SUPER_ADMIN)
+            return false;
 
-        if (hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN)) return true;
+        if (hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN))
+            return true;
 
         return hasRole(currentUser, RoleName.ROLE_STORE_ADMIN)
                 && (targetRole == RoleName.ROLE_DELIVERY_STAFF || targetRole == RoleName.ROLE_CUSTOMER);
@@ -299,4 +319,3 @@ public class UserServiceImpl implements UserService {
         }
     }
 }
-

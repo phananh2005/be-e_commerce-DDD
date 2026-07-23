@@ -58,6 +58,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategorySearchQuery query = CategorySearchQuery.builder()
                 .name(request.getName() == null ? null : request.getName().trim())
+                .enabled(request.getEnabled())
                 .pageable(pageable)
                 .build();
 

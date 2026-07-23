@@ -12,6 +12,7 @@ import java.util.Set;
 public interface UserRepository {
     Optional<User> getById(Long id);
     Optional<User> getByUserName(String userName);
+    Optional<User> getByUuid(String uuid);
     void save(User user);
     long count();
     Page<User> getListUsersBySearch(UserSearchQuery userSearchQuery);

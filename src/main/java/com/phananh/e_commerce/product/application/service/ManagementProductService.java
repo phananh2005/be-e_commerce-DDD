@@ -1,7 +1,8 @@
 package com.phananh.e_commerce.product.application.service;
 
-import com.phananh.e_commerce.product.application.dto.response.management.ProductResponse;
-import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductDetailResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductSummaryResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponseForManagement;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ManagementProductSearchRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductCreateRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductUpdateRequest;
@@ -14,13 +15,13 @@ public interface ManagementProductService {
 
 
 	// Management - product detail
-	ProductResponse getManagementProductById(Long id);
+	ProductDetailResponseForManagement getManagementProductById(Long id);
 
 	// Management - list variants by product
-	List<ProductVariantResponse> getManagementProductVariantsByProductId(Long productId);
+	List<ProductVariantResponseForManagement> getManagementProductVariantsByProductId(Long productId);
 
 	// Management - search all products (including inactive)
-	Page<ProductResponse> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest);
+	Page<ProductSummaryResponseForManagement> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest);
 
 	// Management - create/update operations
 	void createProduct(ProductCreateRequest productCreateRequest);

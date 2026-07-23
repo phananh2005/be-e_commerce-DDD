@@ -38,6 +38,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Optional<Order> findByUuid(String uuid) {
+        return springDataOrderRepository.findByUuid(uuid);
+    }
+
+    @Override
     public List<Order> findByUserId(Long userId) {
         return springDataOrderRepository.findByUserId(userId);
     }
@@ -50,7 +55,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Page<Order> getListOrdersBySearch(OrderSearchQuery orderSearchQuery) {
         Specification<Order> specification = Specification
-                .where(OrderSearchSpecification.hasOrderCode(orderSearchQuery.getOrderCode()))
+                .where(OrderSearchSpecification.hasOrderUuid(orderSearchQuery.getOrderUuid()))
                 .and(OrderSearchSpecification.hasCreatedFromDate(orderSearchQuery.getCreatedFromDate()))
                 .and(OrderSearchSpecification.hasCreatedToDate(orderSearchQuery.getCreatedToDate()))
                 .and(OrderSearchSpecification.hasStatus(orderSearchQuery.getStatus()))

@@ -6,6 +6,15 @@ Quản lý các phiên bản hướng dẫn phát triển Frontend theo kiểu F
 
 | Version | Ngày tạo | Thay đổi | Breaking Change |
 |---------|----------|---------|-----------------|
+| V1_3_2 | 2026-07-23 | Thêm query parameter `enabled` cho API tìm kiếm brand và category | Không |
+| V1_3_1 | 2026-07-23 | Sửa lỗi sort parameter trong API danh sách user: fullName → info.fullName, username → credentials.username | Không |
+| V1_3_0 | 2026-07-23 | Bỏ field `userUuid` khỏi response API danh sách đơn hàng management `GET /management/order/search` | Có |
+| V1_2_2 | 2026-07-23 | Thêm field `userId` và `username` vào response API quản trị đơn hàng `GET /management/order` và `GET /management/order/{orderId}` | Không |
+| V1_2_1 | 2026-07-23 | Thêm audit fields và linked data (categoryName, brandName, userName) cho API chi tiết product/order/user; Lưu ý ID chỉ dùng backend, không hiển thị UI | Có |
+| V1_2_0 | 2026-07-23 | Cập nhật bộ lọc productSearch theo uuid và name, thêm `id` vào response | Không |
+| V1_1_9 | 2026-07-22 | Thêm field `id` vào response getAllUsers | Không |
+| V1_1_8 | 2026-07-22 | Thay đổi filter orderCode→orderUuid, userId→userUuid trong management order search | Có |
+| V1_1_7 | 2026-07-22 | Thêm lại field `id` cho Product, OrderItem để gửi API | Không |
 | V1_1_6 | 2026-07-22 | Gộp migration response identifiers sang UUID | Có |
 | V1_1_5 | 2026-07-21 | Cập nhật request/response management product search | Có |
 | V1_1_4 | 2026-07-21 | Thêm field `cancellationReason` vào OrderDetailResponse | Không |

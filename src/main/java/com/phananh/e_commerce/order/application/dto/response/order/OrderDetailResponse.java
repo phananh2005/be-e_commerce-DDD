@@ -10,8 +10,11 @@ import java.util.List;
 @Data
 @Builder
 public class OrderDetailResponse {
+    private Long orderId;
+    private Long userId;
     private String orderUuid;
     private String userUuid;
+    private String username;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String createdBy;
@@ -37,6 +40,7 @@ public class OrderDetailResponse {
     @Data
     @Builder
     public static class Item {
+        private Long productId;
         private String productUuid;
         private String productName;
         private String skuCode;

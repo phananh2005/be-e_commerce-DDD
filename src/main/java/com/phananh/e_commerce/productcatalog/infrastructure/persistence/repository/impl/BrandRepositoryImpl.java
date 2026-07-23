@@ -33,7 +33,8 @@ public class BrandRepositoryImpl implements BrandRepository {
         Pageable pageable = query.getPageable();
 
         Specification<Brand> specification = Specification
-                .where(BrandSearchSpecification.hasKeyword(query.getName()));
+                .where(BrandSearchSpecification.hasKeyword(query.getName()))
+                .and(BrandSearchSpecification.hasEnabled(query.getEnabled()));
 
         return springDataBrandRepository.findAll(specification, pageable);
     }

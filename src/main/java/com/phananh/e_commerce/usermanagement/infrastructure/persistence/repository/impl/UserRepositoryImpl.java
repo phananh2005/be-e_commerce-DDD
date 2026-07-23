@@ -36,6 +36,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> getByUuid(String uuid) {
+        return springDataUserRepository.findByUuid(uuid);
+    }
+
+    @Override
     public void save(User user) {
         springDataUserRepository.save(user);
     }
@@ -49,7 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Page<User> getListUsersBySearch(UserSearchQuery userSearchQuery) {
         Specification<User> specification = Specification
                 .where(UserSearchSpecification.hasUserIdentifier(userSearchQuery.getUserIdentifier()))
-                .and(UserSearchSpecification.hasKeyword(userSearchQuery.getKeyword()))
+                .and(UserSearchSpecification.hasUserInfo(userSearchQuery.getUserInfo()))
                 .and(UserSearchSpecification.hasRoleName(userSearchQuery.getRoleNames()))
                 .and(UserSearchSpecification.isEnabled(userSearchQuery.getEnabled()))
                 .and(UserSearchSpecification.createdAtFrom(userSearchQuery.getCreatedDateFrom()))

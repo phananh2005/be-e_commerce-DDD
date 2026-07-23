@@ -9,10 +9,13 @@ import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.product.application.dto.command.ProductCreateCommand;
 import com.phananh.e_commerce.product.application.dto.command.ProductVariantCreateCommand;
 import com.phananh.e_commerce.product.application.dto.query.ManagementProductSearchQuery;
-import com.phananh.e_commerce.product.application.dto.response.management.ProductResponse;
-import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductDetailResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductSummaryResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponseForManagement;
 import com.phananh.e_commerce.product.application.mapper.ManagementProductMapper;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
+import com.phananh.e_commerce.productcatalog.application.service.BrandService;
+import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
 import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
@@ -46,11 +49,13 @@ public class ManagementProductServiceImpl implements ManagementProductService {
     ProductRepository productRepository;
     ManagementProductMapper managementProductMapper;
     CloudinaryService cloudinaryService;
+    CategoryService categoryService;
+    BrandService brandService;
 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest) {
+    public Page<ProductSummaryResponseForManagement> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest) {
         int page = PageUtils.getPageNumber(managementProductSearchRequest.getPage());
         int size = PageUtils.getPageSize(managementProductSearchRequest.getSize());
         String sortBy = PageUtils.getSortBy(managementProductSearchRequest.getSortBy());
@@ -71,16 +76,20 @@ public class ManagementProductServiceImpl implements ManagementProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductResponse getManagementProductById(Long id) {
+    public ProductDetailResponseForManagement getManagementProductById(Long id) {
         Product product = productRepository.getProductById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        return managementProductMapper.toManagementProductResponse(product);
+        ProductDetailResponseForManagement response = managementProductMapper.toManagementProductDetailResponse(product);
+        response.setCategoryName(product.getCategoryId() != null ? categoryService.getCategoryNameById(product.getCategoryId()) : null);
+        response.setBrandName(product.getBrandId() != null ? brandService.getBrandNameById(product.getBrandId()) : null);
+        
+        return response;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductVariantResponse> getManagementProductVariantsByProductId(Long productId) {
+    public List<ProductVariantResponseForManagement> getManagementProductVariantsByProductId(Long productId) {
         if (productRepository.getProductById(productId).isEmpty()) {
             throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
         }

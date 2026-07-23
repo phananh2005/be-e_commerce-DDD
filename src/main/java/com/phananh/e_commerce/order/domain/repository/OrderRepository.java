@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface OrderRepository {
     Order save(Order order);
     Optional<Order> findById(Long id);
+    Optional<Order> findByUuid(String uuid);
     List<Order> findByUserId(Long userId);
     Page<Order> findAll(Pageable pageable);
     Page<Order> getListOrdersBySearch(OrderSearchQuery orderSearchQuery);

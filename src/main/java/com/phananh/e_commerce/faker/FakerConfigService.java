@@ -1,10 +1,8 @@
 package com.phananh.e_commerce.faker;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "app.faker")
 public class FakerConfigService {
 
     private boolean enabled = false;

@@ -12,9 +12,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SpringDataOrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     List<Order> findByUserId(Long userId);
+    Optional<Order> findByUuid(String uuid);
 
     @Query(value = """
             select

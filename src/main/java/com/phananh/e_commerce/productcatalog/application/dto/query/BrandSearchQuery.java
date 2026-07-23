@@ -8,5 +8,6 @@ import org.springframework.data.domain.Pageable;
 @Builder
 public class BrandSearchQuery {
     private String name;
+    private Boolean enabled;
     private Pageable pageable;
 }

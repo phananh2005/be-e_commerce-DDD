@@ -23,7 +23,8 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public Page<Category> getAllBySearch(CategorySearchQuery categorySearchQuery) {
         Specification<Category> specification = Specification
-                .where(CategorySearchSpecification.hasKeyword(categorySearchQuery.getName()));
+                .where(CategorySearchSpecification.hasKeyword(categorySearchQuery.getName()))
+                .and(CategorySearchSpecification.hasEnabled(categorySearchQuery.getEnabled()));
 
         return springDataCategoryRepository.findAll(specification, categorySearchQuery.getPageable());
     }

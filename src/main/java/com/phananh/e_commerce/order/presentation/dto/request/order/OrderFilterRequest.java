@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderFilterRequest {
-    private String orderCode;
+    private String orderUuid;
     private LocalDateTime createdFromDate;
     private LocalDateTime createdToDate;
     private OrderStatus status;
-    private Long userId;
+    private String userUuid;
 
     @Min(value = 0, message = "Page must be >= 0")
     private Integer page;

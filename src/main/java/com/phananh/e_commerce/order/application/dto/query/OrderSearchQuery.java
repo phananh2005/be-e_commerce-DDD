@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OrderSearchQuery {
-    private String orderCode;
+    private String orderUuid;
     private LocalDateTime createdFromDate;
     private LocalDateTime createdToDate;
     private OrderStatus status;

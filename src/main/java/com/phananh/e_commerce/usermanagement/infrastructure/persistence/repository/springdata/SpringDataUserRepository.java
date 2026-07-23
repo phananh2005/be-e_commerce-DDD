@@ -11,6 +11,8 @@ public interface SpringDataUserRepository extends JpaRepository<User, Long>, Jpa
 
     Optional<User> findByCredentials_Username(String username);
 
+    Optional<User> findByUuid(String uuid);
+
     boolean existsByCredentialsUsername(String username);
 
     boolean existsByInfoEmail(String email);

@@ -18,6 +18,12 @@ public class BrandSearchSpecification {
 		};
 	}
 
+	public static Specification<Brand> hasEnabled(Boolean enabled) {
+		return (root, query, criteriaBuilder) -> enabled == null
+				? criteriaBuilder.conjunction()
+				: criteriaBuilder.equal(root.get("isEnabled"), enabled);
+	}
+
 	public static Specification<Brand> createdAtFrom(LocalDateTime createdDateFrom) {
 		return (root, query, criteriaBuilder) -> {
 			if (createdDateFrom == null) return criteriaBuilder.conjunction();

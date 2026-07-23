@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserQueryRequest {
     private String userIdentifier;
-    private String keyword;
+    private String userInfo;
     private Set<RoleName> roleNames;
     private Boolean enabled;
 

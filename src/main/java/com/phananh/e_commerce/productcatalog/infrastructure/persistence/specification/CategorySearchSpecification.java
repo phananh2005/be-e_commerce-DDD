@@ -18,6 +18,12 @@ public class CategorySearchSpecification {
         };
     }
 
+    public static Specification<Category> hasEnabled(Boolean enabled) {
+        return (root, query, criteriaBuilder) -> enabled == null
+                ? criteriaBuilder.conjunction()
+                : criteriaBuilder.equal(root.get("isEnabled"), enabled);
+    }
+
     public static Specification<Category> createdAtFrom(LocalDateTime createdDateFrom) {
         return (root, query, criteriaBuilder) -> {
             if (createdDateFrom == null) return criteriaBuilder.conjunction();

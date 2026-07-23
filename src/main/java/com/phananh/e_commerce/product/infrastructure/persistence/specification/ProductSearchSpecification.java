@@ -17,23 +17,24 @@ public class ProductSearchSpecification {
     }
 
     public static Specification<Product> hasBrandId(Long brandId) {
-        return (root, query, criteriaBuilder) ->
-                brandId == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("brand").get("id"), brandId);
+        return (root, query, criteriaBuilder) -> brandId == null ? criteriaBuilder.conjunction()
+                : criteriaBuilder.equal(root.get("brand").get("id"), brandId);
     }
 
     public static Specification<Product> hasBrandIds(List<Long> brandIds) {
-        return (root, query, criteriaBuilder) ->
-                brandIds == null || brandIds.isEmpty() ? criteriaBuilder.conjunction() : root.get("brand").get("id").in(brandIds);
+        return (root, query, criteriaBuilder) -> brandIds == null || brandIds.isEmpty() ? criteriaBuilder.conjunction()
+                : root.get("brand").get("id").in(brandIds);
     }
 
     public static Specification<Product> hasCategoryId(Long categoryId) {
-        return (root, query, criteriaBuilder) ->
-                categoryId == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("category").get("id"), categoryId);
+        return (root, query, criteriaBuilder) -> categoryId == null ? criteriaBuilder.conjunction()
+                : criteriaBuilder.equal(root.get("category").get("id"), categoryId);
     }
 
     public static Specification<Product> hasCategoryIds(List<Long> categoryIds) {
-        return (root, query, criteriaBuilder) ->
-                categoryIds == null || categoryIds.isEmpty() ? criteriaBuilder.conjunction() : root.get("category").get("id").in(categoryIds);
+        return (root, query, criteriaBuilder) -> categoryIds == null || categoryIds.isEmpty()
+                ? criteriaBuilder.conjunction()
+                : root.get("category").get("id").in(categoryIds);
     }
 
     public static Specification<Product> hasPriceBetween(Double minPrice, Double maxPrice) {
@@ -46,22 +47,14 @@ public class ProductSearchSpecification {
                 return criteriaBuilder.conjunction();
             }
             String likePattern = "%" + productSearch.toLowerCase() + "%";
-            try {
-                Long productId = Long.parseLong(productSearch);
-                return criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("id"), productId),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern)
-                );
-            } catch (NumberFormatException e) {
-                return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern);
-            }
+            return criteriaBuilder.or(
+                    criteriaBuilder.equal(criteriaBuilder.lower(root.get("uuid")), productSearch.toLowerCase()),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern));
         };
     }
 
     public static Specification<Product> hasStatus(String status) {
-        return (root, query, criteriaBuilder) ->
-                status == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("status"), status);
+        return (root, query, criteriaBuilder) -> status == null ? criteriaBuilder.conjunction()
+                : criteriaBuilder.equal(root.get("status"), status);
     }
 }
-
-

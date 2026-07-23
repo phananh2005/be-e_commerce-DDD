@@ -1,8 +1,9 @@
 package com.phananh.e_commerce.product.presentation.controller;
 
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
-import com.phananh.e_commerce.product.application.dto.response.management.ProductResponse;
-import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponse;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductDetailResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductSummaryResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponseForManagement;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ManagementProductSearchRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductCreateRequest;
@@ -31,9 +32,9 @@ public class ManagementProductController {
 
     @Operation(summary = "Tìm kiếm sản phẩm", description = "Tìm kiếm và phân trang danh sách sản phẩm")
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProductsBySearch(@ModelAttribute @Valid ManagementProductSearchRequest managementProductSearchRequest) {
-        Page<ProductResponse> products = managementProductService.getAllProductsBySearch(managementProductSearchRequest);
-        ApiResponse<Page<ProductResponse>> response = ApiResponse.<Page<ProductResponse>>builder()
+    public ResponseEntity<ApiResponse<Page<ProductSummaryResponseForManagement>>> getAllProductsBySearch(@ModelAttribute @Valid ManagementProductSearchRequest managementProductSearchRequest) {
+        Page<ProductSummaryResponseForManagement> products = managementProductService.getAllProductsBySearch(managementProductSearchRequest);
+        ApiResponse<Page<ProductSummaryResponseForManagement>> response = ApiResponse.<Page<ProductSummaryResponseForManagement>>builder()
                 .message("Get product successfully")
                 .result(products)
                 .build();
@@ -42,9 +43,9 @@ public class ManagementProductController {
 
     @Operation(summary = "Lấy chi tiết sản phẩm", description = "Lấy thông tin chi tiết của một sản phẩm theo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductResponse>> getManagementProductById(@PathVariable Long id) {
-        ProductResponse product = managementProductService.getManagementProductById(id);
-        ApiResponse<ProductResponse> response = ApiResponse.<ProductResponse>builder()
+    public ResponseEntity<ApiResponse<ProductDetailResponseForManagement>> getManagementProductById(@PathVariable Long id) {
+        ProductDetailResponseForManagement product = managementProductService.getManagementProductById(id);
+        ApiResponse<ProductDetailResponseForManagement> response = ApiResponse.<ProductDetailResponseForManagement>builder()
                 .message("Get product successfully")
                 .result(product)
                 .build();
@@ -53,9 +54,9 @@ public class ManagementProductController {
 
     @Operation(summary = "Lấy biến thể sản phẩm", description = "Lấy danh sách các biến thể của một sản phẩm")
     @GetMapping("/{productId}/variants")
-    public ResponseEntity<ApiResponse<List<ProductVariantResponse>>> getManagementProductVariantsByProductId(@PathVariable Long productId) {
-        List<ProductVariantResponse> variants = managementProductService.getManagementProductVariantsByProductId(productId);
-        ApiResponse<List<ProductVariantResponse>> response = ApiResponse.<List<ProductVariantResponse>>builder()
+    public ResponseEntity<ApiResponse<List<ProductVariantResponseForManagement>>> getManagementProductVariantsByProductId(@PathVariable Long productId) {
+        List<ProductVariantResponseForManagement> variants = managementProductService.getManagementProductVariantsByProductId(productId);
+        ApiResponse<List<ProductVariantResponseForManagement>> response = ApiResponse.<List<ProductVariantResponseForManagement>>builder()
                 .message("Get product variants successfully")
                 .result(variants)
                 .build();

@@ -1,6 +1,7 @@
 package com.phananh.e_commerce.order.application.service.impl;
 
 import com.phananh.e_commerce.core.util.ListUtils;
+import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.order.application.dto.command.OrderItemCreateCommand;
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.model.OrderItem;
@@ -92,12 +93,20 @@ public class OrderServiceImpl implements OrderService {
         String sortType = PageUtils.getSortType(orderFilterRequest.getSortType());
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
+        Long userId = null;
+        if (!StringUtils.isBlank(orderFilterRequest.getUserUuid())) {
+            userId = userService.getIdByUserUuid(orderFilterRequest.getUserUuid());
+            if (userId == null) {
+                return Page.empty(pageable);
+            }
+        }
+
         OrderSearchQuery orderSearchQuery = OrderSearchQuery.builder()
-                .orderCode(orderFilterRequest.getOrderCode())
+                .orderUuid(orderFilterRequest.getOrderUuid())
                 .createdFromDate(orderFilterRequest.getCreatedFromDate())
                 .createdToDate(orderFilterRequest.getCreatedToDate())
                 .status(orderFilterRequest.getStatus())
-                .userId(orderFilterRequest.getUserId())
+                .userId(userId)
                 .pageable(pageable)
                 .build();
 
@@ -109,18 +118,15 @@ public class OrderServiceImpl implements OrderService {
                     .map(oi -> orderMapper.toManagementOrderItem(oi, productService.getProductInfoByVariantId(oi.getVariantId())))
                     .collect(Collectors.toList());
 
-            String username;
-             if (order.getUserId() != null) {
-                 try {
-                     username = userService.getUserInfo(order.getUserId()).getUsername();
-                 } catch (Exception e) {
-                     username = null;
-                 }
-             } else {
-                 username = null;
-             }
+            String username = null;
+            String userUuid = null;
+            if (order.getUserId() != null) {
+                username = userService.getUsernameByUserId(order.getUserId());
+                userUuid = userService.getUuidByUserId(order.getUserId());
+            }
 
             ManagementOrderResponse response = orderMapper.toManagementOrderResponse(order, username);
+            response.setUserUuid(userUuid);
             response.setItems(items);
             return response;
         });
@@ -277,7 +283,16 @@ public class OrderServiceImpl implements OrderService {
             return orderMapper.toCustomerOrderDetailItem(oi, p);
         }).collect(Collectors.toList());
 
+        String username = null;
+        String userUuid = null;
+        if (order.getUserId() != null) {
+            username = userService.getUsernameByUserId(order.getUserId());
+            userUuid = userService.getUuidByUserId(order.getUserId());
+        }
+
         OrderDetailResponse response = orderMapper.toCustomerOrderDetailResponse(order);
+        response.setUsername(username);
+        response.setUserUuid(userUuid);
         response.setItems(items);
         return response;
     }

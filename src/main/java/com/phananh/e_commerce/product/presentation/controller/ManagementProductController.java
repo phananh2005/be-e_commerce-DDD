@@ -4,11 +4,13 @@ import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductDetailResponseForManagement;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductSummaryResponseForManagement;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantsSummaryResponseForManagement;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ManagementProductSearchRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductCreateRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductUpdateRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductVariantCreateRequest;
+import com.phananh.e_commerce.product.presentation.dto.request.management.UpdateVariantStockQuantityAndPriceRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -63,18 +65,29 @@ public class ManagementProductController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Tạo biến thể sản phẩm", description = "Tạo một biến thể mới cho sản phẩm")
-    @PostMapping("/{productId}/variants")
-    public ResponseEntity<?> createProductVariant(@PathVariable Long productId,
-                                                  @RequestBody @Valid ProductVariantCreateRequest request) {
-        managementProductService.createProductVariant(productId, request);
-        return ResponseEntity.noContent().build();
+    @Operation(summary = "Lấy summary biến thể sản phẩm", description = "Lấy thông tin summary (sku, stock, price, avatar) của các biến thể sản phẩm")
+    @GetMapping("/{productId}/variants/summary")
+    public ResponseEntity<ApiResponse<ProductVariantsSummaryResponseForManagement>> getManagementProductVariantsSummaryByProductId(@PathVariable Long productId) {
+        ProductVariantsSummaryResponseForManagement responseDTO = managementProductService.getManagementProductVariantsSummaryByProductId(productId);
+        ApiResponse<ProductVariantsSummaryResponseForManagement> response = ApiResponse.<ProductVariantsSummaryResponseForManagement>builder()
+                .message("Get product variants summary successfully")
+                .result(responseDTO)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Tạo sản phẩm mới", description = "Tạo một sản phẩm mới trong hệ thống")
     @PostMapping("/create")
     public ResponseEntity<?> createProduct(@RequestBody @Valid ProductCreateRequest productCreateRequest) {
         managementProductService.createProduct(productCreateRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Tạo biến thể sản phẩm", description = "Tạo một biến thể mới cho sản phẩm")
+    @PostMapping("/{productId}/variants")
+    public ResponseEntity<?> createProductVariant(@PathVariable Long productId,
+                                                  @RequestBody @Valid ProductVariantCreateRequest request) {
+        managementProductService.createProductVariant(productId, request);
         return ResponseEntity.noContent().build();
     }
 
@@ -92,10 +105,10 @@ public class ManagementProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Cập nhật số lượng tồn kho biến thể", description = "Cập nhật số lượng tồn kho của một biến thể sản phẩm")
-    @PatchMapping("/variant/{variantId}/{stockQuantity}")
-    public ResponseEntity<ApiResponse<Void>> updateVariantStock(@PathVariable Long variantId, @PathVariable Integer stockQuantity) {
-        managementProductService.updateVariantStock(variantId, stockQuantity);
+    @Operation(summary = "Cập nhật số lượng tồn kho và giá biến thể", description = "Cập nhật số lượng tồn kho và giá của một biến thể sản phẩm")
+    @PatchMapping("/variant/{variantId}")
+    public ResponseEntity<ApiResponse<Void>> updateVariantStockQuantityAndPrice(@PathVariable Long variantId, @RequestBody @Valid UpdateVariantStockQuantityAndPriceRequest request) {
+        managementProductService.updateVariantStockQuantityAndPrice(variantId, request);
         return ResponseEntity.noContent().build();
     }
 }

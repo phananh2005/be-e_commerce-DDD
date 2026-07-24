@@ -12,6 +12,7 @@ import com.phananh.e_commerce.product.application.dto.query.ManagementProductSea
 import com.phananh.e_commerce.product.application.dto.response.management.ProductDetailResponseForManagement;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductSummaryResponseForManagement;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantsSummaryResponseForManagement;
 import com.phananh.e_commerce.product.application.mapper.ManagementProductMapper;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
@@ -84,7 +85,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         ProductDetailResponseForManagement response = managementProductMapper.toManagementProductDetailResponse(product);
         response.setCategoryName(product.getCategoryId() != null ? categoryService.getCategoryNameById(product.getCategoryId()) : null);
         response.setBrandName(product.getBrandId() != null ? brandService.getBrandNameById(product.getBrandId()) : null);
-        
+
         return response;
     }
 
@@ -98,6 +99,22 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         return productRepository.getVariantsByProductId(productId).stream()
                 .map(managementProductMapper::toManagementProductVariantResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProductVariantsSummaryResponseForManagement getManagementProductVariantsSummaryByProductId(Long productId) {
+        Product product = productRepository.getProductById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        List<ProductVariantsSummaryResponseForManagement.Variant> variants = productRepository.getVariantsByProductId(productId).stream()
+                .map(managementProductMapper::toManagementProductVariantSummary)
+                .toList();
+
+        ProductVariantsSummaryResponseForManagement response = new ProductVariantsSummaryResponseForManagement();
+        response.setProductId(productId);
+        response.setVariants(variants);
+        return response;
     }
 
     @Override
@@ -351,22 +368,23 @@ public class ManagementProductServiceImpl implements ManagementProductService {
     }
 
     @Override
-    public void updateVariantStock(Long variantId, Integer stockQuantity) {
-        try {
-            ProductVariant variant = productRepository.getVariantById(variantId)
-                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
-
-            if (stockQuantity == null || stockQuantity < 0) {
-                throw new AppException(ErrorCode.INVALID_QUANTITY);
-            }
-
-            variant.updateStockQuantity(stockQuantity);
-            productRepository.save(variant);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            throw new AppException(ErrorCode.CONCURRENT_UPDATE_ERROR);
-        }
+    @Transactional
+    public void updateVariantStockQuantityAndPrice(Long variantId, com.phananh.e_commerce.product.presentation.dto.request.management.UpdateVariantStockQuantityAndPriceRequest request) {
+        ProductVariant variant = productRepository.getVariantById(variantId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
+        variant.updateStockQuantity(request.getStockQuantity());
+        variant.updatePrice(request.getPrice());
+        productRepository.save(variant);
     }
 
+    @Override
+    @Transactional
+    public void updateVariantStock(Long variantId, Integer stockQuantity) {
+        ProductVariant variant = productRepository.getVariantById(variantId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
+        variant.updateStockQuantity(stockQuantity);
+        productRepository.save(variant);
+    }
 
 }
 

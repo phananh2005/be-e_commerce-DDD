@@ -3,6 +3,7 @@ package com.phananh.e_commerce.product.application.mapper;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductDetailResponseForManagement;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductSummaryResponseForManagement;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantResponseForManagement;
+import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantsSummaryResponseForManagement;
 import com.phananh.e_commerce.product.domain.model.AttributeValue;
 import com.phananh.e_commerce.product.domain.model.Product;
 import com.phananh.e_commerce.product.domain.model.ProductVariant;
@@ -83,6 +84,24 @@ public interface ManagementProductMapper {
         return attributes.stream()
                 .map(this::toManagementAttributeResponse)
                 .collect(Collectors.toSet());
+    }
+
+    @Mapping(target = "variantId", source = "id")
+    @Mapping(target = "skuCode", source = "skuCode")
+    @Mapping(target = "stockQuantity", source = "stockQuantity")
+    @Mapping(target = "price", expression = "java(productVariant.getPrice() == null ? null : productVariant.getPrice().doubleValue())")
+    @Mapping(target = "avatarImageUrl", expression = "java(getAvatarImageUrl(productVariant.getImages()))")
+    ProductVariantsSummaryResponseForManagement.Variant toManagementProductVariantSummary(ProductVariant productVariant);
+
+    default String getAvatarImageUrl(Set<VariantImage> images) {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+        return images.stream()
+                .filter(VariantImage::isAvatar)
+                .map(VariantImage::getImageUrl)
+                .findFirst()
+                .orElse(null);
     }
 }
 

@@ -9,7 +9,6 @@ import com.phananh.e_commerce.product.application.service.ManagementProductServi
 import com.phananh.e_commerce.product.presentation.dto.request.management.ManagementProductSearchRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductCreateRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductUpdateRequest;
-import com.phananh.e_commerce.product.presentation.dto.request.management.ProductVariantCreateRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.UpdateVariantStockQuantityAndPriceRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -80,14 +79,6 @@ public class ManagementProductController {
     @PostMapping("/create")
     public ResponseEntity<?> createProduct(@RequestBody @Valid ProductCreateRequest productCreateRequest) {
         managementProductService.createProduct(productCreateRequest);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Tạo biến thể sản phẩm", description = "Tạo một biến thể mới cho sản phẩm")
-    @PostMapping("/{productId}/variants")
-    public ResponseEntity<?> createProductVariant(@PathVariable Long productId,
-                                                  @RequestBody @Valid ProductVariantCreateRequest request) {
-        managementProductService.createProductVariant(productId, request);
         return ResponseEntity.noContent().build();
     }
 

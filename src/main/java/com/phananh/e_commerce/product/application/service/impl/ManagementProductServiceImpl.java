@@ -198,47 +198,6 @@ public class ManagementProductServiceImpl implements ManagementProductService {
 
     @Override
     @Transactional
-    public void createProductVariant(Long productId, ProductVariantCreateRequest request) {
-        Product product = productRepository.getProductById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-
-        Set<VariantImage> images = new HashSet<>();
-        Set<AttributeValue> attributeValues = new HashSet<>();
-
-        ProductVariantCreateCommand variantCreateCommand = ProductVariantCreateCommand.builder()
-                .product(product)
-                .skuCode(request.getSkuCode())
-                .price(request.getPrice())
-                .stockQuantity(request.getStockQuantity())
-                .images(images)
-                .attributeValues(attributeValues)
-                .build();
-
-        ProductVariant variant = ProductVariant.create(variantCreateCommand);
-
-        if (!StringUtils.isBlank(request.getVariantAvatarUrl())) {
-            images.add(VariantImage.create(variant, request.getVariantAvatarUrl(), true));
-        }
-
-        if (!ListUtils.isNullOrEmpty(request.getVariantImageUrls())) {
-            for (String imageUrl : request.getVariantImageUrls()) {
-                if (!StringUtils.isBlank(imageUrl)) {
-                    images.add(VariantImage.create(variant, imageUrl, false));
-                }
-            }
-        }
-
-        if (request.getAttributes() != null && !request.getAttributes().isEmpty()) {
-            attributeValues.addAll(getAttributeValues(request.getAttributes()));
-        }
-
-        product.addVariant(variant);
-        productRepository.save(product);
-    }
-
-
-    @Override
-    @Transactional
     public void updateProduct(ProductUpdateRequest productUpdateRequest) {
         Product product = productRepository.getProductById(productUpdateRequest.getProductId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -304,6 +263,42 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                 } catch (ObjectOptimisticLockingFailureException e) {
                     throw new AppException(ErrorCode.CONCURRENT_UPDATE_ERROR);
                 }
+            }
+        }
+
+        if (!ListUtils.isNullOrEmpty(productUpdateRequest.getNewVariants())) {
+            for (ProductUpdateRequest.VariantCreateRequest newVariantRequest : productUpdateRequest.getNewVariants()) {
+                Set<VariantImage> images = new HashSet<>();
+                Set<AttributeValue> attributeValues = new HashSet<>();
+
+                ProductVariantCreateCommand variantCreateCommand = ProductVariantCreateCommand.builder()
+                        .product(product)
+                        .skuCode(newVariantRequest.getSkuCode())
+                        .price(newVariantRequest.getPrice())
+                        .stockQuantity(newVariantRequest.getStockQuantity())
+                        .images(images)
+                        .attributeValues(attributeValues)
+                        .build();
+
+                ProductVariant variant = ProductVariant.create(variantCreateCommand);
+
+                if (!StringUtils.isBlank(newVariantRequest.getVariantAvatarUrl())) {
+                    images.add(VariantImage.create(variant, newVariantRequest.getVariantAvatarUrl(), true));
+                }
+
+                if (!ListUtils.isNullOrEmpty(newVariantRequest.getVariantImageUrls())) {
+                    for (String imageUrl : newVariantRequest.getVariantImageUrls()) {
+                        if (!StringUtils.isBlank(imageUrl)) {
+                            images.add(VariantImage.create(variant, imageUrl, false));
+                        }
+                    }
+                }
+
+                if (newVariantRequest.getAttributes() != null && !newVariantRequest.getAttributes().isEmpty()) {
+                    attributeValues.addAll(getAttributeValues(newVariantRequest.getAttributes()));
+                }
+
+                product.addVariant(variant);
             }
         }
 

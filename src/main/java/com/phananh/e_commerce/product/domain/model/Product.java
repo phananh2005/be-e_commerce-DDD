@@ -100,6 +100,10 @@ public class Product extends BaseEntity{
         this.variants.add(variant);
     }
 
+    public void removeAvatarUrl() {
+        this.avatarUrl = null;
+    }
+
     @PrePersist
     public void generateUuid() {
         if (this.uuid == null) {

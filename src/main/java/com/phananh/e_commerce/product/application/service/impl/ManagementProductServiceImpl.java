@@ -212,7 +212,8 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         // - imageUrl is non-empty => set this new URL
         // - imageUrl is empty string ("") => remove existing image
         if (productUpdateRequest.getProductAvatarUrl() != null) {
-            product.updateAvatarUrl(productUpdateRequest.getProductAvatarUrl());
+            if (productUpdateRequest.getProductAvatarUrl().isBlank()) product.removeAvatarUrl();
+            else product.updateAvatarUrl(productUpdateRequest.getProductAvatarUrl());
         }
 
         // Update variants
@@ -233,8 +234,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                     // - imageUrl is empty string ("") => remove existing image
                     if (variantRequest.getVariantAvatarUrl() != null) {
                         if (variantRequest.getVariantAvatarUrl().isBlank()) variant.removeAvatar();
-                        else
-                            variant.updateAvatar(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
+                        else variant.updateAvatar(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
                     }
 
                     // Delete images by ID

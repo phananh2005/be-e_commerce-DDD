@@ -12,8 +12,8 @@ public class ProductDetailResponseForManagement {
     private String description;
     private String avatarUrl;
     private String status;
-    private String categoryName;
-    private String brandName;
+    private Long categoryId;
+    private Long brandId;
     private String createdBy;
     private LocalDateTime createdAt;
     private String modifiedBy;

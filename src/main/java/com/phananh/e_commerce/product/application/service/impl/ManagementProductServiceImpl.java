@@ -15,8 +15,6 @@ import com.phananh.e_commerce.product.application.dto.response.management.Produc
 import com.phananh.e_commerce.product.application.dto.response.management.ProductVariantsSummaryResponseForManagement;
 import com.phananh.e_commerce.product.application.mapper.ManagementProductMapper;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
-import com.phananh.e_commerce.productcatalog.application.service.BrandService;
-import com.phananh.e_commerce.productcatalog.application.service.CategoryService;
 import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
@@ -36,10 +34,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -50,9 +45,6 @@ public class ManagementProductServiceImpl implements ManagementProductService {
     ProductRepository productRepository;
     ManagementProductMapper managementProductMapper;
     CloudinaryService cloudinaryService;
-    CategoryService categoryService;
-    BrandService brandService;
-
 
     @Override
     @Transactional(readOnly = true)
@@ -82,11 +74,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         Product product = productRepository.getProductById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        ProductDetailResponseForManagement response = managementProductMapper.toManagementProductDetailResponse(product);
-        response.setCategoryName(product.getCategoryId() != null ? categoryService.getCategoryNameById(product.getCategoryId()) : null);
-        response.setBrandName(product.getBrandId() != null ? brandService.getBrandNameById(product.getBrandId()) : null);
-
-        return response;
+        return managementProductMapper.toManagementProductDetailResponse(product);
     }
 
     @Override
@@ -112,7 +100,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                 .toList();
 
         ProductVariantsSummaryResponseForManagement response = new ProductVariantsSummaryResponseForManagement();
-        response.setProductId(productId);
+        response.setProductId(product.getId());
         response.setVariants(variants);
         return response;
     }
@@ -163,32 +151,49 @@ public class ManagementProductServiceImpl implements ManagementProductService {
 
                 // Process attributes if provided
                 if (variantRequest.getAttributes() != null && !variantRequest.getAttributes().isEmpty()) {
-                    for (Map.Entry<String, String> attribute : variantRequest.getAttributes().entrySet()) {
-                        String name = attribute.getKey();
-                        String value = attribute.getValue();
-
-                        ProductAttribute productAttribute = productRepository.getProductAttributesByName(name)
-                                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
-                        Set<AttributeValue> existingValues = productAttribute.getAttributeValues();
-                        AttributeValue attributeValue = existingValues.stream()
-                                .filter(v -> v.getValue().equals(value))
-                                .findFirst()
-                                .orElseGet(() -> {
-                                    AttributeValue newValue = AttributeValue.create(value, productAttribute);
-                                    productRepository.save(newValue);
-                                    return newValue;
-                                });
-
-                        attributeValues.add(attributeValue);
-                    }
+                    attributeValues.addAll(getAttributeValues(variantRequest.getAttributes()));
                 }
 
                 variants.add(variant);
             }
         }
 
-
         productRepository.save(product);
+    }
+
+    private Set<AttributeValue> getAttributeValues(Map<String,String> attributesValues) {
+        Set<AttributeValue> attributeValues = new HashSet<>();
+        for (Map.Entry<String, String> attribute : attributesValues.entrySet()) {
+            String name = attribute.getKey();
+            String value = attribute.getValue();
+
+            Optional<ProductAttribute> productAttributeOpt = productRepository.getProductAttributesByName(name);
+            AttributeValue attributeValue;
+            if (productAttributeOpt.isPresent()) {
+                ProductAttribute productAttribute = productAttributeOpt.get();
+                Set<AttributeValue> existingValues = productAttribute.getAttributeValues();
+                attributeValue = existingValues.stream()
+                        .filter(v -> v.getValue().equals(value))
+                        .findFirst()
+                        .orElseGet(() -> {
+                            AttributeValue newValue = AttributeValue.create(value, productAttribute);
+                            productRepository.save(newValue);
+                            return newValue;
+                        });
+            }
+            else {
+                // Handle the case where the attribute doesn't exist
+                ProductAttribute productAttribute = ProductAttribute.builder()
+                        .name(name)
+                        .build();
+
+                attributeValue = AttributeValue.create(value, productAttribute);
+                productRepository.save(attributeValue);
+            }
+
+            attributeValues.add(attributeValue);
+        }
+        return attributeValues;
     }
 
     @Override
@@ -224,28 +229,10 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         }
 
         if (request.getAttributes() != null && !request.getAttributes().isEmpty()) {
-            for (Map.Entry<String, String> attribute : request.getAttributes().entrySet()) {
-                String name = attribute.getKey();
-                String value = attribute.getValue();
-
-                ProductAttribute productAttribute = productRepository.getProductAttributesByName(name)
-                        .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
-                Set<AttributeValue> existingValues = productAttribute.getAttributeValues();
-                AttributeValue attributeValue = existingValues.stream()
-                        .filter(v -> v.getValue().equals(value))
-                        .findFirst()
-                        .orElseGet(() -> {
-                            AttributeValue newValue = AttributeValue.create(value, productAttribute);
-                            productRepository.save(newValue);
-                            return newValue;
-                        });
-
-                attributeValues.add(attributeValue);
-            }
+            attributeValues.addAll(getAttributeValues(request.getAttributes()));
         }
 
         product.addVariant(variant);
-        productRepository.save(variant);
         productRepository.save(product);
     }
 
@@ -281,16 +268,6 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                     variant.updatePrice(variantRequest.getPrice());
                     variant.updateStockQuantity(variantRequest.getStockQuantity());
 
-                    // Delete images by ID
-                    if (ListUtils.isNullOrEmpty(variantRequest.getVariantImageIdsToDelete())) {
-                        List<VariantImage> variantImages = productRepository
-                                .getVariantImagesById(variantRequest.getVariantImageIdsToDelete());
-                        variant.removeListImages(variantImages);
-
-                        List<String> imageUrls = variantImages.stream().map(VariantImage::getImageUrl).toList();
-                        for (String url : imageUrls) cloudinaryService.deleteFileByUrl(url);
-                    }
-
                     // Handle avatar URL update
                     // - imageUrl == null => keep existing image
                     // - imageUrl is non-empty => set this new URL
@@ -299,6 +276,16 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                         if (variantRequest.getVariantAvatarUrl().isBlank()) variant.removeAvatar();
                         else
                             variant.updateAvatar(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
+                    }
+
+                    // Delete images by ID
+                    if (ListUtils.isNullOrEmpty(variantRequest.getVariantImageIdsToDelete())) {
+                        List<VariantImage> variantImages = productRepository
+                                .getVariantImagesById(variantRequest.getVariantImageIdsToDelete());
+                        variant.removeListImages(variantImages);
+
+                        List<String> imageUrls = variantImages.stream().map(VariantImage::getImageUrl).toList();
+                        for (String url : imageUrls) cloudinaryService.deleteFileByUrl(url);
                     }
 
                     // Add new gallery images
@@ -311,28 +298,9 @@ public class ManagementProductServiceImpl implements ManagementProductService {
 
                     // Update variant attributes
                     if (variantRequest.getAttributes() != null && !variantRequest.getAttributes().isEmpty()) {
-                        Set<AttributeValue> attributeValues = new HashSet<>();
-                        for (Map.Entry<String, String> attribute : variantRequest.getAttributes().entrySet()) {
-                            String attrName = attribute.getKey();
-                            String attrValue = attribute.getValue();
-
-                            ProductAttribute productAttribute = productRepository.getProductAttributesByName(attrName)
-                                    .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
-                            Set<AttributeValue> existingValues = productAttribute.getAttributeValues();
-                            AttributeValue attributeValue = existingValues.stream()
-                                    .filter(v -> v.getValue().equals(attrValue))
-                                    .findFirst()
-                                    .orElseGet(() -> {
-                                        AttributeValue newValue = AttributeValue.create(attrValue, productAttribute);
-                                        productRepository.save(newValue);
-                                        return newValue;
-                                    });
-                            attributeValues.add(attributeValue);
-                        }
-                        variant.updateAttributeValues(attributeValues);
+                        variant.updateAttributeValues(getAttributeValues(variantRequest.getAttributes()));
                     }
 
-                    productRepository.save(variant);
                 } catch (ObjectOptimisticLockingFailureException e) {
                     throw new AppException(ErrorCode.CONCURRENT_UPDATE_ERROR);
                 }

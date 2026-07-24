@@ -21,7 +21,7 @@ public class AttributeValue {
     @Column(name = "value", nullable = false)
     private String value;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "attribute_id", nullable = false)
     private ProductAttribute attribute;
 

@@ -51,7 +51,7 @@ public class ProductVariant extends BaseEntity{
     @Builder.Default
     private Set<AttributeValue> attributeValues = new HashSet<>();
 
-    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
     private Set<VariantImage> images = new HashSet<>();
 

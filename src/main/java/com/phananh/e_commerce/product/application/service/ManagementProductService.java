@@ -31,8 +31,6 @@ public interface ManagementProductService {
 	// Management - create/update operations
 	void createProduct(ProductCreateRequest productCreateRequest);
 
-	void createProductVariant(Long productId, ProductVariantCreateRequest productVariantCreateRequest);
-
 	void updateProduct(ProductUpdateRequest productUpdateRequest);
 
 	void updateProductStatus(Long productId, String status);

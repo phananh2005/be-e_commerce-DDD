@@ -238,7 +238,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                     }
 
                     // Delete images by ID
-                    if (ListUtils.isNullOrEmpty(variantRequest.getVariantImageIdsToDelete())) {
+                    if (!ListUtils.isNullOrEmpty(variantRequest.getVariantImageIdsToDelete())) {
                         List<VariantImage> variantImages = productRepository
                                 .getVariantImagesById(variantRequest.getVariantImageIdsToDelete());
                         variant.removeListImages(variantImages);

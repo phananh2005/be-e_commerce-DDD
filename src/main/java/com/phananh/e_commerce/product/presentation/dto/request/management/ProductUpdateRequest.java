@@ -30,6 +30,9 @@ public class ProductUpdateRequest {
     @Valid
     private List<VariantUpdateRequest> variants;
 
+    @Valid
+    private List<VariantCreateRequest> newVariants;
+
     @Data
     public static class VariantUpdateRequest {
         @NotNull(message = "Variant id is required")
@@ -57,6 +60,26 @@ public class ProductUpdateRequest {
         private List<Long> variantImageIdsToDelete;
 
         private List<String> variantImagesUrlsToAdd;
+    }
+
+    @Data
+    public static class VariantCreateRequest {
+        @NotBlank(message = "SKU code is required")
+        private String skuCode;
+
+        @NotNull(message = "Price is required")
+        @DecimalMin(value = "0.0", message = "Price must be >= 0")
+        private BigDecimal price;
+
+        @NotNull(message = "Stock quantity is required")
+        @PositiveOrZero(message = "Stock quantity must be >= 0")
+        private Integer stockQuantity;
+
+        private String variantAvatarUrl;
+
+        private List<String> variantImageUrls;
+
+        private Map<String, String> attributes;
     }
 }
 

@@ -20,5 +20,7 @@ public class ProductCreateCommand {
 
     private Long brandId;
 
+    private String productStatus;
+
     Set<ProductVariant> variants;
 }

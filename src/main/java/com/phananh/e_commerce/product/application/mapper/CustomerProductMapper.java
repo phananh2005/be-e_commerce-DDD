@@ -6,6 +6,7 @@ import com.phananh.e_commerce.product.domain.model.AttributeValue;
 import com.phananh.e_commerce.product.domain.model.Product;
 import com.phananh.e_commerce.product.domain.model.ProductVariant;
 import com.phananh.e_commerce.product.domain.model.VariantImage;
+import com.phananh.e_commerce.product.domain.model.enums.VariantStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -62,6 +63,7 @@ public interface CustomerProductMapper {
     @Mapping(source = "skuCode", target = "variantSkuCode")
     @Mapping(source = "price", target = "variantPrice")
     @Mapping(target = "stockQuantity", source = "stockQuantity")
+    @Mapping(target = "status", expression = "java(variant.getStatus() == null ? null : variant.getStatus().name())")
     @Mapping(expression = "java(imagesToImageResponseSet(variant.getImages()))", target = "variantImageUrl")
     @Mapping(expression = "java(attributesToAttributeResponseSet(variant.getAttributeValues()))", target = "attributes")
     ProductDetailResponse.ProductVariantDetail toProductVariantResponse(ProductVariant variant);
@@ -71,6 +73,7 @@ public interface CustomerProductMapper {
             return Set.of();
         }
         return variants.stream()
+                .filter(v -> v.getStatus() == VariantStatus.ACTIVE)
                 .map(this::toProductVariantResponse)
                 .collect(Collectors.toSet());
     }

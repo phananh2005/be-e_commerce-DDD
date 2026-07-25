@@ -46,6 +46,7 @@ public interface ManagementProductMapper {
     @Mapping(target = "skuCode", source = "skuCode")
     @Mapping(target = "price", expression = "java(productVariant.getPrice() == null ? null : productVariant.getPrice().doubleValue())")
     @Mapping(target = "stockQuantity", source = "stockQuantity")
+    @Mapping(target = "status", expression = "java(productVariant.getStatus() == null ? null : productVariant.getStatus().name())")
     @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "modifiedAt", source = "modifiedAt")
     @Mapping(target = "createdBy", source = "createdBy")
@@ -90,6 +91,7 @@ public interface ManagementProductMapper {
     @Mapping(target = "skuCode", source = "skuCode")
     @Mapping(target = "stockQuantity", source = "stockQuantity")
     @Mapping(target = "price", expression = "java(productVariant.getPrice() == null ? null : productVariant.getPrice().doubleValue())")
+    @Mapping(target = "status", expression = "java(productVariant.getStatus() == null ? null : productVariant.getStatus().name())")
     @Mapping(target = "avatarImageUrl", expression = "java(getAvatarImageUrl(productVariant.getImages()))")
     ProductVariantsSummaryResponseForManagement.Variant toManagementProductVariantSummary(ProductVariant productVariant);
 

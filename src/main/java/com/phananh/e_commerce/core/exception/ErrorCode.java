@@ -34,11 +34,13 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(409, "User already exists", HttpStatus.CONFLICT),
     USERNAME_ALREADY_EXISTS(409, "Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS(409, "Email already exists", HttpStatus.CONFLICT),
-    OLD_PASSWORD_INCORRECT(400, "Old password is incorrect", HttpStatus.BAD_REQUEST),
-    INVALID_QUANTITY(400, "Invalid quantity", HttpStatus.BAD_REQUEST),
-    INSUFFICIENT_STOCK(400, "Insufficient stock", HttpStatus.BAD_REQUEST),
+     OLD_PASSWORD_INCORRECT(400, "Old password is incorrect", HttpStatus.BAD_REQUEST),
+     INVALID_QUANTITY(400, "Invalid quantity", HttpStatus.BAD_REQUEST),
+     INSUFFICIENT_STOCK(400, "Insufficient stock", HttpStatus.BAD_REQUEST),
+     INVALID_PRODUCT_STATUS(400, "Invalid product status", HttpStatus.BAD_REQUEST),
+     PRODUCT_VARIANT_IN_USE(409, "Product variant cannot be deleted because it is used in existing orders", HttpStatus.CONFLICT),
 
-    // Server errors (5xx)
+      // Server errors (5xx)
     INTERNAL_SERVER_ERROR(500, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_DELETE_ERROR(500, "File delete error", HttpStatus.INTERNAL_SERVER_ERROR),
     TOKEN_GENERATION_ERROR(500, "Cannot generate token", HttpStatus.INTERNAL_SERVER_ERROR),

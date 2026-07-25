@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface SpringDataOrderItemRepository extends JpaRepository<OrderItem, Long> {
     List<OrderItem> findByOrder_Id(Long orderId);
+    boolean existsByVariantId(Long variantId);
 }
 
 

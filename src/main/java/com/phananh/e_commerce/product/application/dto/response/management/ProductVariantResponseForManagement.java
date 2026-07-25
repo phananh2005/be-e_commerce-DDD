@@ -11,6 +11,7 @@ public class ProductVariantResponseForManagement {
     private String skuCode;
     private Double price;
     private Integer stockQuantity;
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String createdBy;

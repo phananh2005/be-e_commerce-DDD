@@ -34,6 +34,7 @@ public class ProductDetailResponse{
         private String variantSkuCode;
         private BigDecimal variantPrice;
         private Integer stockQuantity;
+        private String status;
         private Set<Image> variantImageUrl;
         private Set<Attribute> attributes;
 

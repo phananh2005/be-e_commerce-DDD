@@ -16,4 +16,5 @@ public class UpdateVariantStockQuantityAndPriceRequest {
 
     Integer stockQuantity;
     BigDecimal price;
+    String status;
 }

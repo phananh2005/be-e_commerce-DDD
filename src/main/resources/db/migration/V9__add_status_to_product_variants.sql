@@ -1,0 +1,2 @@
+ALTER TABLE product_variants
+ADD COLUMN status ENUM('ACTIVE','INACTIVE') NOT NULL DEFAULT 'ACTIVE' AFTER stock_quantity;

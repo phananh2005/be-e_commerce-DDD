@@ -15,6 +15,7 @@ public class ProductVariantsSummaryResponseForManagement {
         private String skuCode;
         private Integer stockQuantity;
         private Double price;
+        private String status;
         private String avatarImageUrl;
     }
 }

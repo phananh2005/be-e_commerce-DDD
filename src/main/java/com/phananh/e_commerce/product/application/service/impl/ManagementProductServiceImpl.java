@@ -17,6 +17,7 @@ import com.phananh.e_commerce.product.application.mapper.ManagementProductMapper
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.domain.model.*;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
+import com.phananh.e_commerce.product.domain.model.enums.VariantStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ManagementProductSearchRequest;
 import com.phananh.e_commerce.product.presentation.dto.request.management.ProductCreateRequest;
@@ -110,12 +111,25 @@ public class ManagementProductServiceImpl implements ManagementProductService {
     public void createProduct(ProductCreateRequest request) {
         Set<ProductVariant> variants = new HashSet<>();
 
+        String requestedStatus = request.getProductStatus();
+        String status = "DRAFT";
+
+        if (requestedStatus != null && !requestedStatus.isBlank()) {
+            try {
+                ProductStatus.valueOf(requestedStatus.toUpperCase());
+                status = requestedStatus.toUpperCase();
+            } catch (IllegalArgumentException e) {
+                throw new AppException(ErrorCode.INVALID_PRODUCT_STATUS);
+            }
+        }
+
         ProductCreateCommand productCreateCommand = ProductCreateCommand.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .avatarUrl(request.getProductAvatarUrl())
                 .categoryId(request.getCategoryId())
                 .brandId(request.getBrandId())
+                .productStatus(status)
                 .variants(variants)
                 .build();
 
@@ -135,21 +149,18 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                         .build();
                 ProductVariant variant = ProductVariant.create(variantCreateCommand);
 
-                // Add variant avatar (primary image) if URL is provided
                 if (!StringUtils.isBlank(variantRequest.getVariantAvatarUrl())) {
                     images.add(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
                 }
 
-                // Add variant gallery images if URLs are provided
-                if (!ListUtils.isNullOrEmpty(variantRequest.getVariantImageUrls())) {
-                    for (String imageUrl : variantRequest.getVariantImageUrls()) {
-                        if (!StringUtils.isBlank(imageUrl)) {
-                            images.add(VariantImage.create(variant, imageUrl, false));
-                        }
-                    }
-                }
+                if (!ListUtils.isNullOrEmpty(variantRequest.getVariantDetailImageUrls())) {
+                     for (String imageUrl : variantRequest.getVariantDetailImageUrls()) {
+                         if (!StringUtils.isBlank(imageUrl)) {
+                             images.add(VariantImage.create(variant, imageUrl, false));
+                         }
+                     }
+                 }
 
-                // Process attributes if provided
                 if (variantRequest.getAttributes() != null && !variantRequest.getAttributes().isEmpty()) {
                     attributeValues.addAll(getAttributeValues(variantRequest.getAttributes()));
                 }
@@ -161,7 +172,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         productRepository.save(product);
     }
 
-    private Set<AttributeValue> getAttributeValues(Map<String,String> attributesValues) {
+    private Set<AttributeValue> getAttributeValues(Map<String, String> attributesValues) {
         Set<AttributeValue> attributeValues = new HashSet<>();
         for (Map.Entry<String, String> attribute : attributesValues.entrySet()) {
             String name = attribute.getKey();
@@ -180,8 +191,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                             productRepository.save(newValue);
                             return newValue;
                         });
-            }
-            else {
+            } else {
                 // Handle the case where the attribute doesn't exist
                 ProductAttribute productAttribute = ProductAttribute.builder()
                         .name(name)
@@ -217,16 +227,23 @@ public class ManagementProductServiceImpl implements ManagementProductService {
         }
 
         // Update variants
-        if (!ListUtils.isNullOrEmpty(productUpdateRequest.getVariants())) {
-            for (ProductUpdateRequest.VariantUpdateRequest variantRequest : productUpdateRequest.getVariants()) {
+         if (!ListUtils.isNullOrEmpty(productUpdateRequest.getExistVariants())) {
+             for (ProductUpdateRequest.VariantUpdateRequest variantRequest : productUpdateRequest.getExistVariants()) {
                 try {
                     ProductVariant variant = productRepository.getVariantById(variantRequest.getVariantId())
                             .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
 
                     // Update variant basic info
-                    variant.updateSkuCode(variantRequest.getSkuCode());
                     variant.updatePrice(variantRequest.getPrice());
                     variant.updateStockQuantity(variantRequest.getStockQuantity());
+
+                    if (!StringUtils.isBlank(variantRequest.getStatus())) {
+                        try {
+                            variant.updateStatus(VariantStatus.valueOf(variantRequest.getStatus().trim().toUpperCase()));
+                        } catch (IllegalArgumentException ex) {
+                            throw new AppException(ErrorCode.INVALID_REQUEST);
+                        }
+                    }
 
                     // Handle avatar URL update
                     // - imageUrl == null => keep existing image
@@ -234,26 +251,27 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                     // - imageUrl is empty string ("") => remove existing image
                     if (variantRequest.getVariantAvatarUrl() != null) {
                         if (variantRequest.getVariantAvatarUrl().isBlank()) variant.removeAvatar();
-                        else variant.updateAvatar(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
+                        else
+                            variant.updateAvatar(VariantImage.create(variant, variantRequest.getVariantAvatarUrl(), true));
                     }
 
                     // Delete images by ID
-                    if (!ListUtils.isNullOrEmpty(variantRequest.getVariantImageIdsToDelete())) {
-                        List<VariantImage> variantImages = productRepository
-                                .getVariantImagesById(variantRequest.getVariantImageIdsToDelete());
-                        variant.removeListImages(variantImages);
+                     if (!ListUtils.isNullOrEmpty(variantRequest.getVariantDetailImageIdsToDelete())) {
+                         List<VariantImage> variantImages = productRepository
+                                 .getVariantImagesById(variantRequest.getVariantDetailImageIdsToDelete());
+                         variant.removeListImages(variantImages);
 
-                        List<String> imageUrls = variantImages.stream().map(VariantImage::getImageUrl).toList();
-                        for (String url : imageUrls) cloudinaryService.deleteFileByUrl(url);
-                    }
+                         List<String> imageUrls = variantImages.stream().map(VariantImage::getImageUrl).toList();
+                         for (String url : imageUrls) cloudinaryService.deleteFileByUrl(url);
+                     }
 
                     // Add new gallery images
-                    if (!ListUtils.isNullOrEmpty(variantRequest.getVariantImagesUrlsToAdd())) {
-                        variant.addListImage(variantRequest.getVariantImagesUrlsToAdd().stream()
-                                .filter(url -> !StringUtils.isBlank(url))
-                                .map(url -> VariantImage.create(variant, url, false))
-                                .toList());
-                    }
+                     if (!ListUtils.isNullOrEmpty(variantRequest.getVariantDetailImageUrlsToAdd())) {
+                         variant.addListImage(variantRequest.getVariantDetailImageUrlsToAdd().stream()
+                                 .filter(url -> !StringUtils.isBlank(url))
+                                 .map(url -> VariantImage.create(variant, url, false))
+                                 .toList());
+                     }
 
                     // Update variant attributes
                     if (variantRequest.getAttributes() != null && !variantRequest.getAttributes().isEmpty()) {
@@ -286,13 +304,13 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                     images.add(VariantImage.create(variant, newVariantRequest.getVariantAvatarUrl(), true));
                 }
 
-                if (!ListUtils.isNullOrEmpty(newVariantRequest.getVariantImageUrls())) {
-                    for (String imageUrl : newVariantRequest.getVariantImageUrls()) {
-                        if (!StringUtils.isBlank(imageUrl)) {
-                            images.add(VariantImage.create(variant, imageUrl, false));
-                        }
-                    }
-                }
+                if (!ListUtils.isNullOrEmpty(newVariantRequest.getVariantDetailImageUrls())) {
+                     for (String imageUrl : newVariantRequest.getVariantDetailImageUrls()) {
+                         if (!StringUtils.isBlank(imageUrl)) {
+                             images.add(VariantImage.create(variant, imageUrl, false));
+                         }
+                     }
+                 }
 
                 if (newVariantRequest.getAttributes() != null && !newVariantRequest.getAttributes().isEmpty()) {
                     attributeValues.addAll(getAttributeValues(newVariantRequest.getAttributes()));
@@ -337,6 +355,15 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
         variant.updateStockQuantity(request.getStockQuantity());
         variant.updatePrice(request.getPrice());
+        
+        if (!StringUtils.isBlank(request.getStatus())) {
+            try {
+                variant.updateStatus(VariantStatus.valueOf(request.getStatus().trim().toUpperCase()));
+            } catch (IllegalArgumentException ex) {
+                throw new AppException(ErrorCode.INVALID_REQUEST);
+            }
+        }
+        
         productRepository.save(variant);
     }
 

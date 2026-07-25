@@ -75,6 +75,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public List<ProductVariant> getVariantsById(List<Long> ids) {
+        return springDataProductVariantRepository.findByIdIn(ids);
+    }
+
+    @Override
     public Optional<ProductAttribute> getProductAttributesByName(String name) {
         return springDataProductAttributeRepository.findByName(name);
     }

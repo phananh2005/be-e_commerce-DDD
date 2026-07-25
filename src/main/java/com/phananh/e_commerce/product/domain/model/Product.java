@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,17 +48,26 @@ public class Product extends BaseEntity{
     @Column(name = "brand_id")
     private Long brandId;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE} )
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
     private Set<ProductVariant> variants = new HashSet<>();
 
     public static Product create(ProductCreateCommand command) {
+        ProductStatus status = ProductStatus.DRAFT;
+
+        if (command.getProductStatus() != null && !command.getProductStatus().isBlank()) {
+            try {
+                status = ProductStatus.valueOf(command.getProductStatus().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                status = ProductStatus.DRAFT;
+            }
+        }
 
         return Product.builder()
                 .name(StringUtils.isBlank(command.getName()) ? "Empty" : command.getName().trim())
                 .description(StringUtils.isBlank(command.getDescription()) ? null : command.getDescription().trim())
                 .avatarUrl(StringUtils.isBlank(command.getAvatarUrl()) ? null : command.getAvatarUrl().trim())
-                .status(ProductStatus.DRAFT)
+                .status(status)
                 .categoryId(command.getCategoryId())
                 .brandId(command.getBrandId())
                 .variants(command.getVariants())
@@ -102,6 +112,10 @@ public class Product extends BaseEntity{
 
     public void removeAvatarUrl() {
         this.avatarUrl = null;
+    }
+
+    public void removeVariants(List<ProductVariant> variantsToRemove) {
+        variantsToRemove.forEach(this.variants::remove);
     }
 
     @PrePersist

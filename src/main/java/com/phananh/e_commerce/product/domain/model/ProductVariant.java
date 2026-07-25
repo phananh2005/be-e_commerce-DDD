@@ -4,6 +4,7 @@ import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import com.phananh.e_commerce.core.util.ListUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.product.application.dto.command.ProductVariantCreateCommand;
+import com.phananh.e_commerce.product.domain.model.enums.VariantStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +31,7 @@ public class ProductVariant extends BaseEntity{
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "sku_code", unique = true, nullable = false)
+    @Column(name = "sku_code", nullable = false)
     private String skuCode;
 
     @Column(nullable = false, precision = 19, scale = 2)
@@ -38,6 +39,11 @@ public class ProductVariant extends BaseEntity{
 
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private VariantStatus status = VariantStatus.ACTIVE;
 
     @Version
     private Long version;
@@ -114,6 +120,11 @@ public class ProductVariant extends BaseEntity{
     public void addListImage(List<VariantImage> images) {
         if(ListUtils.isNullOrEmpty(images)) throw new IllegalArgumentException("List image is empty");
         this.images.addAll(images);
+    }
+
+    public void updateStatus(VariantStatus status) {
+        if(status == null) throw new IllegalArgumentException("Status is null");
+        this.status = status;
     }
 }
 

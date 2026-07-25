@@ -14,6 +14,7 @@ public interface ProductRepository {
     Page<Product> getAllProductsBySearch(ManagementProductSearchQuery productSearchQuery);
     List<ProductVariant> getVariantsByProductId(Long productId);
     Optional<ProductVariant> getVariantById(Long id);
+    List<ProductVariant> getVariantsById(List<Long> ids);
     Optional<ProductAttribute> getProductAttributesByName(String name);
     List<VariantImage> getVariantImagesById(List<Long> id);
     void save(Product product);

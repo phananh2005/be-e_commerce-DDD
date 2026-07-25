@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.product.presentation.dto.request.management;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -28,6 +29,9 @@ public class ProductCreateRequest {
      */
     private String productAvatarUrl;
 
+    @JsonProperty("productStatus")
+    private String productStatus;
+
     @Valid
     private List<VariantCreateRequest> variants;
 
@@ -51,11 +55,12 @@ public class ProductCreateRequest {
          */
         private String variantAvatarUrl;
 
-        /**
-         * List of URLs for variant gallery images, already uploaded to Cloudinary.
-         */
-        private List<String> variantImageUrls;
+         /**
+          * List of URLs for variant gallery images, already uploaded to Cloudinary.
+          */
+         private List<String> variantDetailImageUrls;
     }
 }
+
 
 

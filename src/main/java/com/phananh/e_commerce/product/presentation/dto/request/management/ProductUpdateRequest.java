@@ -28,7 +28,7 @@ public class ProductUpdateRequest {
     private String productAvatarUrl;
 
     @Valid
-    private List<VariantUpdateRequest> variants;
+    private List<VariantUpdateRequest> existVariants;
 
     @Valid
     private List<VariantCreateRequest> newVariants;
@@ -38,9 +38,6 @@ public class ProductUpdateRequest {
         @NotNull(message = "Variant id is required")
         private Long variantId;
 
-        @NotBlank(message = "SKU code is required")
-        private String skuCode;
-
         @NotNull(message = "Price is required")
         @DecimalMin(value = "0.0", message = "Price must be >= 0")
         private BigDecimal price;
@@ -48,6 +45,8 @@ public class ProductUpdateRequest {
         @NotNull(message = "Stock quantity is required")
         @PositiveOrZero(message = "Stock quantity must be >= 0")
         private Integer stockQuantity;
+
+        private String status;
 
         /**
          * URL of the image already uploaded to Cloudinary. If null -> keep existing image.
@@ -57,9 +56,9 @@ public class ProductUpdateRequest {
 
         private Map<String, String> attributes;
 
-        private List<Long> variantImageIdsToDelete;
+        private List<Long> variantDetailImageIdsToDelete;
 
-        private List<String> variantImagesUrlsToAdd;
+        private List<String> variantDetailImageUrlsToAdd;
     }
 
     @Data
@@ -77,7 +76,7 @@ public class ProductUpdateRequest {
 
         private String variantAvatarUrl;
 
-        private List<String> variantImageUrls;
+        private List<String> variantDetailImageUrls;
 
         private Map<String, String> attributes;
     }

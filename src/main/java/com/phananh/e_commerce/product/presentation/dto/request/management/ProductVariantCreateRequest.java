@@ -26,7 +26,7 @@ public class ProductVariantCreateRequest {
 
     private String variantAvatarUrl;
 
-    private List<String> variantImageUrls;
+    private List<String> variantDetailImageUrls;
 
     private Map<String, String> attributes;
 }

@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface SpringDataProductVariantRepository extends JpaRepository<ProductVariant, Long> {
     List<ProductVariant> findByProduct_Id(Long productId);
     Optional<ProductVariant> findBySkuCode(String skuCode);
+    List<ProductVariant> findByIdIn(List<Long> ids);
 }
 
 

@@ -26,6 +26,11 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     public List<OrderItem> findByOrder_Id(Long orderId) {
         return springDataOrderItemRepository.findByOrder_Id(orderId);
     }
+
+    @Override
+    public boolean existsByVariantId(Long variantId) {
+        return springDataOrderItemRepository.existsByVariantId(variantId);
+    }
 }
 
 

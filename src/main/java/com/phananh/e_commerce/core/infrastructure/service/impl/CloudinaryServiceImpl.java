@@ -85,6 +85,18 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
 
     @Override
+    public void renameResource(String fromPublicId, String toPublicId) {
+        try {
+            Map<String, Object> opts = Map.of("invalidate", true);
+            cloudinary.uploader().rename(fromPublicId, toPublicId, opts);
+            log.info("Cloudinary rename {} -> {}", fromPublicId, toPublicId);
+        } catch (IOException e) {
+            log.error("Failed rename {} to {}", fromPublicId, toPublicId, e);
+            throw new AppException(ErrorCode.FILE_RENAME_ERROR);
+        }
+    }
+
+    @Override
     public void deleteFileByUrl(String url) {
         if (url == null || url.isBlank()) {
             throw new AppException(ErrorCode.FILE_DELETE_ERROR);

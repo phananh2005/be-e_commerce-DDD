@@ -96,11 +96,23 @@ public class FakerService {
     public List<Brand> seedBrands(int count) {
         List<Brand> brands = new ArrayList<>();
         Set<String> names = new HashSet<>();
-        for (int i = 0; i < count; i++) {
-            String name = faker.company().name();
+
+        String[] techBrands = {
+                "Apple", "Samsung", "Xiaomi", "OPPO", "vivo", "Realme", "POCO", "OnePlus",
+                "Dell", "HP", "Lenovo", "ASUS", "Acer", "MSI", "Microsoft", "Huawei",
+                "Sony", "LG", "Google", "Intel", "AMD", "Nvidia", "Qualcomm",
+                "JBL", "Sony Audio", "Bose", "Sennheiser", "Audio-Technica",
+                "Anker", "Belkin", "Logitech", "Razer", "Corsair", "Kingston", "Sandisk",
+                "Garmin", "Fitbit", "Amazfit", "Huawei Watch", "Samsung Watch"
+        };
+
+        int added = 0;
+        int idx = 0;
+        while (added < count && idx < techBrands.length) {
+            String name = techBrands[idx++];
             if (names.contains(name) || brandRepository.existsByNameIgnoreCase(name)) continue;
             names.add(name);
-            brands.add(brandRepository.save(Brand.create(name, faker.lorem().sentence(), null)));
+            brands.add(brandRepository.save(Brand.create(name, "Thương hiệu công nghệ hàng đầu", null)));
         }
         return brands;
     }
@@ -111,7 +123,7 @@ public class FakerService {
     public List<Category> seedCategories(int count) {
         List<Category> categories = new ArrayList<>();
         Set<String> names = new HashSet<>();
-        String[] predefined = {
+        String[] predefined = {"Điện thoại","Laptop","Máy tính bảng","Tai nghe","Sạc","Pin","Màn hình","Máy ảnh","Smartwatch","Loa","Bàn phím","Chuột","USB","Router",
                 "Điện thoại", "Laptop", "Máy tính bảng", "Phụ kiện", "Đồng hồ",
                 "Thời trang nam", "Thời trang nữ", "Giày dép", "Túi xách", "Mỹ phẩm",
                 "Thực phẩm", "Đồ gia dụng", "Thể thao", "Sách", "Đồ chơi"
@@ -132,9 +144,9 @@ public class FakerService {
         Map<ProductAttribute, List<AttributeValue>> result = new LinkedHashMap<>();
 
         Map<String, String[]> attrMap = Map.of(
-                "Màu sắc", new String[]{"Đỏ", "Xanh", "Đen", "Trắng", "Vàng", "Hồng"},
-                "Kích thước", new String[]{"S", "M", "L", "XL", "XXL"},
-                "Chất liệu", new String[]{"Cotton", "Polyester", "Linen", "Denim"}
+                "Màu sắc", new String[]{"Đen", "Trắng", "Xanh", "Xám", "Bạc", "Vàng hồng"},
+                "Dung lượng", new String[]{"64GB", "128GB", "256GB", "512GB", "1TB"},
+                "RAM", new String[]{"4GB", "8GB", "16GB", "32GB", "64GB"}
         );
 
         for (Map.Entry<String, String[]> entry : attrMap.entrySet()) {
@@ -151,13 +163,34 @@ public class FakerService {
         return result;
     }
 
+    private static final String[] PRODUCT_PREFIXES = {
+            "iPhone", "Samsung Galaxy", "Xiaomi", "OPPO", "vivo", "Realme", "POCO",
+            "MacBook", "Dell XPS", "HP Spectre", "Lenovo ThinkPad", "ASUS ROG", "Acer Swift",
+            "iPad", "Samsung Tab", "Huawei MatePad", "Xiaomi Pad",
+            "Apple Watch", "Samsung Watch", "Xiaomi Watch", "Garmin", "Huawei Watch",
+            "AirPods", "Samsung Buds", "Sony WH", "JBL", "Soundpeats",
+            "iPhone", "Samsung", "Anker", "Belkin", "Samsung Galaxy Tab"
+    };
+
+    private static final String[] PRODUCT_SUFFIXES = {
+            "Pro", "Pro Max", "Plus", "Ultra", "Max", "Lite", "5G", "4G", "2024", "2025",
+            "M1", "M2", "M3", "Gen", "Series", "Edition", "Premium"
+    };
+
+    private static String generateTechProductName(Random random) {
+        String prefix = PRODUCT_PREFIXES[random.nextInt(PRODUCT_PREFIXES.length)];
+        String suffix = PRODUCT_SUFFIXES[random.nextInt(PRODUCT_SUFFIXES.length)];
+        return prefix + " " + suffix;
+    }
+
     // ── PRODUCTS ───────────────────────────────────────────────────────────────
 
     @Transactional
     public List<Product> seedProducts(int count, List<Category> categories, List<Brand> brands,
                                       Map<ProductAttribute, List<AttributeValue>> attrMap) {
         List<AttributeValue> colorValues = attrMap.values().stream().findFirst().orElse(List.of());
-        List<AttributeValue> sizeValues = attrMap.values().stream().skip(1).findFirst().orElse(List.of());
+        List<AttributeValue> capacityValues = attrMap.values().stream().skip(1).findFirst().orElse(List.of());
+        List<AttributeValue> ramValues = attrMap.values().stream().skip(2).findFirst().orElse(List.of());
 
         List<Product> products = new ArrayList<>();
         Random random = new Random();
@@ -166,8 +199,10 @@ public class FakerService {
             Long categoryId = categories.isEmpty() ? null : categories.get(random.nextInt(categories.size())).getId();
             Long brandId = brands.isEmpty() ? null : brands.get(random.nextInt(brands.size())).getId();
 
+            String productName = generateTechProductName(random);
+
             Product product = Product.builder()
-                    .name(faker.commerce().productName())
+                    .name(productName)
                     .description(faker.lorem().paragraph())
                     .avatarUrl(null)
                     .status(ProductStatus.ACTIVE)
@@ -177,16 +212,18 @@ public class FakerService {
                     .build();
             product = productRepository.save(product);
 
-            // 2 variants per product
-            for (int v = 0; v < 2; v++) {
+            // 2-4 variants per product
+            int variantCount = random.nextInt(3) + 2;
+            for (int v = 0; v < variantCount; v++) {
                 String sku = "SKU-" + System.nanoTime() + "-" + v;
-                BigDecimal price = BigDecimal.valueOf(faker.number().numberBetween(50000, 5000000))
+                BigDecimal price = BigDecimal.valueOf(faker.number().numberBetween(500000, 50000000))
                         .setScale(2, RoundingMode.HALF_UP);
                 int stock = faker.number().numberBetween(0, 200);
 
                 Set<AttributeValue> attrValues = new HashSet<>();
                 if (!colorValues.isEmpty()) attrValues.add(colorValues.get(random.nextInt(colorValues.size())));
-                if (!sizeValues.isEmpty()) attrValues.add(sizeValues.get(random.nextInt(sizeValues.size())));
+                if (!capacityValues.isEmpty()) attrValues.add(capacityValues.get(random.nextInt(capacityValues.size())));
+                if (!ramValues.isEmpty()) attrValues.add(ramValues.get(random.nextInt(ramValues.size())));
 
                 ProductVariant variant = ProductVariant.builder()
                         .product(product)

@@ -114,9 +114,9 @@ public class Product extends BaseEntity{
         this.avatarUrl = null;
     }
 
-    public void removeVariants(List<ProductVariant> variantsToRemove) {
-        variantsToRemove.forEach(this.variants::remove);
-    }
+//    public void removeVariants(List<ProductVariant> variantsToRemove) {
+//        variantsToRemove.forEach(this.variants::remove);
+//    }
 
     @PrePersist
     public void generateUuid() {

@@ -43,6 +43,7 @@ public enum ErrorCode {
       // Server errors (5xx)
     INTERNAL_SERVER_ERROR(500, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_DELETE_ERROR(500, "File delete error", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_RENAME_ERROR(500, "File rename error", HttpStatus.INTERNAL_SERVER_ERROR),
     TOKEN_GENERATION_ERROR(500, "Cannot generate token", HttpStatus.INTERNAL_SERVER_ERROR),
     TOKEN_SIGNING_ERROR(500, "Cannot sign token", HttpStatus.INTERNAL_SERVER_ERROR),
     ROLE_READ_ERROR(500, "Cannot read role name", HttpStatus.INTERNAL_SERVER_ERROR);

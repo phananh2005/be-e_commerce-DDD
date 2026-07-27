@@ -28,4 +28,5 @@ public interface CloudinaryService {
      * Convenience: delete resource by URL (extracts publicId then deletes).
      */
     void deleteFileByUrl(String url);
+    void renameResource(String fromPublicId, String toPublicId);
 }

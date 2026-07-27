@@ -2,6 +2,8 @@ package com.phananh.e_commerce.authentication.application.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.redis.core.RedisTemplate;
+import java.util.concurrent.TimeUnit;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.phananh.e_commerce.authentication.presentation.dto.request.AuthenticationRequest;
@@ -9,6 +11,7 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.Introspect
 import com.phananh.e_commerce.authentication.presentation.dto.request.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.ResendOtpRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsRequest;
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
@@ -51,6 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private final SpringDataUserRepository springDataUserRepository;
 	private final SpringDataRoleRepository springDataRoleRepository;
+	private final RedisTemplate<String, Object> redisTemplate;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final byte[] jwtSecret;
 	private final long accessTokenExpirationSeconds;
@@ -61,12 +65,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public AuthenticationServiceImpl(
 			SpringDataUserRepository springDataUserRepository,
 			SpringDataRoleRepository springDataRoleRepository,
+			RedisTemplate<String, Object> redisTemplate,
 			@Value("${application.security.jwt.secret-key}") String jwtSecret,
 			@Value("${application.security.jwt.expiration}") long accessTokenExpirationSeconds,
 			@Value("${application.security.jwt.refresh-expiration}") long refreshTokenExpirationSeconds
 	) {
 		this.springDataUserRepository = springDataUserRepository;
 		this.springDataRoleRepository = springDataRoleRepository;
+		this.redisTemplate = redisTemplate;
 		this.jwtSecret = jwtSecret.getBytes(StandardCharsets.UTF_8);
 		this.accessTokenExpirationSeconds = accessTokenExpirationSeconds;
 		this.refreshTokenExpirationSeconds = refreshTokenExpirationSeconds;
@@ -102,17 +108,55 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new AppException(ErrorCode.PHONE_NUMBER_MISMATCH);
             }
 
-            User user = springDataUserRepository.findByInfoPhoneNumber(request.getPhoneNumber())
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+            Object pendingReqObj = redisTemplate.opsForValue().get("register:user:" + request.getPhoneNumber());
+            if (pendingReqObj != null) {
+                RegisterRequest pendingReq = objectMapper.convertValue(pendingReqObj, RegisterRequest.class);
 
-            if (!user.getInfo().isPhoneVerified()) {
-                user.verifyPhone();
+                Role role = springDataRoleRepository.findByName(RoleName.ROLE_CUSTOMER)
+                        .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.ROLE_CUSTOMER).build()));
+
+                UserInfo userInfo = UserInfo.builder()
+                        .email(pendingReq.getEmail())
+                        .address(pendingReq.getAddress())
+                        .fullName(pendingReq.getFullName())
+                        .phoneNumber(pendingReq.getPhoneNumber())
+                        .isPhoneVerified(true)
+                        .build();
+
+                User user = User.builder()
+                        .credentials(new UserCredentials(
+                                pendingReq.getUsername(),
+                                PasswordUtils.encode(pendingReq.getPassword()),
+                                true))
+                        .info(userInfo)
+                        .roles(new HashSet<>(Set.of(role)))
+                        .build();
+
                 springDataUserRepository.save(user);
+                redisTemplate.delete("register:user:" + request.getPhoneNumber());
+            } else {
+                User user = springDataUserRepository.findByInfoPhoneNumber(request.getPhoneNumber())
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+                if (!user.getInfo().isPhoneVerified()) {
+                    user.verifyPhone();
+                    springDataUserRepository.save(user);
+                }
             }
         } catch (AppException e) {
             throw e;
         } catch (Exception e) {
             throw new AppException(ErrorCode.INVALID_FIREBASE_TOKEN);
+        }
+    }
+
+    @Override
+    public void resendOtp(ResendOtpRequest request) {
+        String key = "register:user:" + request.getPhoneNumber();
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+        } else {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
     }
 
@@ -125,27 +169,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
-        Role role = springDataRoleRepository.findByName(roleName)
-                .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(roleName).build()));
-
-        UserInfo userInfo = UserInfo.builder()
-                .email(request.getEmail())
-                .address(request.getAddress())
-                .fullName(request.getFullName())
-                .phoneNumber(request.getPhoneNumber())
-                .isPhoneVerified(false)
-                .build();
-
-        User user = User.builder()
-                .credentials(new UserCredentials(
-                        request.getUsername(),
-                        PasswordUtils.encode(request.getPassword()),
-                        true))
-                .info(userInfo)
-                .roles(new HashSet<>(Set.of(role)))
-                .build();
-
-        springDataUserRepository.save(user);
+        redisTemplate.opsForValue().set("register:user:" + request.getPhoneNumber(), request, 30, TimeUnit.MINUTES);
     }
 
 	@Override

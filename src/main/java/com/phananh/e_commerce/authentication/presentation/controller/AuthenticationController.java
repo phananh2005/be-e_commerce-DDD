@@ -5,6 +5,7 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.Introspect
 import com.phananh.e_commerce.authentication.presentation.dto.request.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.ResendOtpRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsRequest;
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
@@ -53,6 +54,13 @@ public class AuthenticationController {
     @PostMapping("/verify-sms")
     public ResponseEntity<?> verifySms(@Valid @RequestBody VerifySmsRequest request) {
         authenticationService.verifySms(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Gửi lại OTP (Reset thời gian đăng ký)")
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resendOtp(@Valid @RequestBody ResendOtpRequest request) {
+        authenticationService.resendOtp(request);
         return ResponseEntity.noContent().build();
     }
 

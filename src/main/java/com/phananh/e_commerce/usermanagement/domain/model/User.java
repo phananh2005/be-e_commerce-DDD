@@ -44,6 +44,18 @@ public class User extends BaseEntity{
         this.info = userInfo;
     }
 
+    public void verifyPhone() {
+        if (this.info != null) {
+            this.info = new UserInfo(
+                    this.info.fullName(),
+                    this.info.email(),
+                    this.info.address(),
+                    this.info.phoneNumber(),
+                    true
+            );
+        }
+    }
+
     public void changePassword (String oldPassword, String newPassword){
         this.credentials = this.credentials.changePassword(oldPassword, newPassword);
     }

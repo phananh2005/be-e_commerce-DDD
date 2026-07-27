@@ -61,11 +61,17 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        boolean isPhoneVerified = user.getInfo().isPhoneVerified();
+        if (!user.getInfo().phoneNumber().equals(userInfoUpdateRequest.getPhoneNumber())) {
+            isPhoneVerified = false;
+        }
+
         UserInfo updatedUserInfo = UserInfo.builder()
                 .email(userInfoUpdateRequest.getEmail())
                 .fullName(userInfoUpdateRequest.getFullName())
                 .phoneNumber(userInfoUpdateRequest.getPhoneNumber())
                 .address(userInfoUpdateRequest.getAddress())
+                .isPhoneVerified(isPhoneVerified)
                 .build();
         user.updateInfo(updatedUserInfo);
 
@@ -231,6 +237,7 @@ public class UserServiceImpl implements UserService {
                 .address(request.getAddress())
                 .fullName(request.getFullName())
                 .phoneNumber(request.getPhoneNumber())
+                .isPhoneVerified(false)
                 .build();
 
         User user = User.builder()
@@ -318,4 +325,6 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.FORBIDDEN);
         }
     }
+
+
 }

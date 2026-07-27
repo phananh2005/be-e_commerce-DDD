@@ -5,6 +5,7 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.Introspect
 import com.phananh.e_commerce.authentication.presentation.dto.request.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsRequest;
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
@@ -45,6 +46,13 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         authenticationService.register(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Xác thực SMS OTP")
+    @PostMapping("/verify-sms")
+    public ResponseEntity<?> verifySms(@Valid @RequestBody VerifySmsRequest request) {
+        authenticationService.verifySms(request);
         return ResponseEntity.noContent().build();
     }
 

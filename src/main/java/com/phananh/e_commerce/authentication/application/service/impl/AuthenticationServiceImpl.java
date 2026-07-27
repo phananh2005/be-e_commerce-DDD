@@ -2,11 +2,14 @@ package com.phananh.e_commerce.authentication.application.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.phananh.e_commerce.authentication.presentation.dto.request.AuthenticationRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.IntrospectRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsRequest;
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
@@ -90,6 +93,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         registerWithRole(request, RoleName.ROLE_CUSTOMER);
     }
 
+    @Override
+    public void verifySms(VerifySmsRequest request) {
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
+            String firebasePhone = (String) decodedToken.getClaims().get("phone_number");
+            if (firebasePhone == null || !firebasePhone.equals(request.getPhoneNumber())) {
+                throw new AppException(ErrorCode.PHONE_NUMBER_MISMATCH);
+            }
+
+            User user = springDataUserRepository.findByInfoPhoneNumber(request.getPhoneNumber())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+            if (!user.getInfo().isPhoneVerified()) {
+                user.verifyPhone();
+                springDataUserRepository.save(user);
+            }
+        } catch (AppException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.INVALID_FIREBASE_TOKEN);
+        }
+    }
+
     private void registerWithRole(RegisterRequest request, RoleName roleName) {
         if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
             throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -107,6 +133,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .address(request.getAddress())
                 .fullName(request.getFullName())
                 .phoneNumber(request.getPhoneNumber())
+                .isPhoneVerified(false)
                 .build();
 
         User user = User.builder()

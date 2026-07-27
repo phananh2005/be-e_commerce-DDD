@@ -39,3 +39,5 @@ build/
 
 ### Antigravity ###
 .agents/
+
+./src/main/resources/serviceAccountKey.json

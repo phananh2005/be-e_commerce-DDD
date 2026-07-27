@@ -5,6 +5,7 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.Introspect
 import com.phananh.e_commerce.authentication.presentation.dto.request.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRequest;
+import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsRequest;
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
@@ -13,6 +14,8 @@ public interface AuthenticationService {
 	AuthTokenResponse login(AuthenticationRequest request);
 
 	void register(RegisterRequest request);
+
+	void verifySms(VerifySmsRequest request);
 
 	AuthTokenResponse refreshToken(RefreshTokenRequest request);
 

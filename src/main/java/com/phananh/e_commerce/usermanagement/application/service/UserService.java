@@ -25,5 +25,6 @@ public interface UserService {
     void updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest);
     void updateUserStatus(Long userId, String status);
     void createUser(CreateUserRequest request);
+
 }
 

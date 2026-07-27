@@ -14,10 +14,12 @@ public record UserInfo(
         @Column(name = "address", columnDefinition = "TEXT")
         String address,
         @Column(name = "phone_number", unique = true, nullable = false)
-        String phoneNumber) {
+        String phoneNumber,
+        @Column(name = "is_phone_verified", nullable = false)
+        boolean isPhoneVerified) {
 
     @Builder
-    public UserInfo(String fullName, String email, String address, String phoneNumber) {
+    public UserInfo {
         if (StringUtils.isBlank(fullName)) {
             throw new IllegalArgumentException("Full name cannot be null or blank");
         }
@@ -25,9 +27,9 @@ public record UserInfo(
             throw new IllegalArgumentException("Phone number cannot be null or blank");
         }
 
-        this.fullName = fullName.trim();
-        this.email = StringUtils.isBlank(email) ? null : email.trim();
-        this.address = StringUtils.isBlank(address) ? null : address.trim();
-        this.phoneNumber = phoneNumber.trim();
+        fullName = fullName.trim();
+        email = StringUtils.isBlank(email) ? null : email.trim();
+        address = StringUtils.isBlank(address) ? null : address.trim();
+        phoneNumber = phoneNumber.trim();
     }
 }

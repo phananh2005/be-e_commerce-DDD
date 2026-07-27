@@ -51,7 +51,8 @@ public class AdminAccountInitializer implements ApplicationRunner {
                 adminSeedProperties.fullName(),
                 adminSeedProperties.email(),
                 adminSeedProperties.address(),
-                adminSeedProperties.phoneNumber()));
+                adminSeedProperties.phoneNumber(),
+                true));
         setField(adminUser, "roles", new HashSet<>(Set.of(superAdminRole)));
 
         springDataUserRepository.save(adminUser);

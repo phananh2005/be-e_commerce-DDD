@@ -6,6 +6,9 @@ Quản lý các phiên bản hướng dẫn phát triển Frontend theo kiểu F
 
 | Version | Ngày tạo | Thay đổi | Breaking Change |
 |---------|----------|---------|-----------------|
+| V1_8_0 | 2026-07-27 | Xóa API xác thực số điện thoại `POST /users/verify-phone` trong CustomerUserController | Có |
+| V1_7_0 | 2026-07-27 | Tách API xác thực SMS OTP `POST /auth/verify-sms` riêng khỏi API đăng ký `POST /auth/register` | Có |
+| V1_6_0 | 2026-07-27 | Thêm xác thực Firebase Phone Auth khi đăng ký và endpoint verify phone | Có |
 | V1_5_2 | 2026-07-25 | Thêm 3 API Dashboard: overview, order statistics, revenue report | Không |
 | V1_5_1 | 2026-07-25 | Xóa field `skuCode` khỏi API update product (variant updates); skuCode chỉ được set khi tạo variant mới | Có |
 | V1_4_6 | 2026-07-25 | Xóa field `deletedVariantIds` khỏi API update product; Để "xóa" variant, đặt `status: INACTIVE` thay vì xóa vật lý | Có |

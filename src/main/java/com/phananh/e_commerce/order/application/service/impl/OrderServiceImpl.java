@@ -312,10 +312,25 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
+        OrderStatus oldStatus = order.getStatus();
+        OrderStatus newStatus;
         try {
-            order.updateStatusWithReason(OrderStatus.valueOf(status), cancellationReason);
+            newStatus = OrderStatus.valueOf(status);
+            order.updateStatusWithReason(newStatus, cancellationReason);
         } catch (IllegalArgumentException e) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        boolean wasCancelledOrReturned = (oldStatus == OrderStatus.CANCELLED || oldStatus == OrderStatus.RETURNED);
+        boolean isCancelledOrReturned = (newStatus == OrderStatus.CANCELLED || newStatus == OrderStatus.RETURNED);
+
+        if (!wasCancelledOrReturned && isCancelledOrReturned) {
+            List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(order.getId());
+            for (OrderItem item : orderItems) {
+                ProductInfoResponse productInfo = productService.getProductInfoByVariantId(item.getVariantId());
+                int newStock = productInfo.getStockQuantity() + item.getQuantity();
+                managementProductService.updateVariantStock(item.getVariantId(), newStock);
+            }
         }
 
         orderRepository.save(order);

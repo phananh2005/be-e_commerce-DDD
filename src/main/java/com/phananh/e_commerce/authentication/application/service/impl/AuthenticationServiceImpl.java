@@ -82,7 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public AuthTokenResponse login(AuthenticationRequest request) {
 		User user = springDataUserRepository.findByCredentials_Username(request.getUsername())
 				.orElseThrow(() -> new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD));

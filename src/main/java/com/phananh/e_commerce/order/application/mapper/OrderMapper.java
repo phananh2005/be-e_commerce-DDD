@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
 
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "orderUuid", source = "uuid")
     @Mapping(target = "totalPrice", source = "totalPrice")
     @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")

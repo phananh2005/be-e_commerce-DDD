@@ -96,7 +96,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void register(RegisterRequest request) {
-        registerWithRole(request, RoleName.ROLE_CUSTOMER);
+		if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
+			throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
+		}
+
+		if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
+			throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+		}
+
+		if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank() && springDataUserRepository.existsByInfoPhoneNumber(request.getPhoneNumber())) {
+			throw new AppException(ErrorCode.PHONE_NUMBER_ALREADY_EXISTS);
+		}
+
+		redisTemplate.opsForValue().set("register:user:" + request.getPhoneNumber(), request, 30, TimeUnit.MINUTES);
     }
 
     @Override
@@ -160,17 +172,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    private void registerWithRole(RegisterRequest request, RoleName roleName) {
-        if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        }
-
-        if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
-
-        redisTemplate.opsForValue().set("register:user:" + request.getPhoneNumber(), request, 30, TimeUnit.MINUTES);
-    }
+//    private void registerWithRole(RegisterRequest request, RoleName roleName) {
+//        if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
+//            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
+//        }
+//
+//        if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
+//            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+//        }
+//
+//        redisTemplate.opsForValue().set("register:user:" + request.getPhoneNumber(), request, 30, TimeUnit.MINUTES);
+//    }
 
 	@Override
 	public AuthTokenResponse refreshToken(RefreshTokenRequest request) {

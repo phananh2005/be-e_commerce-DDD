@@ -52,3 +52,4 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V2.0.0 | 2026-07-27 | [Thay đổi luồng đăng ký tài khoản (Lưu Redis 15 phút)](V2_0_0__change_registration_flow_with_redis.md) | Có |
 | V2.1.0 | 2026-07-27 | [Thêm API gửi lại OTP (Reset thời gian lưu Redis)](V2_1_0__add_resend_otp_api.md) | Không |
 | V2.1.1 | 2026-07-27 | [Cập nhật thời hạn lưu đăng ký lên 30 phút](V2_1_1__update_registration_ttl_to_30m.md) | Không |
+| V2.1.2 | 2026-07-28 | [Thêm kiểm tra trùng lặp số điện thoại trong API đăng ký](V2_1_2__add_phone_number_uniqueness_check_to_register.md) | Không |

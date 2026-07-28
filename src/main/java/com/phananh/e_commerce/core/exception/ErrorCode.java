@@ -39,6 +39,7 @@ public enum ErrorCode {
      INSUFFICIENT_STOCK(400, "Insufficient stock", HttpStatus.BAD_REQUEST),
      INVALID_PRODUCT_STATUS(400, "Invalid product status", HttpStatus.BAD_REQUEST),
      PRODUCT_VARIANT_IN_USE(409, "Product variant cannot be deleted because it is used in existing orders", HttpStatus.CONFLICT),
+     PHONE_NUMBER_ALREADY_EXISTS(409, "Phone number already exists", HttpStatus.CONFLICT),
      PHONE_NUMBER_MISMATCH(400, "Phone number does not match Firebase token", HttpStatus.BAD_REQUEST),
      INVALID_FIREBASE_TOKEN(401, "Invalid Firebase ID token", HttpStatus.UNAUTHORIZED),
 

@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -29,6 +30,9 @@ public class CheckoutRequest {
 
     @NotBlank(message = "Shipping address is required")
     private String shippingAddress;
+
+    @NotNull(message = "Shipping fee is required")
+    private BigDecimal shippingFee;
 
     @Valid
     @NotEmpty(message = "Items are required")

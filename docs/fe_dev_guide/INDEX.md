@@ -57,3 +57,5 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V2.2.1 | 2026-07-28 | [Thay đổi logic kiểm tra refresh token (kiểm tra DB thay vì Redis)](V2_2_1__update_refresh_token_validation_to_db.md) | Không |
 | V2.2.2 | 2026-07-28 | [Trả về mã lỗi 405 Method Not Allowed khi sai HTTP Method](V2_2_2__add_405_method_not_allowed_error_code.md) | Có |
 | V2.2.3 | 2026-07-28 | [Đồng bộ và sửa lỗi tài liệu API so với Backend thực tế](V2_2_3__sync_incorrect_apis_with_be.md) | Có |
+-   [ V 2 . 2 . 4 :   A d d   s h i p p i n g F e e   t o   c h e c k o u t   r e q u e s t ] ( V 2 _ 2 _ 4 _ _ a d d _ s h i p p i n g _ f e e _ t o _ c h e c k o u t _ r e q u e s t . m d )  
+ 

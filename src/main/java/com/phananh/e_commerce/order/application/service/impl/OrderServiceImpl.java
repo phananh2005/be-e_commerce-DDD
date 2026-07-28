@@ -3,6 +3,7 @@ package com.phananh.e_commerce.order.application.service.impl;
 import com.phananh.e_commerce.core.util.ListUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.order.application.dto.command.OrderItemCreateCommand;
+import com.phananh.e_commerce.order.domain.model.CartItem;
 import com.phananh.e_commerce.order.domain.model.Order;
 import com.phananh.e_commerce.order.domain.model.OrderItem;
 import com.phananh.e_commerce.order.domain.model.enums.OrderStatus;
@@ -23,6 +24,7 @@ import com.phananh.e_commerce.order.application.dto.response.order.OrderSummaryR
 import com.phananh.e_commerce.order.application.dto.response.order.ManagementOrderResponse;
 import com.phananh.e_commerce.order.domain.repository.OrderRepository;
 import com.phananh.e_commerce.order.domain.repository.OrderItemRepository;
+import com.phananh.e_commerce.order.domain.repository.CartItemRepository;
 import com.phananh.e_commerce.product.application.service.ProductInternalService;
 import com.phananh.e_commerce.product.application.service.ManagementProductService;
 import com.phananh.e_commerce.product.application.dto.response.internal.ProductInfoResponse;
@@ -54,6 +56,7 @@ public class OrderServiceImpl implements OrderService {
 
     OrderRepository orderRepository;
     OrderItemRepository orderItemRepository;
+    CartItemRepository cartItemRepository;
 
     ProductInternalService productService;
     ManagementProductService managementProductService;
@@ -191,10 +194,10 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         Order order = Order.createFirst(orderCreateCommand);
-        order = orderRepository.save(order);
 
         BigDecimal total = BigDecimal.ZERO;
         Set<OrderItem> itemsToSave = new HashSet<>();
+        List<CartItem> cartItemsToRemove = new ArrayList<>();
 
         for (CheckoutRequest.Item item : checkoutRequest.getItems()) {
             ProductInfoResponse productInfo = productService.getProductInfoByVariantId(item.getVariantId());
@@ -214,16 +217,22 @@ public class OrderServiceImpl implements OrderService {
                     .price(price)
                     .build();
             OrderItem orderItem = OrderItem.create(orderItemCreateCommand);
-            orderItemRepository.save(orderItem);
 
             int newStock = currentStock - item.getQuantity();
             managementProductService.updateVariantStock(item.getVariantId(), Math.max(newStock, 0));
             itemsToSave.add(orderItem);
+
+            cartItemRepository.getByUserIdAndVariantId(userId, item.getVariantId())
+                    .ifPresent(cartItemsToRemove::add);
         }
         order.updateTotalPrice(total);
-        order.updateShippingFee(BigDecimal.ZERO);
+        order.updateShippingFee(checkoutRequest.getShippingFee());
         order.addOrderItems(itemsToSave);
         orderRepository.save(order);
+
+        if (!cartItemsToRemove.isEmpty()) {
+            cartItemRepository.deleteAll(cartItemsToRemove);
+        }
     }
 
     @Override

@@ -91,6 +91,7 @@ public class Order extends BaseEntity{
                 .paymentMethod(command.getPaymentMethod())
                 .isPaid(isPaid)
                 .paymentDate(isPaid ? LocalDateTime.now() : null)
+                .totalPrice(BigDecimal.ZERO)
                 .build();
     }
 

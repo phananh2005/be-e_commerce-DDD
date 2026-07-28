@@ -27,7 +27,7 @@ public class OrderController {
     OrderService orderService;
 
     @Operation(summary = "Xem trước đơn hàng", description = "Xem trước thông tin và giá tiền trước khi thanh toán")
-    @GetMapping("/preview")
+    @PostMapping("/preview")
     public ResponseEntity<ApiResponse<OrderPreviewDetailResponse>> previewOrder(@RequestBody @Valid List<OrderPreviewRequest> orderPreviewRequest) {
         OrderPreviewDetailResponse response = orderService.previewOrder(orderPreviewRequest);
         return ResponseEntity.ok(ApiResponse.<OrderPreviewDetailResponse>builder()

@@ -106,7 +106,7 @@ public class CartItemServiceImpl implements CartItemService {
         if(!cartItems.getUserId().equals(userId)) throw new AppException(ErrorCode.UNAUTHORIZED);
 
         Optional<CartItem> existingCartItem = cartItemRepository.getByUserIdAndVariantId(userId, cartUpdateItemRequest.getVariantId());
-        if(existingCartItem.isEmpty()){
+        if(existingCartItem.isEmpty() || existingCartItem.get().getId().equals(cartItems.getId())){
             cartItems.updateVariant(cartUpdateItemRequest.getVariantId());
 
             if(cartUpdateItemRequest.getQuantity() > productService.getStockQuantityByVariantId(cartUpdateItemRequest.getVariantId())){

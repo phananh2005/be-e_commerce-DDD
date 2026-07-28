@@ -55,3 +55,5 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V2.1.2 | 2026-07-28 | [Thêm kiểm tra trùng lặp số điện thoại trong API đăng ký](V2_1_2__add_phone_number_uniqueness_check_to_register.md) | Không |
 | V2.2.0 | 2026-07-28 | [Cập nhật request đăng xuất yêu cầu cả accessToken và refreshToken](V2_2_0__update_logout_request_with_refresh_token.md) | Có |
 | V2.2.1 | 2026-07-28 | [Thay đổi logic kiểm tra refresh token (kiểm tra DB thay vì Redis)](V2_2_1__update_refresh_token_validation_to_db.md) | Không |
+| V2.2.2 | 2026-07-28 | [Trả về mã lỗi 405 Method Not Allowed khi sai HTTP Method](V2_2_2__add_405_method_not_allowed_error_code.md) | Có |
+| V2.2.3 | 2026-07-28 | [Đồng bộ và sửa lỗi tài liệu API so với Backend thực tế](V2_2_3__sync_incorrect_apis_with_be.md) | Có |

@@ -27,8 +27,11 @@ import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
+import com.phananh.e_commerce.authentication.domain.model.RefreshToken;
+import com.phananh.e_commerce.authentication.infrastructure.persistence.repository.springdata.SpringDataRefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -43,7 +46,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -54,17 +56,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private final SpringDataUserRepository springDataUserRepository;
 	private final SpringDataRoleRepository springDataRoleRepository;
+	private final SpringDataRefreshTokenRepository springDataRefreshTokenRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final byte[] jwtSecret;
 	private final long accessTokenExpirationSeconds;
 	private final long refreshTokenExpirationSeconds;
 
-	private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
-
 	public AuthenticationServiceImpl(
 			SpringDataUserRepository springDataUserRepository,
 			SpringDataRoleRepository springDataRoleRepository,
+			SpringDataRefreshTokenRepository springDataRefreshTokenRepository,
 			RedisTemplate<String, Object> redisTemplate,
 			@Value("${application.security.jwt.secret-key}") String jwtSecret,
 			@Value("${application.security.jwt.expiration}") long accessTokenExpirationSeconds,
@@ -72,6 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	) {
 		this.springDataUserRepository = springDataUserRepository;
 		this.springDataRoleRepository = springDataRoleRepository;
+		this.springDataRefreshTokenRepository = springDataRefreshTokenRepository;
 		this.redisTemplate = redisTemplate;
 		this.jwtSecret = jwtSecret.getBytes(StandardCharsets.UTF_8);
 		this.accessTokenExpirationSeconds = accessTokenExpirationSeconds;
@@ -79,6 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public AuthTokenResponse login(AuthenticationRequest request) {
 		User user = springDataUserRepository.findByCredentials_Username(request.getUsername())
 				.orElseThrow(() -> new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD));
@@ -95,6 +99,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
     @Override
+    @Transactional(readOnly = true)
     public void register(RegisterRequest request) {
 		if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
 			throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -112,6 +117,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public void verifySms(VerifySmsRequest request) {
         try {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
@@ -185,9 +191,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 //    }
 
 	@Override
+	@Transactional
 	public AuthTokenResponse refreshToken(RefreshTokenRequest request) {
-		TokenClaims claims = parseAndValidateToken(request.getRefreshToken(), REFRESH_TYPE);
-		invalidatedTokens.add(request.getRefreshToken());
+		RefreshToken rt = springDataRefreshTokenRepository.findByToken(request.getRefreshToken())
+				.orElseThrow(() -> new AppException(ErrorCode.INVALID_TOKEN));
+
+		TokenClaims claims = parseAndValidateToken(request.getRefreshToken(), REFRESH_TYPE, false);
+		
+		springDataRefreshTokenRepository.delete(rt);
 
 		User user = springDataUserRepository.findByCredentials_Username(claims.username())
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -200,8 +211,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
+	@Transactional
 	public LogoutResponse logout(LogoutRequest request) {
-		invalidatedTokens.add(request.getToken());
+		try {
+			TokenClaims claims = parseAndValidateToken(request.getAccessToken(), ACCESS_TYPE);
+			long ttl = claims.expiresAt() - Instant.now().getEpochSecond();
+			if (ttl > 0) {
+				redisTemplate.opsForValue().set("jwt:revoked:" + request.getAccessToken(), "revoked", ttl, TimeUnit.SECONDS);
+			}
+		} catch (AppException e) {
+			// Token is already invalid or expired, no need to do anything
+		}
+
+		springDataRefreshTokenRepository.findByToken(request.getRefreshToken())
+				.ifPresent(springDataRefreshTokenRepository::delete);
+
 		return LogoutResponse.builder().success(true).build();
 	}
 
@@ -249,6 +273,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		String accessToken = generateToken(username, roles, ACCESS_TYPE, accessTokenExpirationSeconds);
 		String refreshToken = generateToken(username, roles, REFRESH_TYPE, refreshTokenExpirationSeconds);
 
+		RefreshToken rt = RefreshToken.builder()
+				.token(refreshToken)
+				.user(user)
+				.expiresAt(Instant.now().plusSeconds(refreshTokenExpirationSeconds))
+				.build();
+		springDataRefreshTokenRepository.save(rt);
+
 		return AuthTokenResponse.builder()
 				.accessToken(accessToken)
 				.refreshToken(refreshToken)
@@ -287,11 +318,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	private TokenClaims parseAndValidateToken(String token, String expectedType) {
+		return parseAndValidateToken(token, expectedType, true);
+	}
+
+	private TokenClaims parseAndValidateToken(String token, String expectedType, boolean checkRedis) {
 		if (token == null || token.isBlank()) {
 			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 
-		if (invalidatedTokens.contains(token)) {
+		if (checkRedis && Boolean.TRUE.equals(redisTemplate.hasKey("jwt:revoked:" + token))) {
 			throw new AppException(ErrorCode.INVALID_TOKEN);
 		}
 

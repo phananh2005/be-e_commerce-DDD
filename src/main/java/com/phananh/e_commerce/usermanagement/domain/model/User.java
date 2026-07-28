@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.usermanagement.domain.model;
 
+import com.phananh.e_commerce.authentication.domain.model.RefreshToken;
 import com.phananh.e_commerce.core.domain.model.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,9 @@ public class User extends BaseEntity{
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private Set<RefreshToken> refreshTokens = new HashSet<>();
+
     public void updateInfo (UserInfo userInfo){
         this.info = userInfo;
     }
@@ -67,7 +71,10 @@ public class User extends BaseEntity{
 
     public void active(){this.credentials = this.credentials.activeUser();}
 
-    public void inactive(){this.credentials = this.credentials.inactiveUser();}
+    public void inactive(){
+        this.credentials = this.credentials.inactiveUser();
+        this.refreshTokens.clear();
+    }
 
     @PrePersist
     public void generateUuid() {

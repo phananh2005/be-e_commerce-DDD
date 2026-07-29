@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,8 +38,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         return springDataOrderRepository.findById(id);
     }
 
-    @Override
-    public Optional<Order> findByUuid(String uuid) {
+    public Optional<Order> findByUuid(UUID uuid) {
         return springDataOrderRepository.findByUuid(uuid);
     }
 

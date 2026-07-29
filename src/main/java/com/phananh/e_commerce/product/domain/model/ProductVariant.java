@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "product_variants")
@@ -26,6 +27,9 @@ public class ProductVariant extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", columnDefinition = "BINARY(16)", unique = true, nullable = false, updatable = false)
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
@@ -70,6 +74,7 @@ public class ProductVariant extends BaseEntity{
         }
 
         return ProductVariant.builder()
+                .uuid(UUID.randomUUID())
                 .product(command.getProduct())
                 .skuCode(StringUtils.isBlank(command.getSkuCode()) ? "empty" : command.getSkuCode().trim())
                 .price(command.getPrice().signum() < 0 ? BigDecimal.ZERO : command.getPrice())
@@ -125,6 +130,13 @@ public class ProductVariant extends BaseEntity{
     public void updateStatus(VariantStatus status) {
         if(status == null) throw new IllegalArgumentException("Status is null");
         this.status = status;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
     }
 }
 

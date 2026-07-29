@@ -11,12 +11,14 @@ import java.util.Optional;
 public interface ProductRepository {
     Page<Product> getProductsActiveBySearch(ProductSearchQuery productSearchQuery);
     Optional<Product> getProductById(Long id);
+    Optional<Product> getProductByUuid(String uuid);
     Page<Product> getAllProductsBySearch(ManagementProductSearchQuery productSearchQuery);
     List<ProductVariant> getVariantsByProductId(Long productId);
     Optional<ProductVariant> getVariantById(Long id);
-    List<ProductVariant> getVariantsById(List<Long> ids);
+    Optional<ProductVariant> getVariantByUuid(String uuid);
     Optional<ProductAttribute> getProductAttributesByName(String name);
     List<VariantImage> getVariantImagesById(List<Long> id);
+    List<VariantImage> getVariantImagesByUuid(List<String> uuids);
     void save(Product product);
     void save(AttributeValue attributeValue);
     void save(ProductVariant variant);

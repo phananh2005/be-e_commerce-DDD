@@ -10,6 +10,7 @@ public interface SpringDataProductVariantRepository extends JpaRepository<Produc
     List<ProductVariant> findByProduct_Id(Long productId);
     Optional<ProductVariant> findBySkuCode(String skuCode);
     List<ProductVariant> findByIdIn(List<Long> ids);
+    Optional<ProductVariant> findByUuid(java.util.UUID uuid);
 }
 
 

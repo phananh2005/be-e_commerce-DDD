@@ -21,7 +21,7 @@ public class CustomerProductSearchRequest {
     private Double maxPrice;
 
     @Min(value = 0, message = "Min rating must be >= 0")
-    @Max(value = 5, message = "Min rating must be <= 5")
+    @Max(value = 5, message = "Max rating must be <= 5")
     private Integer minRating;
 
     @Min(value = 0, message = "Page must be >= 0")

@@ -11,7 +11,7 @@ public interface CartItemService {
 
     void addProductToCart(CartAddItemRequest cartAddItemRequest);
 
-    void removeProductFromCart(List<Long> cartItemIds);
+    void removeProductFromCart(List<String> cartItemUuids);
 
     String updateCartItem(CartUpdateItemRequest cartUpdateItemRequest);
 }

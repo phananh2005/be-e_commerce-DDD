@@ -48,9 +48,9 @@ public class CartController {
     }
 
     @Operation(summary = "Xóa sản phẩm khỏi giỏ hàng", description = "Xóa một hoặc nhiều sản phẩm khỏi giỏ hàng")
-    @DeleteMapping("/remove/{ids}")
-    public ResponseEntity<ApiResponse<Void>> removeProductFromCart(@PathVariable List<Long> ids) {
-        cartItemService.removeProductFromCart(ids);
+    @DeleteMapping("/remove/{uuids}")
+    public ResponseEntity<ApiResponse<Void>> removeProductFromCart(@PathVariable List<String> uuids) {
+        cartItemService.removeProductFromCart(uuids);
         return ResponseEntity.noContent().build();
     }
 

@@ -29,11 +29,11 @@ public interface OrderService {
 
     List<OrderSummaryResponse> getMyOrder();
 
-    OrderDetailResponse getOrderDetail(Long orderId);
+    OrderDetailResponse getOrderDetail(String orderUuid);
 
-    OrderDetailResponse getOrderDetailForManagement(Long orderId);
+    OrderDetailResponse getOrderDetailForManagement(String orderUuid);
 
-    void updateOrderStatus(Long orderId, String status, String cancellationReason);
+    void updateOrderStatus(String orderUuid, String status, String cancellationReason);
 }
 
 

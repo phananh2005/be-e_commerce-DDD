@@ -16,8 +16,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserRoleUpdateRequest {
 
-    @NotNull(message = "User id is required")
-    private Long userId;
+    @NotNull(message = "User uuid is required")
+    private String userUuid;
 
     @NotEmpty(message = "Roles must not be empty")
     private Set<RoleName> roleNames;

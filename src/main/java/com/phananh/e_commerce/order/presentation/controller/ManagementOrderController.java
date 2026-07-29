@@ -35,9 +35,9 @@ public class ManagementOrderController {
     }
 
     @Operation(summary = "Lấy chi tiết đơn hàng", description = "Lấy thông tin chi tiết của một đơn hàng theo ID")
-    @GetMapping("/{orderId}")
-    public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetailForManagement(@PathVariable Long orderId) {
-        OrderDetailResponse response = orderService.getOrderDetailForManagement(orderId);
+    @GetMapping("/{orderUuid}")
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetailForManagement(@PathVariable String orderUuid) {
+        OrderDetailResponse response = orderService.getOrderDetailForManagement(orderUuid);
         return ResponseEntity.ok(ApiResponse.<OrderDetailResponse>builder()
                 .result(response)
                 .message("Get order detail successfully")
@@ -45,9 +45,9 @@ public class ManagementOrderController {
     }
 
 @Operation(summary = "Cập nhật trạng thái đơn hàng", description = "Cập nhật trạng thái xử lý của đơn hàng. Khi status là CANCELLED hoặc RETURNED thì phải nhập cancellationReason.")
-    @PatchMapping("{orderId}")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusUpdateRequest request) {
-        orderService.updateOrderStatus(orderId, request.getStatus(), request.getCancellationReason());
+    @PatchMapping("/{orderUuid}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable String orderUuid, @RequestBody OrderStatusUpdateRequest request) {
+        orderService.updateOrderStatus(orderUuid, request.getStatus(), request.getCancellationReason());
         return ResponseEntity.noContent().build();
     }
 }

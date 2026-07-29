@@ -19,6 +19,7 @@ import com.phananh.e_commerce.usermanagement.domain.repository.UserRepository;
 import com.phananh.e_commerce.usermanagement.presentation.dto.request.*;
 
 import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -94,11 +95,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserInfoResponseForManagement getUserInfo(Long id) {
+    public UserInfoResponseForManagement getUserInfo(String uuid) {
         User currentUser = userRepository.getByUserName(SecurityUtils.getCurrentUserName())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
 
-        User user = userRepository.getById(id)
+        User user = userRepository.getByUuid(UUID.fromString(uuid))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if (!hasRole(currentUser, RoleName.ROLE_SUPER_ADMIN)) {
@@ -129,7 +130,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Long getIdByUserUuid(String userUuid) {
-        User user = userRepository.getByUuid(userUuid)
+        User user = userRepository.getByUuid(UUID.fromString(userUuid))
                 .orElse(null);
         return user != null ? user.getId() : null;
     }
@@ -147,7 +148,7 @@ public class UserServiceImpl implements UserService {
     public String getUuidByUserId(Long userId) {
         User user = userRepository.getById(userId)
                 .orElse(null);
-        return user != null ? user.getUuid() : null;
+        return user != null ? user.getUuid().toString() : null;
     }
 
     @Override
@@ -191,7 +192,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest) {
-        User user = userRepository.getById(userRoleUpdateRequest.getUserId())
+        User user = userRepository.getByUuid(UUID.fromString(userRoleUpdateRequest.getUserUuid()))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         validateManagementPermission(user);
@@ -203,8 +204,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUserStatus(Long userId, String status) {
-        User user = userRepository.getById(userId)
+    public void updateUserStatus(String uuid, String status) {
+        User user = userRepository.getByUuid(UUID.fromString(uuid))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         validateManagementPermission(user);

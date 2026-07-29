@@ -13,9 +13,10 @@ import java.util.Set;
 public interface ProductInternalMapper {
 
 	@Mapping(target = "productId", expression = "java(product.getId())")
-	@Mapping(target = "productUuid", expression = "java(product.getUuid())")
+	@Mapping(target = "productUuid", expression = "java(product.getUuid() != null ? product.getUuid().toString() : null)")
 	@Mapping(target = "productName", expression = "java(product.getName())")
 	@Mapping(target = "productStatus", expression = "java(product.getStatus() == null ? null : product.getStatus().name())")
+	@Mapping(target = "variantUuid", expression = "java(resolveVariant(product, variantId).getUuid() != null ? resolveVariant(product, variantId).getUuid().toString() : null)")
 	@Mapping(target = "variantSkuCode", expression = "java(resolveVariant(product, variantId).getSkuCode())")
 	@Mapping(target = "variantImageUrl", expression = "java(resolveVariantImageUrl(resolveVariant(product, variantId).getImages()))")
 	@Mapping(target = "variantPrice", expression = "java(resolveVariant(product, variantId).getPrice())")

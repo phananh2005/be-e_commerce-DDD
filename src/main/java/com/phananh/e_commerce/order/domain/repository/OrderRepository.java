@@ -13,11 +13,12 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface OrderRepository {
     Order save(Order order);
     Optional<Order> findById(Long id);
-    Optional<Order> findByUuid(String uuid);
+    Optional<Order> findByUuid(UUID uuid);
     List<Order> findByUserId(Long userId);
     Page<Order> findAll(Pageable pageable);
     Page<Order> getListOrdersBySearch(OrderSearchQuery orderSearchQuery);

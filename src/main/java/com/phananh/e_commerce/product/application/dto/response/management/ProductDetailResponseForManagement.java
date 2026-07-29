@@ -1,11 +1,14 @@
 package com.phananh.e_commerce.product.application.dto.response.management;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
 public class ProductDetailResponseForManagement {
+    @JsonIgnore
+    @Deprecated
     private Long id;
     private String uuid;
     private String name;

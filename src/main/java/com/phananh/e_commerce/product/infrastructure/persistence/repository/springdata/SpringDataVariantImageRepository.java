@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface SpringDataVariantImageRepository extends JpaRepository<VariantImage, Long> {
     List<VariantImage> findByIdIn(List<Long> ids);
+    List<VariantImage> findByUuidIn(List<java.util.UUID> uuids);
 }
 

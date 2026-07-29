@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> getByUuid(String uuid) {
+    public Optional<User> getByUuid(UUID uuid) {
         return springDataUserRepository.findByUuid(uuid);
     }
 

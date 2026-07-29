@@ -60,6 +60,7 @@ public interface CustomerProductMapper {
     ProductDetailResponse toProductDetailResponse(Product product);
 
     @Mapping(source = "id", target = "variantId")
+    @Mapping(source = "uuid", target = "variantUuid")
     @Mapping(source = "skuCode", target = "variantSkuCode")
     @Mapping(source = "price", target = "variantPrice")
     @Mapping(target = "stockQuantity", source = "stockQuantity")
@@ -79,6 +80,7 @@ public interface CustomerProductMapper {
     }
 
     @Mapping(source = "id", target = "imageId")
+    @Mapping(source = "uuid", target = "imageUuid")
     @Mapping(source = "imageUrl", target = "imageUrl")
     @Mapping(source = "avatar", target = "avatar")
     ProductDetailResponse.ProductVariantDetail.Image toVariantImageResponse(VariantImage image);

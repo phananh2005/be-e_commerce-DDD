@@ -3,6 +3,7 @@ package com.phananh.e_commerce.product.domain.model;
 import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "variant_image")
@@ -15,6 +16,9 @@ public class VariantImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", columnDefinition = "BINARY(16)", unique = true, nullable = false, updatable = false)
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "variant_id", nullable = false)
@@ -36,10 +40,18 @@ public class VariantImage {
         }
 
         return VariantImage.builder()
+                .uuid(UUID.randomUUID())
                 .variant(variant)
                 .imageUrl(imageUrl.trim())
                 .isAvatar(isAvatar)
                 .build();
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
     }
 }
 

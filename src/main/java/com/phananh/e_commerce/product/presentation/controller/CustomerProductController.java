@@ -38,9 +38,9 @@ public class CustomerProductController {
     }
 
     @Operation(summary = "Lấy chi tiết sản phẩm", description = "Lấy thông tin chi tiết của một sản phẩm theo ID bao gồm các biến thể")
-    @GetMapping("/product/{id}")
-    public ResponseEntity<ApiResponse<ProductDetailResponse>> getProductById(@PathVariable Long id) {
-        ProductDetailResponse product = customerProductService.getProductById(id);
+    @GetMapping("/product/{uuid}")
+    public ResponseEntity<ApiResponse<ProductDetailResponse>> getProductById(@PathVariable String uuid) {
+        ProductDetailResponse product = customerProductService.getProductById(uuid);
         ApiResponse<ProductDetailResponse> response = ApiResponse.<ProductDetailResponse>builder()
                 .message("Get product successfully")
                 .result(product)

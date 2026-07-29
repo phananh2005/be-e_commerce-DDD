@@ -12,7 +12,11 @@ public interface CartItemRepository {
 
     List<CartItem> getByListId(List<Long> ids);
 
+    List<CartItem> getByListUuid(List<String> uuids);
+
     Optional<CartItem> getById(Long id);
+
+    Optional<CartItem> getByUuid(String uuid);
 
     CartItem save(CartItem cartItem);
 

@@ -48,9 +48,15 @@ public class ProductSearchSpecification {
                 return criteriaBuilder.conjunction();
             }
             String likePattern = "%" + productSearch.toLowerCase() + "%";
-            return criteriaBuilder.or(
-                    criteriaBuilder.equal(criteriaBuilder.lower(root.get("uuid")), productSearch.toLowerCase()),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern));
+            jakarta.persistence.criteria.Predicate namePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern);
+            try {
+                java.util.UUID uuid = java.util.UUID.fromString(productSearch);
+                return criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("uuid"), uuid),
+                        namePredicate);
+            } catch (IllegalArgumentException e) {
+                return namePredicate;
+            }
         };
     }
 

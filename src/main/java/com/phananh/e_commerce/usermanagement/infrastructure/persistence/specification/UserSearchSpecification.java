@@ -15,10 +15,17 @@ public class UserSearchSpecification {
                 return criteriaBuilder.conjunction();
             }
             String likePattern = "%" + userIdentifier.toLowerCase() + "%";
-            return criteriaBuilder.or(
-                    criteriaBuilder.equal(criteriaBuilder.lower(root.get("uuid")), userIdentifier.toLowerCase()),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern)
-            );
+            jakarta.persistence.criteria.Predicate usernamePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("credentials").get("username")), likePattern);
+            
+            try {
+                java.util.UUID uuid = java.util.UUID.fromString(userIdentifier);
+                return criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("uuid"), uuid),
+                        usernamePredicate
+                );
+            } catch (IllegalArgumentException e) {
+                return usernamePredicate;
+            }
         };
     }
 

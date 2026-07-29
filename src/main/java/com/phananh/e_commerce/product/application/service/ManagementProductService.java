@@ -17,13 +17,13 @@ public interface ManagementProductService {
 
 
 	// Management - product detail
-	ProductDetailResponseForManagement getManagementProductById(Long id);
+	ProductDetailResponseForManagement getManagementProductById(String uuid);
 
 	// Management - list variants by product
-	List<ProductVariantResponseForManagement> getManagementProductVariantsByProductId(Long productId);
+	List<ProductVariantResponseForManagement> getManagementProductVariantsByProductId(String uuid);
 
 	// Management - get variants summary by product
-	ProductVariantsSummaryResponseForManagement getManagementProductVariantsSummaryByProductId(Long productId);
+	ProductVariantsSummaryResponseForManagement getManagementProductVariantsSummaryByProductId(String uuid);
 
 	// Management - search all products (including inactive)
 	Page<ProductSummaryResponseForManagement> getAllProductsBySearch(ManagementProductSearchRequest managementProductSearchRequest);
@@ -35,7 +35,7 @@ public interface ManagementProductService {
 
 	void updateProductStatus(Long productId, String status);
 
-	void updateVariantStockQuantityAndPrice(Long variantId, UpdateVariantStockQuantityAndPriceRequest request);
+	void updateVariantStockQuantityAndPrice(String uuid, UpdateVariantStockQuantityAndPriceRequest request);
 
 	void updateVariantStock(Long variantId, Integer stockQuantity);
 }

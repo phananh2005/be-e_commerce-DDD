@@ -9,5 +9,5 @@ public interface CustomerProductService {
 
     Page<ProductSummaryResponse> getProductsActiveBySearch(CustomerProductSearchRequest customerProductSearchRequest);
 
-    ProductDetailResponse getProductById(Long id);
+    ProductDetailResponse getProductById(String uuid);
 }

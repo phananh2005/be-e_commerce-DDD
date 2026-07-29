@@ -40,6 +40,14 @@ public class ProductInternalServiceImpl implements ProductInternalService {
 
     @Override
     @Transactional(readOnly = true)
+    public Long getVariantIdByUuid(String variantUuid) {
+        ProductVariant productVariant = productRepository.getVariantByUuid(variantUuid)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
+        return productVariant.getId();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public long countProducts() {
         return productRepository.count();
     }

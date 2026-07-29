@@ -10,7 +10,12 @@ public class OrderSearchSpecification {
     public static Specification<Order> hasOrderUuid(String orderUuid) {
         return (root, query, cb) -> {
             if (orderUuid == null) return cb.conjunction();
-            return cb.equal(cb.lower(root.get("uuid")), orderUuid.toLowerCase());
+            try {
+                java.util.UUID uuid = java.util.UUID.fromString(orderUuid);
+                return cb.equal(root.get("uuid"), uuid);
+            } catch (IllegalArgumentException e) {
+                return cb.disjunction();
+            }
         };
     }
 

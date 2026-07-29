@@ -23,8 +23,8 @@ public class User extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "uuid", columnDefinition = "VARCHAR(36)", unique = true, nullable = false)
-    private String uuid;
+    @Column(name = "uuid", columnDefinition = "BINARY(16)", unique = true, nullable = false)
+    private UUID uuid;
 
     @Embedded
     private UserCredentials credentials;
@@ -42,6 +42,7 @@ public class User extends BaseEntity{
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @Builder.Default
     private Set<RefreshToken> refreshTokens = new HashSet<>();
 
     public void updateInfo (UserInfo userInfo){
@@ -79,7 +80,7 @@ public class User extends BaseEntity{
     @PrePersist
     public void generateUuid() {
         if (this.uuid == null) {
-            this.uuid = UUID.randomUUID().toString();
+            this.uuid = UUID.randomUUID();
         }
     }
 }

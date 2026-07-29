@@ -38,6 +38,29 @@ public class CartItemRepositoryImpl implements CartItemRepository {
     }
 
     @Override
+    public Optional<CartItem> getByUuid(String uuid) {
+        try {
+            return springDataCartItemRepository.findByUuid(java.util.UUID.fromString(uuid));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<CartItem> getByListUuid(List<String> uuids) {
+        if (uuids == null || uuids.isEmpty()) return List.of();
+        List<java.util.UUID> uuidList = uuids.stream().map(uuidStr -> {
+            try {
+                return java.util.UUID.fromString(uuidStr);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }).filter(java.util.Objects::nonNull).toList();
+        if(uuidList.isEmpty()) return List.of();
+        return springDataCartItemRepository.findByUuidIn(uuidList);
+    }
+
+    @Override
     public CartItem save(CartItem cartItem) {
         return springDataCartItemRepository.save(cartItem);
     }

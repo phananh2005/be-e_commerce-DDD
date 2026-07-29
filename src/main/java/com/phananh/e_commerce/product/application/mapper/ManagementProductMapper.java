@@ -57,6 +57,7 @@ public interface ManagementProductMapper {
 
     // Mapper for VariantImage -> management ProductVariantResponse.Image
     @Mapping(source = "id", target = "imageId")
+    @Mapping(source = "uuid", target = "imageUuid")
     @Mapping(source = "imageUrl", target = "imageUrl")
     @Mapping(source = "avatar", target = "avatar")
     ProductVariantResponseForManagement.Image toManagementVariantImageResponse(VariantImage image);
@@ -88,6 +89,7 @@ public interface ManagementProductMapper {
     }
 
     @Mapping(target = "variantId", source = "id")
+    @Mapping(target = "variantUuid", source = "uuid")
     @Mapping(target = "skuCode", source = "skuCode")
     @Mapping(target = "stockQuantity", source = "stockQuantity")
     @Mapping(target = "price", expression = "java(productVariant.getPrice() == null ? null : productVariant.getPrice().doubleValue())")

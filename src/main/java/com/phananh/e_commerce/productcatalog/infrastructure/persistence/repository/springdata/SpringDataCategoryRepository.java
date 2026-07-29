@@ -13,5 +13,3 @@ public interface SpringDataCategoryRepository extends JpaRepository<Category, Lo
     boolean existsByNameIgnoreCase(String name);
     List<Category> findByIsEnabledTrue();
 }
-
-

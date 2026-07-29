@@ -102,6 +102,7 @@ public interface OrderMapper {
     @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().toString() : null)")
     @Mapping(target = "createdAt", source = "order.createdAt")
     @Mapping(target = "modifiedAt", source = "order.modifiedAt")
+    @Mapping(target = "userUuid", ignore = true)
     @Mapping(target = "items", ignore = true)
     ManagementOrderResponse toManagementOrderResponse(Order order, String username);
 

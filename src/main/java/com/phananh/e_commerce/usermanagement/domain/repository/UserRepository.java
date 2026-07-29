@@ -8,11 +8,12 @@ import org.springframework.data.domain.Page;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public interface UserRepository {
     Optional<User> getById(Long id);
     Optional<User> getByUserName(String userName);
-    Optional<User> getByUuid(String uuid);
+    Optional<User> getByUuid(UUID uuid);
     void save(User user);
     long count();
     Page<User> getListUsersBySearch(UserSearchQuery userSearchQuery);

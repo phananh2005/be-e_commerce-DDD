@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,7 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManagementOrderResponse {
+    @JsonIgnore
+    @Deprecated
     private Long orderId;
+    @JsonIgnore
+    @Deprecated
     private Long userId;
     private String orderUuid;
     private String userUuid;
@@ -30,6 +35,8 @@ public class ManagementOrderResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Item {
+        @JsonIgnore
+        @Deprecated
         private Long productId;
         private String productUuid;
         private String productName;

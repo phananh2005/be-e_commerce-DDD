@@ -55,18 +55,19 @@ public class CartItemServiceImpl implements CartItemService {
     @Transactional
     public void addProductToCart(CartAddItemRequest cartAddItemRequest) {
         Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
-        Optional<CartItem> cartItem = cartItemRepository.getByUserIdAndVariantId(userId, cartAddItemRequest.getVariantId());
+        Long variantId = productService.getVariantIdByUuid(cartAddItemRequest.getVariantUuid());
+        Optional<CartItem> cartItem = cartItemRepository.getByUserIdAndVariantId(userId, variantId);
         if(cartItem.isEmpty()){
-            if(cartAddItemRequest.getQuantity() > productService.getStockQuantityByVariantId(cartAddItemRequest.getVariantId())){
+            if(cartAddItemRequest.getQuantity() > productService.getStockQuantityByVariantId(variantId)){
                 throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
             }
-            CartItem newCartItem = CartItem.addItem(userId, cartAddItemRequest.getVariantId(), cartAddItemRequest.getQuantity());
+            CartItem newCartItem = CartItem.addItem(userId, variantId, cartAddItemRequest.getQuantity());
             cartItemRepository.save(newCartItem);
         }
         else {
             CartItem existingCartItem = cartItem.get();
             Integer newQuantity = existingCartItem.getQuantity() + cartAddItemRequest.getQuantity();
-            if(newQuantity > productService.getStockQuantityByVariantId(cartAddItemRequest.getVariantId())){
+            if(newQuantity > productService.getStockQuantityByVariantId(variantId)){
                 throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
             }
             existingCartItem.updateQuantity(newQuantity);
@@ -76,13 +77,13 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional
-    public void removeProductFromCart(List<Long> cartItemIds) {
-        if (cartItemIds == null || cartItemIds.isEmpty()) {
+    public void removeProductFromCart(List<String> cartItemUuids) {
+        if (cartItemUuids == null || cartItemUuids.isEmpty()) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
         Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
-        List<CartItem> cartItems = cartItemRepository.getByListId(cartItemIds);
+        List<CartItem> cartItems = cartItemRepository.getByListUuid(cartItemUuids);
         if (ListUtils.isNullOrEmpty(cartItems)) {
             throw new AppException(ErrorCode.CART_ITEM_NOT_FOUND);
         }
@@ -101,15 +102,17 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         Long userId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
-        CartItem cartItems = cartItemRepository.getById(cartUpdateItemRequest.getCartItemId())
+        CartItem cartItems = cartItemRepository.getByUuid(cartUpdateItemRequest.getCartItemUuid())
                 .orElseThrow(() -> new AppException(ErrorCode.CART_ITEM_NOT_FOUND));
         if(!cartItems.getUserId().equals(userId)) throw new AppException(ErrorCode.UNAUTHORIZED);
 
-        Optional<CartItem> existingCartItem = cartItemRepository.getByUserIdAndVariantId(userId, cartUpdateItemRequest.getVariantId());
-        if(existingCartItem.isEmpty() || existingCartItem.get().getId().equals(cartItems.getId())){
-            cartItems.updateVariant(cartUpdateItemRequest.getVariantId());
+        Long variantId = productService.getVariantIdByUuid(cartUpdateItemRequest.getVariantUuid());
 
-            if(cartUpdateItemRequest.getQuantity() > productService.getStockQuantityByVariantId(cartUpdateItemRequest.getVariantId())){
+        Optional<CartItem> existingCartItem = cartItemRepository.getByUserIdAndVariantId(userId, variantId);
+        if(existingCartItem.isEmpty() || existingCartItem.get().getId().equals(cartItems.getId())){
+            cartItems.updateVariant(variantId);
+
+            if(cartUpdateItemRequest.getQuantity() > productService.getStockQuantityByVariantId(variantId)){
                 throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
             }
             cartItems.updateQuantity(cartUpdateItemRequest.getQuantity());
@@ -122,7 +125,7 @@ public class CartItemServiceImpl implements CartItemService {
             cartItemRepository.delete(cartItems);
             CartItem cartItemUpdate = existingCartItem.get();
             Integer newQuantity = cartItemUpdate.getQuantity() + cartUpdateItemRequest.getQuantity();
-            Integer stockQuantity = productService.getStockQuantityByVariantId(cartUpdateItemRequest.getVariantId());
+            Integer stockQuantity = productService.getStockQuantityByVariantId(variantId);
             if(newQuantity > stockQuantity){
                 newQuantity = stockQuantity;
             }

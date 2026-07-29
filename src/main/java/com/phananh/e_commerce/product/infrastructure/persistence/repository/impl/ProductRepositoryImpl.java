@@ -52,6 +52,15 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public Optional<Product> getProductByUuid(String uuid) {
+        try {
+            return springDataProductRepository.findByUuid(java.util.UUID.fromString(uuid));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Page<Product> getAllProductsBySearch(ManagementProductSearchQuery productSearchQuery) {
         Pageable pageable = productSearchQuery.getPageable();
 
@@ -75,9 +84,15 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<ProductVariant> getVariantsById(List<Long> ids) {
-        return springDataProductVariantRepository.findByIdIn(ids);
+    public Optional<ProductVariant> getVariantByUuid(String uuid) {
+        try {
+            return springDataProductVariantRepository.findByUuid(java.util.UUID.fromString(uuid));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
+
+
 
     @Override
     public Optional<ProductAttribute> getProductAttributesByName(String name) {
@@ -87,6 +102,16 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public List<VariantImage> getVariantImagesById(List<Long> id) {
         return springDataVariantImageRepository.findByIdIn(id);
+    }
+
+    @Override
+    public List<VariantImage> getVariantImagesByUuid(List<String> uuids) {
+        try {
+            List<java.util.UUID> parsedUuids = uuids.stream().map(java.util.UUID::fromString).toList();
+            return springDataVariantImageRepository.findByUuidIn(parsedUuids);
+        } catch (IllegalArgumentException e) {
+            return List.of();
+        }
     }
 
     @Override

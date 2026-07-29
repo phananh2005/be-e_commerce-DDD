@@ -12,6 +12,6 @@ public interface CategoryRepository {
     List<Category> getEnabled();
     Category saveAndFlush(Category category);
     Category save(Category category);
-    boolean existsByNameIgnoreCase(String normalizedName);
+    boolean existsByNameIgnoreCase(String name);
     Optional<Category> getById(Long categoryId);
 }

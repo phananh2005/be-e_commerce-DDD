@@ -4,8 +4,12 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 public class ProductSummaryResponseForManagement {
+    @JsonIgnore
+    @Deprecated
     private Long id;
     private String uuid;
     private String avatarUrl;

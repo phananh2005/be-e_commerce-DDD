@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.product.application.dto.response.customer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import lombok.Data;
 
@@ -10,6 +11,8 @@ import java.util.Set;
 @Data
 public class ProductDetailResponse{
 
+    @JsonIgnore
+    @Deprecated
     private Long productId;
     private String productUuid;
     private LocalDateTime createdAt;
@@ -30,7 +33,10 @@ public class ProductDetailResponse{
 
     @Data
     public static class ProductVariantDetail {
+        @JsonIgnore
+        @Deprecated
         private Long variantId;
+        private String variantUuid;
         private String variantSkuCode;
         private BigDecimal variantPrice;
         private Integer stockQuantity;
@@ -47,7 +53,10 @@ public class ProductDetailResponse{
 
         @Data
         public static class Image {
+            @JsonIgnore
+            @Deprecated
             private Long imageId;
+            private String imageUuid;
             private String imageUrl;
             private boolean isAvatar;
         }

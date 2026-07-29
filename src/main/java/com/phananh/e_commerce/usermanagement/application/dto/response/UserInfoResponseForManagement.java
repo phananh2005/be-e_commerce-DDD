@@ -7,9 +7,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 @Builder
 public class UserInfoResponseForManagement {
+    @JsonIgnore
+    @Deprecated
     private Long id;
     private String uuid;
     private String username;

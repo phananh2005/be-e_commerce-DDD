@@ -5,8 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface SpringDataProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+    Optional<Product> findByUuid(UUID uuid);
     List<Product> findByNameContainingIgnoreCase(String name);
     Product findByVariants_Id(Long variantId);
 }

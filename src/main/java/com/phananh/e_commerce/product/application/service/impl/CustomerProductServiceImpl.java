@@ -59,8 +59,8 @@ public class CustomerProductServiceImpl implements CustomerProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDetailResponse getProductById(Long id) {
-        Product product = productRepository.getProductById(id).orElseThrow(
+    public ProductDetailResponse getProductById(String uuid) {
+        Product product = productRepository.getProductByUuid(uuid).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         if (product.getVariants() == null || product.getVariants().isEmpty()) {

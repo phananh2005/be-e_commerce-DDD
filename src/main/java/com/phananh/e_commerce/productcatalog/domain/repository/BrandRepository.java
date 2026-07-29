@@ -12,6 +12,6 @@ public interface BrandRepository {
     Page<Brand> getListBrandBySearch(BrandSearchQuery query);
     Brand saveAndFlush(Brand brand);
     void save(Brand brand);
-    boolean existsByNameIgnoreCase(String normalizedName);
+    boolean existsByNameIgnoreCase(String name);
     Optional<Brand> getById(Long brandId);
 }

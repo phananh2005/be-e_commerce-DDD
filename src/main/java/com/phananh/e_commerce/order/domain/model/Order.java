@@ -29,8 +29,8 @@ public class Order extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "uuid", columnDefinition = "VARCHAR(36)", unique = true, nullable = false)
-    private String uuid;
+    @Column(name = "uuid", columnDefinition = "BINARY(16)", unique = true, nullable = false)
+    private UUID uuid;
 
     @Column(nullable = false)
     private Long userId;
@@ -125,7 +125,7 @@ public class Order extends BaseEntity{
     @PrePersist
     public void generateUuid() {
         if (this.uuid == null) {
-            this.uuid = UUID.randomUUID().toString();
+            this.uuid = UUID.randomUUID();
         }
     }
 }

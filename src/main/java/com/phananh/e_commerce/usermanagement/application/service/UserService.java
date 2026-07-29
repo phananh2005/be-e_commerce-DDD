@@ -15,7 +15,7 @@ public interface UserService {
     UserInfoResponse getMyInfo();
     void updateMyInfo(UserInfoUpdateRequest userInfoUpdateRequest);
     void changePassword(UserChangePasswordRequest userChangePasswordRequest);
-    UserInfoResponseForManagement getUserInfo(Long id);
+    UserInfoResponseForManagement getUserInfo(String uuid);
     String getUsernameByUserId(Long userId);
     String getUuidByUserId(Long userId);
     Long getIdByUserName(String userName);
@@ -23,7 +23,7 @@ public interface UserService {
     Page<UserSummaryForManagementResponse> getAllUsers(UserQueryRequest userQueryRequest);
     List<RoleResponse> getRoles();
     void updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest);
-    void updateUserStatus(Long userId, String status);
+    void updateUserStatus(String uuid, String status);
     void createUser(CreateUserRequest request);
 
 }

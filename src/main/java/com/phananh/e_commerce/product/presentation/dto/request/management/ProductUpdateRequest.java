@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.product.presentation.dto.request.management;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -14,8 +15,12 @@ import java.util.Map;
 @Data
 public class ProductUpdateRequest {
 
-    @NotNull(message = "Product id is required")
+    @JsonIgnore
+    @Deprecated
     private Long productId;
+
+    @NotNull(message = "Product uuid is required")
+    private String productUuid;
 
     private String name;
 
@@ -35,8 +40,12 @@ public class ProductUpdateRequest {
 
     @Data
     public static class VariantUpdateRequest {
-        @NotNull(message = "Variant id is required")
+        @JsonIgnore
+        @Deprecated
         private Long variantId;
+
+        @NotNull(message = "Variant uuid is required")
+        private String variantUuid;
 
         @NotNull(message = "Price is required")
         @DecimalMin(value = "0.0", message = "Price must be >= 0")
@@ -56,7 +65,11 @@ public class ProductUpdateRequest {
 
         private Map<String, String> attributes;
 
+        @JsonIgnore
+        @Deprecated
         private List<Long> variantDetailImageIdsToDelete;
+
+        private List<String> variantDetailImageUuidsToDelete;
 
         private List<String> variantDetailImageUrlsToAdd;
     }

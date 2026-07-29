@@ -43,9 +43,9 @@ public class ManagementProductController {
     }
 
     @Operation(summary = "Lấy chi tiết sản phẩm", description = "Lấy thông tin chi tiết của một sản phẩm theo ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductDetailResponseForManagement>> getManagementProductById(@PathVariable Long id) {
-        ProductDetailResponseForManagement product = managementProductService.getManagementProductById(id);
+    @GetMapping("/{uuid}")
+    public ResponseEntity<ApiResponse<ProductDetailResponseForManagement>> getManagementProductById(@PathVariable String uuid) {
+        ProductDetailResponseForManagement product = managementProductService.getManagementProductById(uuid);
         ApiResponse<ProductDetailResponseForManagement> response = ApiResponse.<ProductDetailResponseForManagement>builder()
                 .message("Get product successfully")
                 .result(product)
@@ -54,9 +54,9 @@ public class ManagementProductController {
     }
 
     @Operation(summary = "Lấy biến thể sản phẩm", description = "Lấy danh sách các biến thể của một sản phẩm")
-    @GetMapping("/{productId}/variants")
-    public ResponseEntity<ApiResponse<List<ProductVariantResponseForManagement>>> getManagementProductVariantsByProductId(@PathVariable Long productId) {
-        List<ProductVariantResponseForManagement> variants = managementProductService.getManagementProductVariantsByProductId(productId);
+    @GetMapping("/{uuid}/variants")
+    public ResponseEntity<ApiResponse<List<ProductVariantResponseForManagement>>> getManagementProductVariantsByProductId(@PathVariable String uuid) {
+        List<ProductVariantResponseForManagement> variants = managementProductService.getManagementProductVariantsByProductId(uuid);
         ApiResponse<List<ProductVariantResponseForManagement>> response = ApiResponse.<List<ProductVariantResponseForManagement>>builder()
                 .message("Get product variants successfully")
                 .result(variants)
@@ -65,9 +65,9 @@ public class ManagementProductController {
     }
 
     @Operation(summary = "Lấy summary biến thể sản phẩm", description = "Lấy thông tin summary (sku, stock, price, avatar) của các biến thể sản phẩm")
-    @GetMapping("/{productId}/variants/summary")
-    public ResponseEntity<ApiResponse<ProductVariantsSummaryResponseForManagement>> getManagementProductVariantsSummaryByProductId(@PathVariable Long productId) {
-        ProductVariantsSummaryResponseForManagement responseDTO = managementProductService.getManagementProductVariantsSummaryByProductId(productId);
+    @GetMapping("/{uuid}/variants/summary")
+    public ResponseEntity<ApiResponse<ProductVariantsSummaryResponseForManagement>> getManagementProductVariantsSummaryByProductId(@PathVariable String uuid) {
+        ProductVariantsSummaryResponseForManagement responseDTO = managementProductService.getManagementProductVariantsSummaryByProductId(uuid);
         ApiResponse<ProductVariantsSummaryResponseForManagement> response = ApiResponse.<ProductVariantsSummaryResponseForManagement>builder()
                 .message("Get product variants summary successfully")
                 .result(responseDTO)
@@ -97,9 +97,9 @@ public class ManagementProductController {
     }
 
     @Operation(summary = "Cập nhật số lượng tồn kho và giá biến thể", description = "Cập nhật số lượng tồn kho và giá của một biến thể sản phẩm")
-    @PatchMapping("/variant/{variantId}")
-    public ResponseEntity<ApiResponse<Void>> updateVariantStockQuantityAndPrice(@PathVariable Long variantId, @RequestBody @Valid UpdateVariantStockQuantityAndPriceRequest request) {
-        managementProductService.updateVariantStockQuantityAndPrice(variantId, request);
+    @PatchMapping("/variant/{uuid}")
+    public ResponseEntity<ApiResponse<Void>> updateVariantStockQuantityAndPrice(@PathVariable String uuid, @RequestBody @Valid UpdateVariantStockQuantityAndPriceRequest request) {
+        managementProductService.updateVariantStockQuantityAndPrice(uuid, request);
         return ResponseEntity.noContent().build();
     }
 }

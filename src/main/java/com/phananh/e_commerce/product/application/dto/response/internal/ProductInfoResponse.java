@@ -10,6 +10,7 @@ public class ProductInfoResponse {
     private String productUuid;
     private String productName;
     private String productStatus;
+    private String variantUuid;
     private String variantSkuCode;
     private String variantImageUrl;
     private BigDecimal variantPrice;

@@ -55,11 +55,11 @@ public class ManagementUserController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @Operation(summary = "Lấy thông tin người dùng", description = "Lấy thông tin chi tiết của một người dùng theo ID")
-    @GetMapping("/info/{id}")
-    public ResponseEntity<ApiResponse<UserInfoResponseForManagement>> getUserInfo(@PathVariable Long id) {
+    @Operation(summary = "Lấy thông tin người dùng", description = "Lấy thông tin chi tiết của một người dùng theo UUID")
+    @GetMapping("/info/{uuid}")
+    public ResponseEntity<ApiResponse<UserInfoResponseForManagement>> getUserInfo(@PathVariable String uuid) {
         ApiResponse<UserInfoResponseForManagement> apiResponse = ApiResponse.<UserInfoResponseForManagement>builder()
-                .result(userService.getUserInfo(id))
+                .result(userService.getUserInfo(uuid))
                 .message("Get user info successfully")
                 .build();
         return ResponseEntity.ok(apiResponse);
@@ -73,10 +73,10 @@ public class ManagementUserController {
     }
 
     @Operation(summary = "Cập nhật trạng thái người dùng", description = "Kích hoạt hoặc vô hiệu hóa tài khoản người dùng")
-    @PatchMapping("/{id}/{status}")
-    public ResponseEntity<?> updateUserStatus(@PathVariable("id") Long userId,
+    @PatchMapping("/{uuid}/{status}")
+    public ResponseEntity<?> updateUserStatus(@PathVariable("uuid") String userUuid,
                                               @PathVariable String status) {
-        userService.updateUserStatus(userId, status);
+        userService.updateUserStatus(userUuid, status);
         return ResponseEntity.noContent().build();
     }
 

@@ -148,7 +148,8 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderPreviewRequest req : orderPreviewRequest) {
-            ProductInfoResponse productInfo = productService.getProductInfoByVariantId(req.getVariantId());
+            Long variantId = productService.getVariantIdByUuid(req.getVariantUuid());
+            ProductInfoResponse productInfo = productService.getProductInfoByVariantId(variantId);
             if (req.getQuantity() == null || req.getQuantity() <= 0) throw new AppException(ErrorCode.INVALID_REQUEST);
             if (req.getQuantity() > productInfo.getStockQuantity())
                 throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
@@ -200,7 +201,8 @@ public class OrderServiceImpl implements OrderService {
         List<CartItem> cartItemsToRemove = new ArrayList<>();
 
         for (CheckoutRequest.Item item : checkoutRequest.getItems()) {
-            ProductInfoResponse productInfo = productService.getProductInfoByVariantId(item.getVariantId());
+            Long variantId = productService.getVariantIdByUuid(item.getVariantUuid());
+            ProductInfoResponse productInfo = productService.getProductInfoByVariantId(variantId);
             if (item.getQuantity() == null || item.getQuantity() <= 0)
                 throw new AppException(ErrorCode.INVALID_REQUEST);
             Integer currentStock = productInfo.getStockQuantity();
@@ -212,17 +214,17 @@ public class OrderServiceImpl implements OrderService {
 
             OrderItemCreateCommand orderItemCreateCommand = OrderItemCreateCommand.builder()
                     .order(order)
-                    .variantId(item.getVariantId())
+                    .variantId(variantId)
                     .quantity(item.getQuantity())
                     .price(price)
                     .build();
             OrderItem orderItem = OrderItem.create(orderItemCreateCommand);
 
             int newStock = currentStock - item.getQuantity();
-            managementProductService.updateVariantStock(item.getVariantId(), Math.max(newStock, 0));
+            managementProductService.updateVariantStock(variantId, Math.max(newStock, 0));
             itemsToSave.add(orderItem);
 
-            cartItemRepository.getByUserIdAndVariantId(userId, item.getVariantId())
+            cartItemRepository.getByUserIdAndVariantId(userId, variantId)
                     .ifPresent(cartItemsToRemove::add);
         }
         order.updateTotalPrice(total);
@@ -258,8 +260,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDetailResponse getOrderDetail(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+    public OrderDetailResponse getOrderDetail(String orderUuid) {
+        Order order = orderRepository.findByUuid(UUID.fromString(orderUuid))
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         Long currentUserId = userService.getIdByUserName(SecurityUtils.getCurrentUserName());
@@ -281,8 +283,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDetailResponse getOrderDetailForManagement(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+    public OrderDetailResponse getOrderDetailForManagement(String orderUuid) {
+        Order order = orderRepository.findByUuid(UUID.fromString(orderUuid))
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(order.getId());
@@ -308,8 +310,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void updateOrderStatus(Long orderId, String status, String cancellationReason) {
-        Order order = orderRepository.findById(orderId)
+    public void updateOrderStatus(String orderUuid, String status, String cancellationReason) {
+        Order order = orderRepository.findByUuid(UUID.fromString(orderUuid))
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         OrderStatus oldStatus = order.getStatus();

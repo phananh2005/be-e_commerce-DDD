@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface SpringDataUserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
@@ -13,7 +14,7 @@ public interface SpringDataUserRepository extends JpaRepository<User, Long>, Jpa
 
     Optional<User> findByInfoPhoneNumber(String phoneNumber);
 
-    Optional<User> findByUuid(String uuid);
+    Optional<User> findByUuid(UUID uuid);
 
     boolean existsByCredentialsUsername(String username);
 

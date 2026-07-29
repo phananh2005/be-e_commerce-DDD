@@ -71,8 +71,8 @@ public class ManagementProductServiceImpl implements ManagementProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDetailResponseForManagement getManagementProductById(Long id) {
-        Product product = productRepository.getProductById(id).orElseThrow(
+    public ProductDetailResponseForManagement getManagementProductById(String uuid) {
+        Product product = productRepository.getProductByUuid(uuid).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return managementProductMapper.toManagementProductDetailResponse(product);
@@ -80,28 +80,27 @@ public class ManagementProductServiceImpl implements ManagementProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductVariantResponseForManagement> getManagementProductVariantsByProductId(Long productId) {
-        if (productRepository.getProductById(productId).isEmpty()) {
-            throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
-        }
+    public List<ProductVariantResponseForManagement> getManagementProductVariantsByProductId(String uuid) {
+        Product product = productRepository.getProductByUuid(uuid).orElseThrow(
+                () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        return productRepository.getVariantsByProductId(productId).stream()
+        return productRepository.getVariantsByProductId(product.getId()).stream()
                 .map(managementProductMapper::toManagementProductVariantResponse)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ProductVariantsSummaryResponseForManagement getManagementProductVariantsSummaryByProductId(Long productId) {
-        Product product = productRepository.getProductById(productId)
+    public ProductVariantsSummaryResponseForManagement getManagementProductVariantsSummaryByProductId(String uuid) {
+        Product product = productRepository.getProductByUuid(uuid)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        List<ProductVariantsSummaryResponseForManagement.Variant> variants = productRepository.getVariantsByProductId(productId).stream()
+        List<ProductVariantsSummaryResponseForManagement.Variant> variants = productRepository.getVariantsByProductId(product.getId()).stream()
                 .map(managementProductMapper::toManagementProductVariantSummary)
                 .toList();
 
         ProductVariantsSummaryResponseForManagement response = new ProductVariantsSummaryResponseForManagement();
-        response.setProductId(product.getId());
+        response.setProductUuid(product.getUuid().toString());
         response.setVariants(variants);
         return response;
     }
@@ -209,7 +208,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
     @Override
     @Transactional
     public void updateProduct(ProductUpdateRequest productUpdateRequest) {
-        Product product = productRepository.getProductById(productUpdateRequest.getProductId())
+        Product product = productRepository.getProductByUuid(productUpdateRequest.getProductUuid())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         product.updateName(productUpdateRequest.getName());
@@ -230,7 +229,7 @@ public class ManagementProductServiceImpl implements ManagementProductService {
          if (!ListUtils.isNullOrEmpty(productUpdateRequest.getExistVariants())) {
              for (ProductUpdateRequest.VariantUpdateRequest variantRequest : productUpdateRequest.getExistVariants()) {
                 try {
-                    ProductVariant variant = productRepository.getVariantById(variantRequest.getVariantId())
+                    ProductVariant variant = productRepository.getVariantByUuid(variantRequest.getVariantUuid())
                             .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
 
                     // Update variant basic info
@@ -256,9 +255,9 @@ public class ManagementProductServiceImpl implements ManagementProductService {
                     }
 
                     // Delete images by ID
-                     if (!ListUtils.isNullOrEmpty(variantRequest.getVariantDetailImageIdsToDelete())) {
+                     if (!ListUtils.isNullOrEmpty(variantRequest.getVariantDetailImageUuidsToDelete())) {
                          List<VariantImage> variantImages = productRepository
-                                 .getVariantImagesById(variantRequest.getVariantDetailImageIdsToDelete());
+                                 .getVariantImagesByUuid(variantRequest.getVariantDetailImageUuidsToDelete());
                          variant.removeListImages(variantImages);
 
                          List<String> imageUrls = variantImages.stream().map(VariantImage::getImageUrl).toList();
@@ -350,8 +349,8 @@ public class ManagementProductServiceImpl implements ManagementProductService {
 
     @Override
     @Transactional
-    public void updateVariantStockQuantityAndPrice(Long variantId, com.phananh.e_commerce.product.presentation.dto.request.management.UpdateVariantStockQuantityAndPriceRequest request) {
-        ProductVariant variant = productRepository.getVariantById(variantId)
+    public void updateVariantStockQuantityAndPrice(String uuid, com.phananh.e_commerce.product.presentation.dto.request.management.UpdateVariantStockQuantityAndPriceRequest request) {
+        ProductVariant variant = productRepository.getVariantByUuid(uuid)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
         variant.updateStockQuantity(request.getStockQuantity());
         variant.updatePrice(request.getPrice());

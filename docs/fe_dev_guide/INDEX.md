@@ -55,12 +55,6 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V2.1.2 | 2026-07-28 | [Thêm kiểm tra trùng lặp số điện thoại trong API đăng ký](V2_1_2__add_phone_number_uniqueness_check_to_register.md) | Không |
 | V2.2.0 | 2026-07-28 | [Cập nhật request đăng xuất yêu cầu cả accessToken và refreshToken](V2_2_0__update_logout_request_with_refresh_token.md) | Có |
 | V2.2.1 | 2026-07-28 | [Thay đổi logic kiểm tra refresh token (kiểm tra DB thay vì Redis)](V2_2_1__update_refresh_token_validation_to_db.md) | Không |
-| V2.2.2 | 2026-07-28 | [Trả về mã lỗi 405 Method Not Allowed khi sai HTTP Method](V2_2_2__add_405_method_not_allowed_error_code.md) | Có |
 | V2.2.3 | 2026-07-28 | [Đồng bộ và sửa lỗi tài liệu API so với Backend thực tế](V2_2_3__sync_incorrect_apis_with_be.md) | Có |
--   [ V 2 . 2 . 4 :   A d d   s h i p p i n g F e e   t o   c h e c k o u t   r e q u e s t ] ( V 2 _ 2 _ 4 _ _ a d d _ s h i p p i n g _ f e e _ t o _ c h e c k o u t _ r e q u e s t . m d ) 
- 
- -   [ V 2 . 2 . 5 :   A d d   i d   t o   O r d e r S u m m a r y R e s p o n s e ] ( V 2 _ 2 _ 5 _ _ a d d _ i d _ t o _ o r d e r _ s u m m a r y _ r e s p o n s e . m d ) 
- 
- -   [ V 2 . 2 . 6 :   R e t u r n   o r d e r I d   i n   c h e c k o u t   r e s p o n s e ] ( V 2 _ 2 _ 6 _ _ r e t u r n _ o r d e r _ i d _ i n _ c h e c k o u t _ r e s p o n s e . m d ) 
- 
- 
+| V2.2.4 | 2026-07-28 | [Add shippingFee to checkout request](V2_2_4__add_shipping_fee_to_checkout_request.md) | Có |
+| V2.2.5 | 2026-07-29 | [Add id to OrderSummaryResponse](V2_2_5__add_id_to_order_summary_response.md) | Không |

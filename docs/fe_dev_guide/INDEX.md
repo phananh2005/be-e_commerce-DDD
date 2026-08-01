@@ -68,3 +68,6 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V3.5.0 | 2026-07-29 | [Xóa các trường ID cũ khỏi Management Order Response](V3_5_0__remove_ids_from_management_order_response.md) | Có |
 | V3.6.0 | 2026-07-29 | [Xóa trường id khỏi Management Product Search Response](V3_6_0__remove_id_from_management_product_search_response.md) | Có |
 | V3.7.0 | 2026-07-29 | [Cập nhật Management User API sử dụng UUID](V3_7_0__update_management_user_api_use_uuid.md) | Có |
+| V3.8.0 | 2026-07-31 | [Bổ sung kiểm tra token type trong JWT Decoder](V3_8_0__add_token_type_validation_to_jwt_decoder.md) | Có |
+| V3.8.1 | 2026-08-01 | [Xóa trường roles khỏi Refresh Token payload](V3_8_1__remove_roles_from_refresh_token_payload.md) | Không |
+| V3.8.2 | 2026-08-01 | [Thêm kiểm tra trạng thái user khi validate token](V3_8_2__add_user_status_validation_to_jwt_decoder.md) | Không |

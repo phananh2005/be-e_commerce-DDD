@@ -5,6 +5,7 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.Introspect
 import com.phananh.e_commerce.authentication.presentation.dto.request.LogoutRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RefreshTokenRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRequest;
+import com.phananh.e_commerce.authentication.application.dto.response.RegisterResponse;
 import com.phananh.e_commerce.authentication.presentation.dto.request.ResendOtpRequest;
 import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsRequest;
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
@@ -45,9 +46,12 @@ public class AuthenticationController {
 
     @Operation(summary = "Đăng ký tài khoản mới")
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        authenticationService.register(request);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        ApiResponse<RegisterResponse> response = ApiResponse.<RegisterResponse>builder()
+                .message("Registration initiated")
+                .result(authenticationService.register(request))
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Xác thực SMS OTP")

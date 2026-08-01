@@ -17,4 +17,7 @@ public class VerifySmsRequest {
 
     @NotBlank(message = "Firebase ID Token is required")
     private String idToken;
+
+    @NotBlank(message = "Registration token is required")
+    private String registrationToken;
 }

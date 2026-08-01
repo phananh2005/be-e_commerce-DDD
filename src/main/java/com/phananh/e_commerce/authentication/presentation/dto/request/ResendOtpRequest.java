@@ -14,4 +14,7 @@ public class ResendOtpRequest {
 
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
+
+    @NotBlank(message = "Registration token is required")
+    private String registrationToken;
 }

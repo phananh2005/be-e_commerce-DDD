@@ -11,10 +11,12 @@ import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenR
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
 
+import com.phananh.e_commerce.authentication.application.dto.response.RegisterResponse;
+
 public interface AuthenticationService {
 	AuthTokenResponse login(AuthenticationRequest request);
 
-	void register(RegisterRequest request);
+	RegisterResponse register(RegisterRequest request);
 
 	void verifySms(VerifySmsRequest request);
 

@@ -16,6 +16,7 @@ import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsR
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
+import com.phananh.e_commerce.authentication.application.dto.response.RegisterResponse;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.PasswordUtils;
@@ -76,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		this.springDataRoleRepository = springDataRoleRepository;
 		this.springDataRefreshTokenRepository = springDataRefreshTokenRepository;
 		this.redisTemplate = redisTemplate;
-		this.jwtSecret = jwtSecret.getBytes(StandardCharsets.UTF_8);
+		this.jwtSecret = java.util.Base64.getDecoder().decode(jwtSecret);
 		this.accessTokenExpirationSeconds = accessTokenExpirationSeconds;
 		this.refreshTokenExpirationSeconds = refreshTokenExpirationSeconds;
 	}
@@ -100,7 +101,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional(readOnly = true)
-    public void register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
 		if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
 			throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
 		}
@@ -113,7 +114,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			throw new AppException(ErrorCode.PHONE_NUMBER_ALREADY_EXISTS);
 		}
 
-		redisTemplate.opsForValue().set("register:user:" + request.getPhoneNumber(), request, 30, TimeUnit.MINUTES);
+		String registrationToken = UUID.randomUUID().toString();
+		redisTemplate.opsForValue().set("register:user:" + registrationToken, request, 30, TimeUnit.MINUTES);
+		
+		return RegisterResponse.builder().registrationToken(registrationToken).build();
     }
 
     @Override
@@ -126,7 +130,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new AppException(ErrorCode.PHONE_NUMBER_MISMATCH);
             }
 
-            Object pendingReqObj = redisTemplate.opsForValue().get("register:user:" + request.getPhoneNumber());
+            Object pendingReqObj = redisTemplate.opsForValue().get("register:user:" + request.getRegistrationToken());
             if (pendingReqObj != null) {
                 RegisterRequest pendingReq = objectMapper.convertValue(pendingReqObj, RegisterRequest.class);
 
@@ -151,7 +155,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build();
 
                 springDataUserRepository.save(user);
-                redisTemplate.delete("register:user:" + request.getPhoneNumber());
+                redisTemplate.delete("register:user:" + request.getRegistrationToken());
             } else {
                 User user = springDataUserRepository.findByInfoPhoneNumber(request.getPhoneNumber())
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -170,7 +174,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void resendOtp(ResendOtpRequest request) {
-        String key = "register:user:" + request.getPhoneNumber();
+        String key = "register:user:" + request.getRegistrationToken();
         if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
             redisTemplate.expire(key, 30, TimeUnit.MINUTES);
         } else {
@@ -271,7 +275,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				.orElse("");
 
 		String accessToken = generateToken(username, roles, ACCESS_TYPE, accessTokenExpirationSeconds);
-		String refreshToken = generateToken(username, roles, REFRESH_TYPE, refreshTokenExpirationSeconds);
+		String refreshToken = generateToken(username, null, REFRESH_TYPE, refreshTokenExpirationSeconds);
 
 		RefreshToken rt = RefreshToken.builder()
 				.token(refreshToken)
@@ -300,7 +304,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		Map<String, Object> payload = new LinkedHashMap<>();
 		payload.put("sub", username);
-		payload.put("roles", roles);
+		if (roles != null) {
+			payload.put("roles", roles);
+		}
 		payload.put("type", tokenType);
 		payload.put("iat", now);
 		payload.put("exp", exp);
@@ -363,6 +369,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 			if (username.isBlank()) {
 				throw new AppException(ErrorCode.INVALID_TOKEN);
+			}
+
+			User user = springDataUserRepository.findByCredentials_Username(username)
+					.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+			if (user.getCredentials() == null || !Boolean.TRUE.equals(user.getCredentials().isEnabled())) {
+				throw new AppException(ErrorCode.ACCOUNT_DISABLED);
 			}
 
 			return new TokenClaims(username, tokenType, exp);

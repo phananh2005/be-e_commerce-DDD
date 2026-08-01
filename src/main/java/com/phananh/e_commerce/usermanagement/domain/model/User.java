@@ -41,7 +41,7 @@ public class User extends BaseEntity{
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     @Builder.Default
     private Set<RefreshToken> refreshTokens = new HashSet<>();
 

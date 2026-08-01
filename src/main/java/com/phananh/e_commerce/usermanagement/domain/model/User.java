@@ -63,6 +63,7 @@ public class User extends BaseEntity{
 
     public void changePassword (String oldPassword, String newPassword){
         this.credentials = this.credentials.changePassword(oldPassword, newPassword);
+        this.refreshTokens.clear();
     }
 
     public void updateRoles(Set<Role> roles){

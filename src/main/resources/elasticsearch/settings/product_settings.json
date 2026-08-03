@@ -1,0 +1,13 @@
+{
+  "analysis": {
+    "analyzer": {
+      "vi_smart_unaccent": {
+        "tokenizer": "vi_tokenizer",
+        "filter": [
+          "lowercase",
+          "asciifolding"
+        ]
+      }
+    }
+  }
+}

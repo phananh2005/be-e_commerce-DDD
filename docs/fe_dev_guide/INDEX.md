@@ -71,3 +71,6 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V3.8.0 | 2026-07-31 | [Bổ sung kiểm tra token type trong JWT Decoder](V3_8_0__add_token_type_validation_to_jwt_decoder.md) | Có |
 | V3.8.1 | 2026-08-01 | [Xóa trường roles khỏi Refresh Token payload](V3_8_1__remove_roles_from_refresh_token_payload.md) | Không |
 | V3.8.2 | 2026-08-01 | [Thêm kiểm tra trạng thái user khi validate token](V3_8_2__add_user_status_validation_to_jwt_decoder.md) | Không |
+| V3.8.3 | 2026-08-01 | [Sửa lỗi TOCTOU - đổi cơ chế lưu Redis bằng registrationToken](V3_8_3__fix_registration_toctou_vulnerability.md) | Có |
+| V3.8.4 | 2026-08-02 | [Vô hiệu hóa refresh token khi đổi mật khẩu](V3_8_4__invalidate_refresh_tokens_on_password_change.md) | Có |
+| V3.8.5 | 2026-08-02 | [Sử dụng Elasticsearch cho tìm kiếm sản phẩm của khách hàng](V3_8_5__use_elasticsearch_for_customer_product_search.md) | Không |

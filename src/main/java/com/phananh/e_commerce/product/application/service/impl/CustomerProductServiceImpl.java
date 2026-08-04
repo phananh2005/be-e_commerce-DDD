@@ -22,6 +22,10 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.json.JsonData;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,25 +54,56 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortType), sortBy));
 
-        Criteria criteria = new Criteria();
+        BoolQuery.Builder boolBuilder = new BoolQuery.Builder();
+
         if (!StringUtils.isBlank(request.getKeyword())) {
-            criteria.and(new Criteria("name").contains(request.getKeyword().trim()));
-        }
-        if (request.getCategoryId() != null) {
-            criteria.and(new Criteria("categoryId").is(request.getCategoryId()));
-        }
-        if (request.getBrandId() != null) {
-            criteria.and(new Criteria("brandId").is(request.getBrandId()));
-        }
-        if (request.getMinPrice() != null) {
-            criteria.and(new Criteria("minPrice").greaterThanEqual(request.getMinPrice()));
-        }
-        if (request.getMaxPrice() != null) {
-            criteria.and(new Criteria("minPrice").lessThanEqual(request.getMaxPrice()));
+            String kw = request.getKeyword().trim();
+            Query multiMatch = Query.of(q -> q.multiMatch(m -> m
+                    .query(kw)
+                    .fields(java.util.Arrays.asList(
+                            "name^6", 
+                            "name.unaccent^5", 
+                            "name.english^4", 
+                            "description^3", 
+                            "description.unaccent^2", 
+                            "description.english^1"
+                    ))
+                    .fuzziness("AUTO")
+            ));
+            boolBuilder.must(multiMatch);
         }
 
-        CriteriaQuery query = new CriteriaQuery(criteria);
-        query.setPageable(pageable);
+        if (request.getCategoryId() != null) {
+            boolBuilder.filter(Query.of(q -> q.term(t -> t
+                    .field("categoryId")
+                    .value(request.getCategoryId())
+            )));
+        }
+        if (request.getBrandId() != null) {
+            boolBuilder.filter(Query.of(q -> q.term(t -> t
+                    .field("brandId")
+                    .value(request.getBrandId())
+            )));
+        }
+        if (request.getMinPrice() != null || request.getMaxPrice() != null) {
+            boolBuilder.filter(Query.of(q -> q.range(r -> {
+                r.field("minPrice");
+                if (request.getMinPrice() != null) {
+                    r.gte(JsonData.of(request.getMinPrice().doubleValue()));
+                }
+                if (request.getMaxPrice() != null) {
+                    r.lte(JsonData.of(request.getMaxPrice().doubleValue()));
+                }
+                return r;
+            })));
+        }
+
+        Query finalQuery = Query.of(q -> q.bool(boolBuilder.build()));
+
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(finalQuery)
+                .withPageable(pageable)
+                .build();
 
         SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
 

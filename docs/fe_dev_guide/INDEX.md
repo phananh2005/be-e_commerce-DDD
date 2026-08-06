@@ -76,3 +76,4 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V3.8.5 | 2026-08-02 | [Sử dụng Elasticsearch cho tìm kiếm sản phẩm của khách hàng](V3_8_5__use_elasticsearch_for_customer_product_search.md) | Không |
 | V3.8.6 | 2026-08-04 | [Cải thiện tìm kiếm sản phẩm với Fuzziness và đa ngôn ngữ](V3_8_6__enhance_customer_product_search_with_fuzziness.md) | Không |
 | V3.8.7 | 2026-08-04 | [Thêm trọng số (boosting) cho tìm kiếm sản phẩm](V3_8_7__add_boosting_weights_to_customer_product_search.md) | Không |
+| V3.8.8 | 2026-08-06 | [Thêm kiểm tra trùng lặp vào API xác thực SMS OTP](V3_8_8__add_duplicate_checks_to_verify_sms.md) | Có |

@@ -134,6 +134,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             if (pendingReqObj != null) {
                 RegisterRequest pendingReq = objectMapper.convertValue(pendingReqObj, RegisterRequest.class);
 
+                if (springDataUserRepository.existsByCredentialsUsername(pendingReq.getUsername())) {
+                    throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
+                }
+
+                if (pendingReq.getEmail() != null && !pendingReq.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(pendingReq.getEmail())) {
+                    throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+                }
+
+                if (pendingReq.getPhoneNumber() != null && !pendingReq.getPhoneNumber().isBlank() && springDataUserRepository.existsByInfoPhoneNumber(pendingReq.getPhoneNumber())) {
+                    throw new AppException(ErrorCode.PHONE_NUMBER_ALREADY_EXISTS);
+                }
+
                 Role role = springDataRoleRepository.findByName(RoleName.ROLE_CUSTOMER)
                         .orElseGet(() -> springDataRoleRepository.save(Role.builder().name(RoleName.ROLE_CUSTOMER).build()));
 
@@ -146,10 +158,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build();
 
                 User user = User.builder()
-                        .credentials(new UserCredentials(
-                                pendingReq.getUsername(),
-                                PasswordUtils.encode(pendingReq.getPassword()),
-                                true))
+                        .credentials(UserCredentials.builder()
+                                .username(pendingReq.getUsername())
+                                .password(PasswordUtils.encode(pendingReq.getPassword()))
+                                .isEnabled(true)
+                                .build())
                         .info(userInfo)
                         .roles(new HashSet<>(Set.of(role)))
                         .build();

@@ -60,18 +60,18 @@ class ProductVariantStatusTest {
     @DisplayName("Should update variant status via updateProduct")
     void testUpdateVariantStatusViaUpdateProduct() {
         ProductUpdateRequest request = new ProductUpdateRequest();
-        request.setProductId(1L);
+        request.setProductUuid("test-product-uuid");
         request.setName("Updated Product");
 
         ProductUpdateRequest.VariantUpdateRequest variantRequest = new ProductUpdateRequest.VariantUpdateRequest();
-        variantRequest.setVariantId(100L);
+        variantRequest.setVariantUuid("test-variant-uuid");
         variantRequest.setPrice(BigDecimal.valueOf(100));
         variantRequest.setStockQuantity(50);
         variantRequest.setStatus("INACTIVE");
         request.setExistVariants(java.util.Arrays.asList(variantRequest));
 
-        when(productRepository.getProductById(1L)).thenReturn(Optional.of(product));
-        when(productRepository.getVariantById(100L)).thenReturn(Optional.of(variant));
+        when(productRepository.getProductByUuid("test-product-uuid")).thenReturn(Optional.of(product));
+        when(productRepository.getVariantByUuid("test-variant-uuid")).thenReturn(Optional.of(variant));
 
         assertDoesNotThrow(() -> {
             managementProductService.updateProduct(request);
@@ -88,10 +88,10 @@ class ProductVariantStatusTest {
         request.setPrice(BigDecimal.valueOf(120));
         request.setStatus("INACTIVE");
 
-        when(productRepository.getVariantById(100L)).thenReturn(Optional.of(variant));
+        when(productRepository.getVariantByUuid("test-uuid")).thenReturn(Optional.of(variant));
 
         assertDoesNotThrow(() -> {
-            managementProductService.updateVariantStockQuantityAndPrice(100L, request);
+            managementProductService.updateVariantStockQuantityAndPrice("test-uuid", request);
         });
 
         verify(productRepository).save(any(ProductVariant.class));
@@ -105,10 +105,10 @@ class ProductVariantStatusTest {
         request.setPrice(BigDecimal.valueOf(120));
         request.setStatus("INVALID_STATUS");
 
-        when(productRepository.getVariantById(100L)).thenReturn(Optional.of(variant));
+        when(productRepository.getVariantByUuid("test-uuid")).thenReturn(Optional.of(variant));
 
         AppException exception = assertThrows(AppException.class, () -> {
-            managementProductService.updateVariantStockQuantityAndPrice(100L, request);
+            managementProductService.updateVariantStockQuantityAndPrice("test-uuid", request);
         });
 
         assertEquals(ErrorCode.INVALID_REQUEST, exception.getErrorCode());
@@ -131,10 +131,10 @@ class ProductVariantStatusTest {
                 .status(VariantStatus.ACTIVE)
                 .build();
 
-        when(productRepository.getVariantById(100L)).thenReturn(Optional.of(activeVariant));
+        when(productRepository.getVariantByUuid("test-uuid")).thenReturn(Optional.of(activeVariant));
 
         assertDoesNotThrow(() -> {
-            managementProductService.updateVariantStockQuantityAndPrice(100L, request);
+            managementProductService.updateVariantStockQuantityAndPrice("test-uuid", request);
         });
 
         assertEquals(VariantStatus.ACTIVE, activeVariant.getStatus());
@@ -157,10 +157,10 @@ class ProductVariantStatusTest {
         requestActive.setPrice(BigDecimal.valueOf(100));
         requestActive.setStatus("ACTIVE");
 
-        when(productRepository.getVariantById(100L)).thenReturn(Optional.of(inactiveVariant));
+        when(productRepository.getVariantByUuid("test-uuid")).thenReturn(Optional.of(inactiveVariant));
 
         assertDoesNotThrow(() -> {
-            managementProductService.updateVariantStockQuantityAndPrice(100L, requestActive);
+            managementProductService.updateVariantStockQuantityAndPrice("test-uuid", requestActive);
         });
 
         assertEquals(VariantStatus.ACTIVE, inactiveVariant.getStatus());

@@ -33,7 +33,7 @@ public class MysqlBinlogListener {
     private String dbPassword;
 
     private final ProductEventPublisher productEventPublisher;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final JdbcTemplate jdbcTemplate;
 
     private final Map<Long, String> tableMap = new HashMap<>();
@@ -50,8 +50,7 @@ public class MysqlBinlogListener {
     }
 
     private String convertUuidBytesToString(Object uuidObj) {
-        if (uuidObj instanceof byte[]) {
-            byte[] bytes = (byte[]) uuidObj;
+        if (uuidObj instanceof byte[] bytes) {
             if (bytes.length == 16) {
                 java.nio.ByteBuffer bb = java.nio.ByteBuffer.wrap(bytes);
                 return new java.util.UUID(bb.getLong(), bb.getLong()).toString();
@@ -92,11 +91,32 @@ public class MysqlBinlogListener {
                 BinaryLogClient client = new BinaryLogClient(host, port, dbUser, dbPassword);
                 client.setServerId(1001); // Unique server id
 
+                // Khôi phục Offset từ Database
+                try {
+                    Map<String, Object> offset = jdbcTemplate.queryForMap("SELECT binlog_filename, binlog_position FROM binlog_tracking WHERE id = 1");
+                    String savedFilename = (String) offset.get("binlog_filename");
+                    long savedPosition = ((Number) offset.get("binlog_position")).longValue();
+                    
+                    if (savedFilename != null && !savedFilename.isEmpty() && savedPosition > 0) {
+                        client.setBinlogFilename(savedFilename);
+                        client.setBinlogPosition(savedPosition);
+                        log.info("CDC: Đã phục hồi Offset -> File: {}, Position: {}", savedFilename, savedPosition);
+                    }
+                } catch (Exception e) {
+                    log.warn("CDC: Không tìm thấy offset cũ, bắt đầu đọc từ hiện tại.");
+                }
+
                 client.registerEventListener(event -> {
                     EventData data = event.getData();
 
+                    // Bắt sự kiện XID (Commit Transaction) để lưu trạng thái Offset
+                    if (data instanceof XidEventData) {
+                        String currentFilename = client.getBinlogFilename();
+                        long currentPosition = client.getBinlogPosition();
+                        jdbcTemplate.update("UPDATE binlog_tracking SET binlog_filename = ?, binlog_position = ? WHERE id = 1", currentFilename, currentPosition);
+                    }
                     // Bắt sự kiện DDL để nạp lại cột (ALTER TABLE)
-                    if (data instanceof QueryEventData queryData) {
+                    else if (data instanceof QueryEventData queryData) {
                         String sql = queryData.getSql().toUpperCase();
                         if (sql.contains("ALTER TABLE PRODUCTS") || sql.contains("ALTER TABLE `PRODUCTS`")) {
                             log.info("CDC: Phát hiện ALTER TABLE products. Nạp lại cấu trúc cột...");

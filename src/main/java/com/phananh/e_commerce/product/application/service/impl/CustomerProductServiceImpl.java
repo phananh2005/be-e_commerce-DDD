@@ -86,16 +86,16 @@ public class CustomerProductServiceImpl implements CustomerProductService {
             )));
         }
         if (request.getMinPrice() != null || request.getMaxPrice() != null) {
-            boolBuilder.filter(Query.of(q -> q.range(r -> {
-                r.field("minPrice");
+            boolBuilder.filter(Query.of(q -> q.range(r -> r.number(n -> {
+                n.field("minPrice");
                 if (request.getMinPrice() != null) {
-                    r.gte(JsonData.of(request.getMinPrice().doubleValue()));
+                    n.gte(request.getMinPrice().doubleValue());
                 }
                 if (request.getMaxPrice() != null) {
-                    r.lte(JsonData.of(request.getMaxPrice().doubleValue()));
+                    n.lte(request.getMaxPrice().doubleValue());
                 }
-                return r;
-            })));
+                return n;
+            }))));
         }
 
         Query finalQuery = Query.of(q -> q.bool(boolBuilder.build()));

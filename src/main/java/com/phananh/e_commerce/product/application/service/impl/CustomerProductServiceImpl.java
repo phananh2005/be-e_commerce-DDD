@@ -107,24 +107,9 @@ public class CustomerProductServiceImpl implements CustomerProductService {
 
         SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
 
-        List<ProductSummaryResponse> content = searchHits.stream().map(hit -> {
-            ProductDocument doc = hit.getContent();
-            ProductSummaryResponse response = new ProductSummaryResponse();
-            if (doc.getId() != null) {
-                try {
-                    response.setProductId(Long.valueOf(doc.getId()));
-                } catch(NumberFormatException ignored) {}
-            }
-            if (doc.getUuid() != null) {
-                response.setProductUuid(doc.getUuid().toString());
-            }
-            response.setProductName(doc.getName());
-            if (doc.getMinPrice() != null) {
-                response.setMinPrice(BigDecimal.valueOf(doc.getMinPrice()));
-            }
-            response.setAvatarUrl(doc.getAvatarUrl());
-            return response;
-        }).collect(Collectors.toList());
+        List<ProductSummaryResponse> content = searchHits.stream()
+                .map(hit -> customerProductMapper.toProductSummaryResponse(hit.getContent()))
+                .collect(Collectors.toList());
 
         return new PageImpl<>(content, pageable, searchHits.getTotalHits());
     }

@@ -2,6 +2,7 @@ package com.phananh.e_commerce.product.application.mapper;
 
 import com.phananh.e_commerce.product.application.dto.response.customer.ProductDetailResponse;
 import com.phananh.e_commerce.product.application.dto.response.customer.ProductSummaryResponse;
+import com.phananh.e_commerce.product.domain.document.ProductDocument;
 import com.phananh.e_commerce.product.domain.model.AttributeValue;
 import com.phananh.e_commerce.product.domain.model.Product;
 import com.phananh.e_commerce.product.domain.model.ProductVariant;
@@ -37,12 +38,19 @@ public interface CustomerProductMapper {
                 .orElse(BigDecimal.ZERO);
     }
 
-    @Mapping(source = "id", target = "productId")
-    @Mapping(target = "productUuid", source = "uuid")
+//    @Mapping(source = "id", target = "productId")
+//    @Mapping(target = "productUuid", source = "uuid")
+//    @Mapping(target = "productName", source = "name")
+//    @Mapping(target = "minPrice", expression = "java(getMinPrice(product))")
+//    @Mapping(source = "avatarUrl", target = "avatarUrl")
+//    ProductSummaryResponse toProductSummaryResponse(Product product);
+
+    @Mapping(target = "productId", expression = "java(document.getId() != null ? Long.valueOf(document.getId()) : null)")
+    @Mapping(target = "productUuid", expression = "java(document.getUuid() != null ? document.getUuid().toString() : null)")
     @Mapping(target = "productName", source = "name")
-    @Mapping(target = "minPrice", expression = "java(getMinPrice(product))")
+    @Mapping(target = "minPrice", expression = "java(document.getMinPrice() != null ? java.math.BigDecimal.valueOf(document.getMinPrice()) : java.math.BigDecimal.ZERO)")
     @Mapping(source = "avatarUrl", target = "avatarUrl")
-    ProductSummaryResponse toProductSummaryResponse(Product product);
+    ProductSummaryResponse toProductSummaryResponse(ProductDocument document);
 
     @Mapping(source = "id", target = "productId")
     @Mapping(target = "productUuid", source = "uuid")

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class MysqlBinlogListener {
 
     private final Map<Long, String> tableMap = new HashMap<>();
     private List<String> productColumns = new CopyOnWriteArrayList<>();
+    private final List<String> transactionBuffer = new ArrayList<>();
 
     private void loadProductColumns() {
         log.info("CDC: Đang nạp cấu trúc cột của bảng products...");
@@ -45,7 +47,7 @@ public class MysqlBinlogListener {
                 "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = 'products' AND TABLE_SCHEMA = DATABASE() ORDER BY ORDINAL_POSITION",
                 String.class
         );
-        this.productColumns = new CopyOnWriteArrayList<>(columns);
+        this.productColumns = new java.util.ArrayList<>(columns);
         log.info("CDC: Cấu trúc cột hiện tại: {}", productColumns);
     }
 
@@ -109,16 +111,26 @@ public class MysqlBinlogListener {
                 client.registerEventListener(event -> {
                     EventData data = event.getData();
 
-                    // Bắt sự kiện XID (Commit Transaction) để lưu trạng thái Offset
+                    // Bắt sự kiện XID (Commit Transaction) để đẩy message và lưu Offset
                     if (data instanceof XidEventData) {
+                        if (!transactionBuffer.isEmpty()) {
+                            log.info("CDC: Phát hiện COMMIT (XID). Đẩy {} event lên RabbitMQ", transactionBuffer.size());
+                            for (String json : transactionBuffer) {
+                                productEventPublisher.publishProductSavedEvent(json);
+                            }
+                            transactionBuffer.clear();
+                        }
+
                         String currentFilename = client.getBinlogFilename();
                         long currentPosition = client.getBinlogPosition();
                         jdbcTemplate.update("UPDATE binlog_tracking SET binlog_filename = ?, binlog_position = ? WHERE id = 1", currentFilename, currentPosition);
                     }
-                    // Bắt sự kiện DDL để nạp lại cột (ALTER TABLE)
+                    // Bắt sự kiện Query (BEGIN, DDL)
                     else if (data instanceof QueryEventData queryData) {
                         String sql = queryData.getSql().toUpperCase();
-                        if (sql.contains("ALTER TABLE PRODUCTS") || sql.contains("ALTER TABLE `PRODUCTS`")) {
+                        if ("BEGIN".equals(sql)) {
+                            transactionBuffer.clear();
+                        } else if (sql.contains("ALTER TABLE PRODUCTS") || sql.contains("ALTER TABLE `PRODUCTS`")) {
                             log.info("CDC: Phát hiện ALTER TABLE products. Nạp lại cấu trúc cột...");
                             loadProductColumns();
                         }
@@ -134,11 +146,11 @@ public class MysqlBinlogListener {
                         if ("products".equals(tableName)) {
                             for (Object[] row : writeData.getRows()) {
                                 Map<String, Object> jsonMap = mapRowToJson(row);
-                                log.info("CDC: Phát hiện INSERT ở bảng products, ID: {}", jsonMap.get("id"));
+                                log.info("CDC: Phát hiện INSERT ở bảng {}, ID: {}", tableName, jsonMap.get("id"));
                                 
                                 try {
                                     String json = objectMapper.writeValueAsString(jsonMap);
-                                    productEventPublisher.publishProductSavedEvent(json);
+                                    transactionBuffer.add(json);
                                 } catch (Exception ex) {
                                     log.error("Lỗi parse JSON", ex);
                                 }
@@ -155,11 +167,11 @@ public class MysqlBinlogListener {
                                 Serializable[] newRow = row.getValue();
 
                                 Map<String, Object> jsonMap = mapRowToJson(newRow);
-                                log.info("CDC: Phát hiện UPDATE ở bảng products, ID: {}", jsonMap.get("id"));
+                                log.info("CDC: Phát hiện UPDATE ở bảng {}, ID: {}", tableName, jsonMap.get("id"));
                                 
                                 try {
                                     String json = objectMapper.writeValueAsString(jsonMap);
-                                    productEventPublisher.publishProductSavedEvent(json);
+                                    transactionBuffer.add(json);
                                 } catch (Exception ex) {
                                     log.error("Lỗi parse JSON", ex);
                                 }

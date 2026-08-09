@@ -47,6 +47,9 @@ public class Product extends BaseEntity{
     @Column(name = "brand_id")
     private Long brandId;
 
+    @Version
+    private Long version;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
     private Set<ProductVariant> variants = new HashSet<>();

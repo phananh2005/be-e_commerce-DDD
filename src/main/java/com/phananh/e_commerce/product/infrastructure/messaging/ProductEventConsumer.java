@@ -29,11 +29,12 @@ public class ProductEventConsumer {
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
 
     @Transactional(readOnly = true)
     @RabbitListener(queues = RabbitMQConfig.PRODUCT_SYNC_QUEUE)
-    public void handleProductSavedEvent(String jsonPayload, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+    public void handleProductSavedEvent(String jsonPayload) throws IOException {
         log.info("Received CDC event: {}", jsonPayload);
         try {
             ProductDocument doc = objectMapper.readValue(jsonPayload, ProductDocument.class);
@@ -46,7 +47,6 @@ public class ProductEventConsumer {
                         if (existingDoc.getVersion() >= doc.getVersion()) {
                             log.info("Ignored outdated message for product {}. ES version: {}, Msg version: {}",
                                     doc.getId(), existingDoc.getVersion(), doc.getVersion());
-                            channel.basicAck(tag, false);
                             return;
                         }
                     }
@@ -73,9 +73,6 @@ public class ProductEventConsumer {
 
             elasticsearchOperations.save(doc);
             log.info("Successfully synced product {} to Elasticsearch", doc.getId());
-            
-            // Xử lý thành công -> Gửi ACK
-            channel.basicAck(tag, false);
         } catch (Exception e) {
             log.error("Error syncing product to Elasticsearch. Để Spring tự đếm Retry...", e);
             // Quăng Exception ra ngoài để Spring AMQP Retry đếm đủ 5 lần. 

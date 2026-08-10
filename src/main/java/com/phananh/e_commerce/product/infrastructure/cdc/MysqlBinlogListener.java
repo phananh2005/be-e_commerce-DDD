@@ -69,6 +69,9 @@ public class MysqlBinlogListener {
 
             if ("uuid".equalsIgnoreCase(colName)) {
                 jsonMap.put(colName, convertUuidBytesToString(value));
+            } else if (value instanceof byte[] bytes) {
+                // Convert TEXT/BLOB byte[] to String to prevent Jackson base64 encoding
+                jsonMap.put(colName, new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
             } else {
                 jsonMap.put(colName, value);
             }

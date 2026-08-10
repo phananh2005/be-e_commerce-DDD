@@ -1,22 +1,17 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+FROM almalinux:9 AS cxx-builder
+RUN dnf install -y git cmake gcc-c++ java-21-openjdk-devel which
+RUN git clone https://github.com/duydo/coccoc-tokenizer.git && \
+    cd coccoc-tokenizer && mkdir build && cd build && cmake -DBUILD_JAVA=1 .. && make install
 
+FROM maven:3.9-eclipse-temurin-22 AS java-builder
+RUN git clone --branch v9.3.0 https://github.com/duydo/elasticsearch-analysis-vietnamese.git && \
+    cd elasticsearch-analysis-vietnamese && mvn clean package -DskipTests
+
+FROM docker.elastic.co/elasticsearch/elasticsearch:9.3.0
 USER root
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Asia/Ho_Chi_Minh
-RUN apt-get update && apt-get install -y zip unzip wget cmake g++ openjdk-17-jdk && \
-    wget -qO plugin.zip https://github.com/duydo/elasticsearch-analysis-vietnamese/releases/download/v8.7.0/elasticsearch-analysis-vietnamese-8.7.0.zip && \
-    unzip plugin.zip -d plugin-ext && \
-    sed -i 's/elasticsearch.version=8.7.0/elasticsearch.version=8.12.2/g' plugin-ext/plugin-descriptor.properties && \
-    cd plugin-ext && zip -r ../plugin.zip * && cd .. && \
-    wget -qO master.zip https://github.com/coccoc/coccoc-tokenizer/archive/master.zip && \
-    unzip master.zip && \
-    cd coccoc-tokenizer-master && \
-    mkdir build && cd build && \
-    cmake -DBUILD_JAVA=1 .. && \
-    make install && \
-    cp /usr/local/lib/libcoccoc_tokenizer* /usr/lib/ && \
-    cd ../.. && rm -rf coccoc-tokenizer-master master.zip && \
-    ldconfig
-
-RUN bin/elasticsearch-plugin install -b file:///usr/share/elasticsearch/plugin.zip
+COPY --from=cxx-builder /usr/local/lib/libcoccoc_tokenizer* /usr/lib/
+COPY --from=cxx-builder /usr/local/share/tokenizer /usr/local/share/tokenizer
+RUN ldconfig
+COPY --from=java-builder /elasticsearch-analysis-vietnamese/target/releases/elasticsearch-analysis-vietnamese-9.3.0.zip /tmp/plugin.zip
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b file:///tmp/plugin.zip && rm /tmp/plugin.zip
 USER elasticsearch

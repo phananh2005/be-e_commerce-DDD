@@ -21,7 +21,7 @@ CREATE TABLE users (
                        full_name VARCHAR(255),
                        address TEXT,
                        phone_number VARCHAR(50) UNIQUE,
-                       is_enabled TINYINT(1) NOT NULL DEFAULT 1,
+                       is_enabled BIT(1) NOT NULL DEFAULT 1,
                        created_by VARCHAR(100),
                        created_at DATETIME,
                        modified_by VARCHAR(100),
@@ -43,7 +43,7 @@ CREATE TABLE brands (
                         name VARCHAR(255) NOT NULL,
                         description TEXT,
                         image_url VARCHAR(1000),
-                        is_enabled TINYINT(1) NOT NULL DEFAULT 1,
+                        is_enabled BIT(1) NOT NULL DEFAULT 1,
                         created_by VARCHAR(100),
                         created_at DATETIME,
                         modified_by VARCHAR(100),
@@ -56,7 +56,7 @@ CREATE TABLE categories (
                             name VARCHAR(255) NOT NULL UNIQUE,
                             description TEXT,
                             image_url VARCHAR(1000),
-                            is_enabled TINYINT(1) NOT NULL DEFAULT 1,
+                            is_enabled BIT(1) NOT NULL DEFAULT 1,
                             created_by VARCHAR(100),
                             created_at DATETIME,
                             modified_by VARCHAR(100),
@@ -114,7 +114,7 @@ CREATE TABLE variant_image (
                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                variant_id BIGINT NOT NULL,
                                image_url VARCHAR(1000) NOT NULL,
-                               is_avatar TINYINT(1) NOT NULL DEFAULT 0,
+                               is_avatar BIT(1) NOT NULL DEFAULT 0,
                                CONSTRAINT fk_variant_image_variant FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -151,12 +151,13 @@ CREATE TABLE orders (
                         phone_number VARCHAR(15),
                         shipping_address TEXT NOT NULL,
                         payment_method ENUM('COD','VNPAY','MOMO','BANK_TRANSFER','PAYPAL') NOT NULL,
-                        is_paid TINYINT(1) NOT NULL DEFAULT 0,
+                        is_paid BIT(1) NOT NULL DEFAULT 0,
                         payment_date DATETIME,
                         created_by VARCHAR(100),
                         created_at DATETIME,
                         modified_by VARCHAR(100),
                         modified_at DATETIME,
+                        KEY idx_order_user_id_created_at (user_id, created_at),
                         CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

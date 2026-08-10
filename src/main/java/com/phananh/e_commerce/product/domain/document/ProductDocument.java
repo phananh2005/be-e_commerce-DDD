@@ -1,6 +1,8 @@
 package com.phananh.e_commerce.product.domain.document;
 
 import lombok.*;
+
+import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
@@ -52,4 +54,10 @@ public class ProductDocument {
 
     @Field(type = FieldType.Long)
     private Long brandId;
+
+    @Field(type = FieldType.Date)
+    private Instant createdAt;
+
+    @Field(type = FieldType.Long)
+    private Long version;
 }

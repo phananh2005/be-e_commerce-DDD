@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FakerConfigService {
 
-    private boolean enabled = false;
+    private boolean enabled = true;
     private int users = 30;
     private int brands = 10;
     private int categories = 15;

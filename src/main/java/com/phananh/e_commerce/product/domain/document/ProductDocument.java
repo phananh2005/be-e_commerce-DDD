@@ -60,4 +60,7 @@ public class ProductDocument {
 
     @Field(type = FieldType.Long)
     private Long version;
+
+    @Field(type = FieldType.Keyword)
+    private String status;
 }

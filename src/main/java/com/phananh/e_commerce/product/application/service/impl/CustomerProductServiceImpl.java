@@ -10,6 +10,7 @@ import com.phananh.e_commerce.product.application.mapper.CustomerProductMapper;
 import com.phananh.e_commerce.product.application.service.CustomerProductService;
 import com.phananh.e_commerce.product.domain.document.ProductDocument;
 import com.phananh.e_commerce.product.domain.model.Product;
+import com.phananh.e_commerce.product.domain.model.enums.ProductStatus;
 import com.phananh.e_commerce.product.domain.repository.ProductRepository;
 import com.phananh.e_commerce.product.presentation.dto.request.customer.CustomerProductSearchRequest;
 import com.phananh.e_commerce.productcatalog.application.service.BrandService;
@@ -97,6 +98,11 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 return n;
             }))));
         }
+
+        boolBuilder.filter(Query.of(q -> q.term(t -> t
+                .field("status")
+                .value(ProductStatus.ACTIVE.name())
+        )));
 
         Query finalQuery = Query.of(q -> q.bool(boolBuilder.build()));
 

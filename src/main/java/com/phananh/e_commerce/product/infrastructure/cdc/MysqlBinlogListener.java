@@ -3,6 +3,7 @@ package com.phananh.e_commerce.product.infrastructure.cdc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
+import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
 import com.phananh.e_commerce.product.infrastructure.messaging.ProductEventPublisher;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,12 @@ public class MysqlBinlogListener {
                 java.nio.ByteBuffer bb = java.nio.ByteBuffer.wrap(bytes);
                 return new java.util.UUID(bb.getLong(), bb.getLong()).toString();
             }
+        } else if (uuidObj instanceof String str) {
+            byte[] bytes = str.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+            if (bytes.length == 16) {
+                java.nio.ByteBuffer bb = java.nio.ByteBuffer.wrap(bytes);
+                return new java.util.UUID(bb.getLong(), bb.getLong()).toString();
+            }
         }
         return null;
     }
@@ -69,6 +76,14 @@ public class MysqlBinlogListener {
 
             if ("uuid".equalsIgnoreCase(colName)) {
                 jsonMap.put(colName, convertUuidBytesToString(value));
+            } else if ("status".equalsIgnoreCase(colName) && value instanceof Number num) {
+                String[] statusEnum = {"", "ACTIVE", "INACTIVE", "DRAFT"};
+                int index = num.intValue();
+                if (index >= 1 && index < statusEnum.length) {
+                    jsonMap.put(colName, statusEnum[index]);
+                } else {
+                    jsonMap.put(colName, "DRAFT");
+                }
             } else if (value instanceof byte[] bytes) {
                 // Convert TEXT/BLOB byte[] to String to prevent Jackson base64 encoding
                 jsonMap.put(colName, new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
@@ -95,6 +110,13 @@ public class MysqlBinlogListener {
 
                 BinaryLogClient client = new BinaryLogClient(host, port, dbUser, dbPassword);
                 client.setServerId(1001); // Unique server id
+
+                EventDeserializer eventDeserializer = new EventDeserializer();
+                eventDeserializer.setCompatibilityMode(
+                        EventDeserializer.CompatibilityMode.DATE_AND_TIME_AS_LONG,
+                        EventDeserializer.CompatibilityMode.CHAR_AND_BINARY_AS_BYTE_ARRAY
+                );
+                client.setEventDeserializer(eventDeserializer);
 
                 // Khôi phục Offset từ Database
                 try {

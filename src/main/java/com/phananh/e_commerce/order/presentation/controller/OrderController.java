@@ -38,6 +38,7 @@ public class OrderController {
 
     @Operation(summary = "Thanh toán đơn hàng", description = "Xác nhận và đặt hàng các sản phẩm trong giỏ hàng")
     @PostMapping("/checkout")
+    @com.phananh.e_commerce.core.infrastructure.annotation.Idempotent
     public ResponseEntity<?> checkout(@RequestBody @Valid CheckoutRequest checkoutRequest) {
         orderService.checkout(checkoutRequest);
         return ResponseEntity.noContent().build();

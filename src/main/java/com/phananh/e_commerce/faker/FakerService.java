@@ -24,7 +24,7 @@ import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
-import com.phananh.e_commerce.core.util.PasswordUtils;
+
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +51,7 @@ public class FakerService {
     private final SpringDataAttributeValueRepository attributeValueRepository;
     private final SpringDataOrderRepository orderRepository;
     private final SpringDataOrderItemRepository orderItemRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     private final Faker faker = new Faker(Locale.forLanguageTag("vi"));
 
@@ -74,7 +75,7 @@ public class FakerService {
             User user = User.builder()
                     .credentials(UserCredentials.builder()
                             .username(username)
-                            .password(PasswordUtils.encode("123456"))
+                            .password(passwordEncoder.encode("123456"))
                             .isEnabled(true)
                             .build())
                     .info(UserInfo.builder()

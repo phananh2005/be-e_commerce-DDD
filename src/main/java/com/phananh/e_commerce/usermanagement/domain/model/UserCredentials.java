@@ -1,8 +1,5 @@
 package com.phananh.e_commerce.usermanagement.domain.model;
 
-import com.phananh.e_commerce.core.exception.AppException;
-import com.phananh.e_commerce.core.exception.ErrorCode;
-import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -35,13 +32,8 @@ public record UserCredentials(
         this.isEnabled = isEnabled;
     }
 
-    public UserCredentials changePassword(String oldPassword, String newPassword) {
-        boolean verifyPassword = PasswordUtils.matches(oldPassword, this.password);
-        if (!verifyPassword) {
-            throw new AppException(ErrorCode.OLD_PASSWORD_INCORRECT);
-        }
-
-        return new UserCredentials(this.username, PasswordUtils.encode(newPassword), this.isEnabled);
+    public UserCredentials changePassword(String newEncodedPassword) {
+        return new UserCredentials(this.username, newEncodedPassword, this.isEnabled);
     }
 
     public UserCredentials activeUser(){

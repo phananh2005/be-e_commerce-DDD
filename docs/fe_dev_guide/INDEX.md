@@ -78,3 +78,4 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V3.8.7 | 2026-08-04 | [Thêm trọng số (boosting) cho tìm kiếm sản phẩm](V3_8_7__add_boosting_weights_to_customer_product_search.md) | Không |
 | V3.8.8 | 2026-08-06 | [Thêm kiểm tra trùng lặp vào API xác thực SMS OTP](V3_8_8__add_duplicate_checks_to_verify_sms.md) | Có |
 | V4.0.0 | 2026-08-11 | [Thay đổi cấu trúc JSON phân trang toàn cục (PageModel)](V4_0_0__global_pagination_json_format_change.md) | Có |
+| V4.0.1 | 2026-08-12 | [Refactor internal authentication sử dụng AuthenticationManager](V4_0_1__refactor_internal_authentication.md) | Không |

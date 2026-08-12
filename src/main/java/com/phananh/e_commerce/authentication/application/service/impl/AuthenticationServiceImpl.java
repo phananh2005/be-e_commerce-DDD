@@ -2,51 +2,38 @@ package com.phananh.e_commerce.authentication.application.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.redis.core.RedisTemplate;
-import java.util.concurrent.TimeUnit;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
-import com.phananh.e_commerce.authentication.presentation.dto.request.AuthenticationRequest;
-import com.phananh.e_commerce.authentication.presentation.dto.request.IntrospectRequest;
-import com.phananh.e_commerce.authentication.presentation.dto.request.LogoutRequest;
-import com.phananh.e_commerce.authentication.presentation.dto.request.RefreshTokenRequest;
-import com.phananh.e_commerce.authentication.presentation.dto.request.RegisterRequest;
-import com.phananh.e_commerce.authentication.presentation.dto.request.ResendOtpRequest;
-import com.phananh.e_commerce.authentication.presentation.dto.request.VerifySmsRequest;
 import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.RegisterResponse;
+import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
+import com.phananh.e_commerce.authentication.domain.model.RefreshToken;
+import com.phananh.e_commerce.authentication.infrastructure.persistence.repository.springdata.SpringDataRefreshTokenRepository;
+import com.phananh.e_commerce.authentication.presentation.dto.request.*;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
-import com.phananh.e_commerce.core.util.PasswordUtils;
 import com.phananh.e_commerce.usermanagement.domain.model.Role;
-import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.User;
+import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
-import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
-import com.phananh.e_commerce.authentication.domain.model.RefreshToken;
-import com.phananh.e_commerce.authentication.infrastructure.persistence.repository.springdata.SpringDataRefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -59,6 +46,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final SpringDataRoleRepository springDataRoleRepository;
 	private final SpringDataRefreshTokenRepository springDataRefreshTokenRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
+	private final AuthenticationManager authenticationManager;
+	private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final byte[] jwtSecret;
 	private final long accessTokenExpirationSeconds;
@@ -69,6 +58,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			SpringDataRoleRepository springDataRoleRepository,
 			SpringDataRefreshTokenRepository springDataRefreshTokenRepository,
 			RedisTemplate<String, Object> redisTemplate,
+			AuthenticationManager authenticationManager,
+			org.springframework.security.crypto.password.PasswordEncoder passwordEncoder,
 			@Value("${application.security.jwt.secret-key}") String jwtSecret,
 			@Value("${application.security.jwt.expiration}") long accessTokenExpirationSeconds,
 			@Value("${application.security.jwt.refresh-expiration}") long refreshTokenExpirationSeconds
@@ -77,6 +68,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		this.springDataRoleRepository = springDataRoleRepository;
 		this.springDataRefreshTokenRepository = springDataRefreshTokenRepository;
 		this.redisTemplate = redisTemplate;
+		this.authenticationManager = authenticationManager;
+		this.passwordEncoder = passwordEncoder;
 		this.jwtSecret = java.util.Base64.getDecoder().decode(jwtSecret);
 		this.accessTokenExpirationSeconds = accessTokenExpirationSeconds;
 		this.refreshTokenExpirationSeconds = refreshTokenExpirationSeconds;
@@ -85,18 +78,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	@Transactional
 	public AuthTokenResponse login(AuthenticationRequest request) {
-		User user = springDataUserRepository.findByCredentials_Username(request.getUsername())
-				.orElseThrow(() -> new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD));
-
-		if (user.getCredentials() == null || !Boolean.TRUE.equals(user.getCredentials().isEnabled())) {
+		org.springframework.security.core.Authentication authentication;
+		try {
+			authentication = authenticationManager.authenticate(
+					new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+							request.getUsername(), request.getPassword()
+					)
+			);
+		} catch (org.springframework.security.authentication.DisabledException e) {
 			throw new AppException(ErrorCode.ACCOUNT_DISABLED);
-		}
-
-		if (!PasswordUtils.matches(request.getPassword(), user.getCredentials().password())) {
+		} catch (org.springframework.security.core.AuthenticationException e) {
 			throw new AppException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
 		}
 
-		return issueTokenPair(user);
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        assert userDetails != null;
+        return issueTokenPair(userDetails);
 	}
 
     @Override
@@ -160,7 +157,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 User user = User.builder()
                         .credentials(UserCredentials.builder()
                                 .username(pendingReq.getUsername())
-                                .password(PasswordUtils.encode(pendingReq.getPassword()))
+                                .password(passwordEncoder.encode(pendingReq.getPassword()))
                                 .isEnabled(true)
                                 .build())
                         .info(userInfo)
@@ -195,18 +192,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-//    private void registerWithRole(RegisterRequest request, RoleName roleName) {
-//        if (springDataUserRepository.existsByCredentialsUsername(request.getUsername())) {
-//            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
-//        }
-//
-//        if (request.getEmail() != null && !request.getEmail().isBlank() && springDataUserRepository.existsByInfoEmail(request.getEmail())) {
-//            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
-//        }
-//
-//        redisTemplate.opsForValue().set("register:user:" + request.getPhoneNumber(), request, 30, TimeUnit.MINUTES);
-//    }
-
 	@Override
 	@Transactional
 	public AuthTokenResponse refreshToken(RefreshTokenRequest request) {
@@ -224,7 +209,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			throw new AppException(ErrorCode.ACCOUNT_DISABLED);
 		}
 
-		return issueTokenPair(user);
+		return issueTokenPair(new CustomUserDetails(user));
 	}
 
 	@Override
@@ -280,10 +265,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 //		}
 //	}
 
-	private AuthTokenResponse issueTokenPair(User user) {
-		String username = user.getCredentials().username();
-		String roles = user.getRoles().stream()
-				.map(this::extractRoleName)
+	private AuthTokenResponse issueTokenPair(CustomUserDetails userDetails) {
+		String username = userDetails.getUsername();
+		String roles = userDetails.getAuthorities().stream()
+				.map(org.springframework.security.core.GrantedAuthority::getAuthority)
 				.reduce((left, right) -> left + " " + right)
 				.orElse("");
 
@@ -292,7 +277,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		RefreshToken rt = RefreshToken.builder()
 				.token(refreshToken)
-				.user(user)
+				.user(userDetails.getUser())
 				.expiresAt(Instant.now().plusSeconds(refreshTokenExpirationSeconds))
 				.build();
 		springDataRefreshTokenRepository.save(rt);
@@ -435,16 +420,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 	}
 
-    private String extractRoleName(Role role) {
-		try {
-			Field field = role.getClass().getDeclaredField("name");
-			field.setAccessible(true);
-			Object value = field.get(role);
-			return value == null ? "" : value.toString();
-		} catch (ReflectiveOperationException ex) {
-			throw new AppException(ErrorCode.ROLE_READ_ERROR);
-		}
-	}
+//    private String extractRoleName(Role role) {
+//		try {
+//			Field field = role.getClass().getDeclaredField("name");
+//			field.setAccessible(true);
+//			Object value = field.get(role);
+//			return value == null ? "" : value.toString();
+//		} catch (ReflectiveOperationException ex) {
+//			throw new AppException(ErrorCode.ROLE_READ_ERROR);
+//		}
+//	}
 
 	private record TokenClaims(String username, String tokenType, long expiresAt) {
 	}

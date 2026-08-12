@@ -5,7 +5,7 @@ import com.phananh.e_commerce.usermanagement.domain.model.User;
 import com.phananh.e_commerce.usermanagement.domain.model.UserCredentials;
 import com.phananh.e_commerce.usermanagement.domain.model.UserInfo;
 import com.phananh.e_commerce.usermanagement.domain.model.enums.RoleName;
-import com.phananh.e_commerce.core.util.PasswordUtils;
+
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataRoleRepository;
 import com.phananh.e_commerce.usermanagement.infrastructure.persistence.repository.springdata.SpringDataUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class AdminAccountInitializer implements ApplicationRunner {
     private final SpringDataUserRepository springDataUserRepository;
     private final SpringDataRoleRepository springDataRoleRepository;
     private final AdminSeedProperties adminSeedProperties;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -45,7 +47,7 @@ public class AdminAccountInitializer implements ApplicationRunner {
         User adminUser = new User();
         setField(adminUser, "credentials", new UserCredentials(
                 adminSeedProperties.username(),
-                PasswordUtils.encode(adminSeedProperties.password()),
+                passwordEncoder.encode(adminSeedProperties.password()),
                 true));
         setField(adminUser, "info", new UserInfo(
                 adminSeedProperties.fullName(),

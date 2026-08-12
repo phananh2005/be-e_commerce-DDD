@@ -3,7 +3,7 @@ package com.phananh.e_commerce.usermanagement.application.service.impl;
 import com.phananh.e_commerce.core.exception.AppException;
 import com.phananh.e_commerce.core.exception.ErrorCode;
 import com.phananh.e_commerce.core.util.PageUtils;
-import com.phananh.e_commerce.core.util.PasswordUtils;
+
 import com.phananh.e_commerce.core.util.SecurityUtils;
 import com.phananh.e_commerce.core.util.StringUtils;
 import com.phananh.e_commerce.usermanagement.application.dto.query.UserSearchQuery;
@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -86,9 +88,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        user.changePassword(
-                userChangePasswordRequest.getOldPassword(),
-                userChangePasswordRequest.getNewPassword());
+        if (!passwordEncoder.matches(userChangePasswordRequest.getOldPassword(), user.getCredentials().password())) {
+            throw new AppException(ErrorCode.OLD_PASSWORD_INCORRECT);
+        }
+
+        user.changePassword(passwordEncoder.encode(userChangePasswordRequest.getNewPassword()));
 
         userRepository.save(user);
     }
@@ -244,7 +248,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .credentials(new UserCredentials(
                         request.getUsername(),
-                        PasswordUtils.encode(request.getPassword()),
+                        passwordEncoder.encode(request.getPassword()),
                         true))
                 .info(userInfo)
                 .roles(roles)

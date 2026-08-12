@@ -61,8 +61,8 @@ public class User extends BaseEntity{
         }
     }
 
-    public void changePassword (String oldPassword, String newPassword){
-        this.credentials = this.credentials.changePassword(oldPassword, newPassword);
+    public void changePassword (String newEncodedPassword){
+        this.credentials = this.credentials.changePassword(newEncodedPassword);
         this.refreshTokens.clear();
     }
 

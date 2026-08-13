@@ -79,3 +79,5 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V3.8.8 | 2026-08-06 | [Thêm kiểm tra trùng lặp vào API xác thực SMS OTP](V3_8_8__add_duplicate_checks_to_verify_sms.md) | Có |
 | V4.0.0 | 2026-08-11 | [Thay đổi cấu trúc JSON phân trang toàn cục (PageModel)](V4_0_0__global_pagination_json_format_change.md) | Có |
 | V4.0.1 | 2026-08-12 | [Refactor internal authentication sử dụng AuthenticationManager](V4_0_1__refactor_internal_authentication.md) | Không |
+| V4.1.0 | 2026-08-11 | [Thêm yêu cầu header Idempotency-Key cho API Thanh toán](V4_1_0__add_idempotency_key_header_for_checkout.md) | Có |
+| V4.1.1 | 2026-08-13 | [Bắt buộc truyền header Idempotency-Key](V4_1_1__require_idempotency_key_header.md) | Có |

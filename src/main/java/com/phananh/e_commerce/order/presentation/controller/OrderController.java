@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.order.presentation.controller;
 
+import com.phananh.e_commerce.core.infrastructure.annotation.Idempotent;
 import com.phananh.e_commerce.order.application.dto.response.order.*;
 import com.phananh.e_commerce.order.presentation.dto.request.order.CheckoutRequest;
 import com.phananh.e_commerce.order.presentation.dto.request.order.OrderPreviewRequest;
@@ -38,7 +39,7 @@ public class OrderController {
 
     @Operation(summary = "Thanh toán đơn hàng", description = "Xác nhận và đặt hàng các sản phẩm trong giỏ hàng")
     @PostMapping("/checkout")
-    @com.phananh.e_commerce.core.infrastructure.annotation.Idempotent
+    @Idempotent
     public ResponseEntity<?> checkout(@RequestBody @Valid CheckoutRequest checkoutRequest) {
         orderService.checkout(checkoutRequest);
         return ResponseEntity.noContent().build();

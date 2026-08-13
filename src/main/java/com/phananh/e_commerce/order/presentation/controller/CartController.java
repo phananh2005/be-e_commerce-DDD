@@ -42,6 +42,7 @@ public class CartController {
 
     @Operation(summary = "Thêm sản phẩm vào giỏ hàng", description = "Thêm một sản phẩm hoặc cập nhật số lượng nếu sản phẩm đã có trong giỏ")
     @PostMapping("/add")
+    @com.phananh.e_commerce.core.infrastructure.annotation.Idempotent
     public ResponseEntity<?> addProductToCart(@RequestBody @Valid CartAddItemRequest cartAddItemRequest) {
         cartItemService.addProductToCart(cartAddItemRequest);
         return ResponseEntity.noContent().build();

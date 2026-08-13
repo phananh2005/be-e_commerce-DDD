@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.productcatalog.presentation.controller;
 
+import com.phananh.e_commerce.core.infrastructure.annotation.Idempotent;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.brand.BrandSearchRequest;
@@ -38,6 +39,7 @@ public class ManagementBrandController {
 
     @Operation(summary = "Tạo thương hiệu mới", description = "Tạo thương hiệu sản phẩm mới trong hệ thống")
     @PostMapping
+    @Idempotent
     public ResponseEntity<?> createBrand(@Valid @RequestBody BrandCreateRequest request) {
         brandService.createBrand(request);
         return ResponseEntity.noContent().build();

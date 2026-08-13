@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.product.presentation.controller;
 
+import com.phananh.e_commerce.core.infrastructure.annotation.Idempotent;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductDetailResponseForManagement;
 import com.phananh.e_commerce.product.application.dto.response.management.ProductSummaryResponseForManagement;
@@ -77,6 +78,7 @@ public class ManagementProductController {
 
     @Operation(summary = "Tạo sản phẩm mới", description = "Tạo một sản phẩm mới trong hệ thống")
     @PostMapping("/create")
+    @Idempotent
     public ResponseEntity<?> createProduct(@RequestBody @Valid ProductCreateRequest productCreateRequest) {
         managementProductService.createProduct(productCreateRequest);
         return ResponseEntity.noContent().build();

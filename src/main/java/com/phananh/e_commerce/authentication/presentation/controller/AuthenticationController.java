@@ -12,6 +12,7 @@ import com.phananh.e_commerce.authentication.application.dto.response.AuthTokenR
 import com.phananh.e_commerce.authentication.application.dto.response.IntrospectResponse;
 import com.phananh.e_commerce.authentication.application.dto.response.LogoutResponse;
 import com.phananh.e_commerce.authentication.application.service.AuthenticationService;
+import com.phananh.e_commerce.core.infrastructure.annotation.Idempotent;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,6 +57,7 @@ public class AuthenticationController {
 
     @Operation(summary = "Xác thực SMS OTP")
     @PostMapping("/verify-sms")
+    @Idempotent
     public ResponseEntity<?> verifySms(@Valid @RequestBody VerifySmsRequest request) {
         authenticationService.verifySms(request);
         return ResponseEntity.noContent().build();

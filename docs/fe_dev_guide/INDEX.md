@@ -81,3 +81,6 @@ Lịch sử cập nhật API và hướng dẫn cho Frontend.
 | V4.0.1 | 2026-08-12 | [Refactor internal authentication sử dụng AuthenticationManager](V4_0_1__refactor_internal_authentication.md) | Không |
 | V4.1.0 | 2026-08-11 | [Thêm yêu cầu header Idempotency-Key cho API Thanh toán](V4_1_0__add_idempotency_key_header_for_checkout.md) | Có |
 | V4.1.1 | 2026-08-13 | [Bắt buộc truyền header Idempotency-Key](V4_1_1__require_idempotency_key_header.md) | Có |
+| V4.1.2 | 2026-08-13 | [Thêm Idempotency-Key cho API tạo sản phẩm, thương hiệu, danh mục](V4_1_2__add_idempotency_to_management_creation_apis.md) | Có |
+| V4.1.3 | 2026-08-13 | [Thêm Idempotency-Key cho API đăng ký và thêm vào giỏ hàng](V4_1_3__add_idempotency_to_register_and_cart_apis.md) | Có |
+| V4.1.4 | 2026-08-13 | [Chuyển Idempotency-Key từ Đăng ký sang Xác thực SMS](V4_1_4__move_idempotency_from_register_to_verifysms.md) | Có |

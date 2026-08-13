@@ -1,5 +1,6 @@
 package com.phananh.e_commerce.productcatalog.presentation.controller;
 
+import com.phananh.e_commerce.core.infrastructure.annotation.Idempotent;
 import com.phananh.e_commerce.core.presentation.dto.response.ApiResponse;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategoryCreateRequest;
 import com.phananh.e_commerce.productcatalog.presentation.dto.request.category.CategorySearchRequest;
@@ -38,6 +39,7 @@ public class ManagementCategoryController {
 
     @Operation(summary = "Tạo danh mục mới", description = "Tạo danh mục sản phẩm mới trong hệ thống")
     @PostMapping
+    @Idempotent
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryCreateRequest request) {
         categoryService.createCategory(request);
         return ResponseEntity.noContent().build();
